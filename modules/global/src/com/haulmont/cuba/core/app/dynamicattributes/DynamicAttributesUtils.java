@@ -11,11 +11,11 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.CategoryAttribute;
 import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.sys.SetValueEntity;
-import org.apache.commons.lang.BooleanUtils;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author degtyarjov
@@ -50,6 +50,28 @@ public final class DynamicAttributesUtils {
     }
 
     /**
+     * Get special meta property path object for dynamic attribute id
+     */
+    @Nullable
+    public static MetaPropertyPath getMetaPropertyPath(MetaClass metaClass, UUID attributeId) {
+        Collection<CategoryAttribute> attributes = AppBeans.get(DynamicAttributes.NAME, DynamicAttributes.class)
+                .getAttributesForMetaClass(metaClass);
+        CategoryAttribute attribute = null;
+        for (CategoryAttribute theAttribute : attributes) {
+            if (theAttribute.getId().equals(attributeId)) {
+                attribute = theAttribute;
+                break;
+            }
+        }
+
+        if (attribute != null) {
+            return getMetaPropertyPath(metaClass, attribute);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Remove dynamic attribute marker (+) from attribute code (if exists)
      */
     public static String decodeAttributeCode(String attributeCode) {
@@ -71,28 +93,36 @@ public final class DynamicAttributesUtils {
     }
 
     /**
+     * Check if the meta property is dynamic attribute property
+     */
+    public static boolean isDynamicAttribute(MetaProperty metaProperty) {
+        return metaProperty instanceof DynamicAttributesMetaProperty;
+    }
+
+    public static CategoryAttribute getCategoryAttribute(MetaProperty metaProperty) {
+        return ((DynamicAttributesMetaProperty) metaProperty).getAttribute();
+    }
+
+    /**
      * Resolve attribute value's Java class
      */
     public static Class getAttributeClass(CategoryAttribute attribute) {
-
-        if (BooleanUtils.isTrue(attribute.getIsEntity())) {
-            return ReflectionHelper.getClass(attribute.getDataType());
-        } else {
-            PropertyType propertyType = attribute.getDataTypeAsPropertyType();
-            switch (propertyType) {
-                case STRING:
-                    return String.class;
-                case INTEGER:
-                    return Integer.class;
-                case DOUBLE:
-                    return Double.class;
-                case BOOLEAN:
-                    return Boolean.class;
-                case DATE:
-                    return Date.class;
-                case ENUMERATION:
-                    return SetValueEntity.class;
-            }
+        PropertyType propertyType = attribute.getDataType();
+        switch (propertyType) {
+            case STRING:
+                return String.class;
+            case INTEGER:
+                return Integer.class;
+            case DOUBLE:
+                return Double.class;
+            case BOOLEAN:
+                return Boolean.class;
+            case DATE:
+                return Date.class;
+            case ENUMERATION:
+                return String.class;
+            case ENTITY:
+                return attribute.getJavaClassForEntity();
         }
         return String.class;
     }

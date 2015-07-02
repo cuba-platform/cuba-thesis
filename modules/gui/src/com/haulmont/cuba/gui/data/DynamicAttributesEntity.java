@@ -6,14 +6,13 @@ package com.haulmont.cuba.gui.data;
 
 import com.haulmont.chile.core.common.ValueListener;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.app.dynamicattributes.PropertyType;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
+import com.haulmont.cuba.core.app.dynamicattributes.PropertyType;
 import com.haulmont.cuba.core.entity.BaseEntity;
 import com.haulmont.cuba.core.entity.CategoryAttribute;
 import com.haulmont.cuba.core.entity.CategoryAttributeValue;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.UuidProvider;
-import com.haulmont.cuba.core.sys.SetValueEntity;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -174,7 +173,7 @@ public class DynamicAttributesEntity implements BaseEntity {
         if (attrValue.getCategoryAttribute().getIsEntity()) {
             attrValue.setEntityValue((UUID) value);
         } else {
-            PropertyType propertyType = attrValue.getCategoryAttribute().getDataTypeAsPropertyType();
+            PropertyType propertyType = attrValue.getCategoryAttribute().getDataType();
             switch (propertyType) {
                 case INTEGER:
                     attrValue.setIntValue((Integer) value);
@@ -189,12 +188,8 @@ public class DynamicAttributesEntity implements BaseEntity {
                     attrValue.setDateValue((Date) value);
                     break;
                 case STRING:
-                    attrValue.setStringValue(StringUtils.trimToNull((String) value));
-                    break;
                 case ENUMERATION:
-                    if (value != null)
-                        attrValue.setStringValue(StringUtils.trimToNull(((SetValueEntity) value).getValue()));
-                    else attrValue.setStringValue(null);
+                    attrValue.setStringValue(StringUtils.trimToNull((String) value));
                     break;
                 case ENTITY:
                     attrValue.setEntityValue((UUID) value);

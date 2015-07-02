@@ -6,14 +6,15 @@
 package com.haulmont.cuba.core.entity;
 
 import com.google.common.base.Preconditions;
+import com.haulmont.bali.util.ReflectionHelper;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.app.dynamicattributes.PropertyType;
 import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.cuba.core.sys.SetValueEntity;
 import org.apache.commons.lang.StringUtils;
 import org.apache.openjpa.persistence.Persistent;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import java.util.*;
@@ -49,8 +50,8 @@ public class CategoryAttribute extends StandardEntity {
     @Column(name = "DATA_TYPE")
     private String dataType;
 
-    @Column(name = "IS_ENTITY")
-    private Boolean isEntity;
+    @Column(name = "ENTITY_CLASS")
+    private String entityClass;
 
     @Column(name = "ORDER_NO")
     private Integer orderNo;
@@ -113,20 +114,18 @@ public class CategoryAttribute extends StandardEntity {
         this.enumeration = e;
     }
 
-    public String getDataType() {
-        return dataType;
+    public PropertyType getDataType() {
+        if (dataType == null) return null;
+
+        return PropertyType.valueOf(dataType);
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setDataType(PropertyType dataType) {
+        this.dataType = dataType != null ? dataType.name() : null;
     }
 
     public Boolean getIsEntity() {
-        return isEntity;
-    }
-
-    public void setIsEntity(Boolean isEntity) {
-        this.isEntity = isEntity;
+        return getDataType() == PropertyType.ENTITY;
     }
 
     public UUID getDefaultEntityId() {
@@ -262,23 +261,27 @@ public class CategoryAttribute extends StandardEntity {
         }
     }
 
-    public PropertyType getDataTypeAsPropertyType() {
-        if (Boolean.TRUE.equals(isEntity)) {
-            return PropertyType.ENTITY;
-        }
-
-        return PropertyType.valueOf(dataType);
-    }
-
-    public List<SetValueEntity> getEnumerationOptions() {
-        Preconditions.checkState(getDataTypeAsPropertyType() == PropertyType.ENUMERATION, "Only enumeration attributes have options");
+    public List<String> getEnumerationOptions() {
+        Preconditions.checkState(getDataType() == PropertyType.ENUMERATION, "Only enumeration attributes have options");
         String enumeration = getEnumeration();
         String[] values = StringUtils.split(enumeration, ',');
-        List<SetValueEntity> options = new LinkedList<>();
-        for (String value : values) {
-            String trimmedValue = StringUtils.trimToNull(value);
-            options.add(new SetValueEntity(trimmedValue));
+        return Arrays.asList(values);
+    }
+
+    public String getEntityClass() {
+        return entityClass;
+    }
+
+    public void setEntityClass(String entityClass) {
+        this.entityClass = entityClass;
+    }
+
+    @Nullable
+    public Class getJavaClassForEntity(){
+        if (StringUtils.isNotBlank(entityClass)) {
+            return ReflectionHelper.getClass(entityClass);
+        } else {
+            return null;
         }
-        return options;
     }
 }
