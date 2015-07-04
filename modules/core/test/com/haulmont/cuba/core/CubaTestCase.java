@@ -208,4 +208,8 @@ public abstract class CubaTestCase extends TestCase {
             }
         }
     }
+
+    protected EntityManager entityManager() {
+        return persistence.getEntityManager();
+    }
 }
