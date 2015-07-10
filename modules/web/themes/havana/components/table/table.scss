@@ -172,10 +172,17 @@
     .#{$primary-stylename}-row-odd.v-selected,
     .#{$primary-stylename}-caption-row.v-selected {
       background-color: $cuba-table-row-selection-background-color;
+      outline-color: transparent;
 
       .#{$primary-stylename}-cell-content {
         color: $cuba-table-text-color;
       }
+    }
+
+    .#{$primary-stylename}-focus {
+      $outline-width: 1px;
+      outline: $outline-width solid lighten($cuba-field-focused-border-color, 20%);
+      outline-offset: -$outline-width;
     }
 
     .#{$primary-stylename}-focus .#{$primary-stylename}-cell-content {

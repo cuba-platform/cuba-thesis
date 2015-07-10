@@ -83,7 +83,6 @@ public class CubaScrollTableWidget extends VScrollTable implements ShortcutActio
     @Override
     protected boolean needToSelectFocused(VScrollTableBody.VScrollTableRow currentRow) {
         // Support select first N rows by Shift+Click #PL-3267
-        // TODO: check isSelectable?
         return currentRow == focusedRow && (!focusedRow.isSelected());
     }
 
