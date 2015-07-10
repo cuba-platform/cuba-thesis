@@ -151,6 +151,7 @@
 
     .#{$primary-stylename}-row:hover,
     .#{$primary-stylename}-row-odd:hover {
+      // In IE, if We change background then outline disappear
       .v-sa & {
         background-color: $cuba-table-row-hover-background-color;
       }
