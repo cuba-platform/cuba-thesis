@@ -151,7 +151,12 @@
 
     .#{$primary-stylename}-row:hover,
     .#{$primary-stylename}-row-odd:hover {
-      background-color: $cuba-table-row-hover-background-color;
+      .v-sa & {
+        background-color: $cuba-table-row-hover-background-color;
+      }
+      .v-ff & {
+        background-color: $cuba-table-row-hover-background-color;
+      }
       .on-hover-visible-layout {
         visibility: visible;
       }
