@@ -333,4 +333,40 @@ public class QueryTransformerRegexTest extends TestCase
                         " and h.updatedBy = (select u.login from sec$User u where u.login = h.param) and c.createTs = :par3)",
                 res);
     }
+
+    public void testJoinAsIs() {
+        QueryTransformerRegex transformer = new QueryTransformerRegex(
+                "select h from sec$GroupHierarchy h, sec$Constraint u where h.userGroup = :par",
+                null);
+
+        transformer.addJoinAsIs("join h.parent.constraints c");
+        String res = transformer.getResult();
+        assertEquals(
+                "select h from sec$GroupHierarchy h join h.parent.constraints c, sec$Constraint u where h.userGroup = :par",
+                res);
+    }
+
+    public void testJoinAsIs2() {
+        QueryTransformerRegex transformer = new QueryTransformerRegex(
+                "select h from sec$Constraint u, sec$GroupHierarchy h where h.userGroup = :par",
+                null);
+
+        transformer.addJoinAsIs("join h.parent.constraints c");
+        String res = transformer.getResult();
+        assertEquals(
+                "select h from sec$Constraint u, sec$GroupHierarchy h join h.parent.constraints c where h.userGroup = :par",
+                res);
+    }
+
+    public void testJoinAsIs3() {
+        QueryTransformerRegex transformer = new QueryTransformerRegex(
+                "select h.level from sec$Constraint u, sec$GroupHierarchy h where h.userGroup = :par",
+                null);
+
+        transformer.addJoinAsIs("join h.parent.constraints c");
+        String res = transformer.getResult();
+        assertEquals(
+                "select h.level from sec$Constraint u, sec$GroupHierarchy h join h.parent.constraints c where h.userGroup = :par",
+                res);
+    }
 }
