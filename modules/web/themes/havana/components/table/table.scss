@@ -157,6 +157,7 @@
       }
     }
 
+    // In IE, if We change background then outline disappear, so disable hover color
     .#{$primary-stylename}-row:hover {
       .v-ie & {
         background-color: $cuba-table-row-background-color;
