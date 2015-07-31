@@ -14,7 +14,6 @@ import com.haulmont.cuba.web.toolkit.ui.CubaTreeTable;
 import com.haulmont.cuba.web.toolkit.ui.client.aggregation.TableAggregationRow;
 import com.haulmont.cuba.web.toolkit.ui.client.table.CubaTableClientRpc;
 import com.haulmont.cuba.web.toolkit.ui.client.table.CubaTableServerRpc;
-import com.haulmont.cuba.web.toolkit.ui.client.table.CubaTableShortcutActionHandler;
 import com.haulmont.cuba.web.toolkit.ui.client.table.TableCellClickListener;
 import com.vaadin.client.*;
 import com.vaadin.client.communication.StateChangeEvent;
@@ -183,7 +182,7 @@ public class CubaTreeTableConnector extends TreeTableConnector {
                 UIDL childUidl = uidl.getChildUIDL(i);
                 if (childUidl.getTag().equals("shortcuts")) {
                     if (getWidget().getShortcutActionHandler() == null) {
-                        getWidget().setShortcutActionHandler(new CubaTableShortcutActionHandler(uidl.getId(), client, this));
+                        getWidget().setShortcutActionHandler(new ShortcutActionHandler(uidl.getId(), client));
                     }
                     getWidget().getShortcutActionHandler().updateActionMap(childUidl);
                 }
