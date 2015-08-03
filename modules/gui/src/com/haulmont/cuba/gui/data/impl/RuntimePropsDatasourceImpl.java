@@ -58,9 +58,9 @@ public class RuntimePropsDatasourceImpl
         this.setMainDs(mainDsId);
         this.setCommitMode(CommitMode.DATASTORE);
 
-        attributes = AppBeans.get(DynamicAttributes.class).getAttributesForMetaClass(resolveMetaClass());
+        attributes = AppBeans.get(DynamicAttributes.class).getAttributesForMetaClass(resolveCategorizedEntityClass());
         for (CategoryAttribute attribute : attributes) {
-            MetaProperty metaProperty = DynamicAttributesUtils.getMetaPropertyPath(resolveMetaClass(), attribute).getMetaProperty();
+            MetaProperty metaProperty = DynamicAttributesUtils.getMetaPropertyPath(mainDs.getMetaClass(), attribute).getMetaProperty();
             this.metaClass.addProperty(metaProperty, attribute);
         }
 
@@ -108,7 +108,7 @@ public class RuntimePropsDatasourceImpl
         }
         if (!initializedBefore && category == null) {
             category = getDefaultCategory();
-            if (resolveMetaClass().getProperty("category") != null) {
+            if (entity.getMetaClass().getProperty("category") != null) {
                 entity.setValue("category", category);
             }
         }
@@ -169,7 +169,7 @@ public class RuntimePropsDatasourceImpl
         fireItemChanged(null);
     }
 
-    protected MetaClass resolveMetaClass() {
+    public MetaClass resolveCategorizedEntityClass() {
         if (categorizedEntityClass == null) {
             return mainDs.getMetaClass();
         } else {
@@ -383,7 +383,7 @@ public class RuntimePropsDatasourceImpl
 
     @Nullable
     public Category getDefaultCategory() {
-        MetaClass metaClass = resolveMetaClass();
+        MetaClass metaClass = resolveCategorizedEntityClass();
         Collection<Category> categoriesForMetaClass = AppBeans.get(DynamicAttributes.class).getCategoriesForMetaClass(metaClass);
         for (Category category : categoriesForMetaClass) {
             if (Boolean.TRUE.equals(category.getIsDefault())) {
