@@ -4,9 +4,11 @@
  */
 package com.haulmont.cuba.core.sys.persistence;
 
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.app.PersistenceManagerAPI;
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Metadata;
 import org.apache.openjpa.jdbc.identifier.DBIdentifier;
 import org.apache.openjpa.jdbc.schema.Column;
 import org.apache.openjpa.jdbc.schema.ForeignKey;
@@ -50,7 +52,9 @@ public final class DBDictionaryUtils {
             buf.append(join.getAlias2()).append(".").append(to[i]);
 
             // KK: support soft delete for collections
-            if ((inverse || persistenceManager.isSecondaryTable(from[i].getTable().getIdentifier().getName()))
+            if ((inverse
+                        || persistenceManager.isLinkTable(from[i].getTable().getIdentifier().getName())
+                        || joinTableInheritance(persistenceManager, from[i], to[i]))
                     && to[i].getTable().containsColumn(DBIdentifier.newColumn(deleteTsCol), null)
                     && persistence.getEntityManagerContext().isSoftDeletion()) {
                 buf.append(" AND ");
@@ -97,6 +101,22 @@ public final class DBDictionaryUtils {
                     append(constColsPK[i]);
         }
         return buf;
+    }
+
+    private static boolean joinTableInheritance(PersistenceManagerAPI pm, Column fromColumn, Column toColumn) {
+        if (pm.isSecondaryTable(fromColumn.getTable().getIdentifier().getName())) {
+            Metadata metadata = AppBeans.get(Metadata.NAME);
+            String fromEntityName = fromColumn.getTable().getComment();
+            String toEntityName = toColumn.getTable().getComment();
+            if (fromEntityName != null && toEntityName != null) {
+                MetaClass fromMetaClass = metadata.getClassNN(fromEntityName);
+                MetaClass toMetaClass = metadata.getClassNN(toEntityName);
+                if (toMetaClass.equals(fromMetaClass.getAncestor())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static SQLBuffer getWhere(DBDictionary dbDictionary, Select sel, boolean forUpdate, boolean useSchema) {

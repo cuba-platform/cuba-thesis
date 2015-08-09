@@ -40,6 +40,8 @@ public class PersistenceManager implements PersistenceManagerAPI {
 
     protected volatile Set<String> softDeleteTables;
 
+    protected volatile Set<String> linkTables;
+
     protected volatile Set<String> secondaryTables;
 
     protected Map<String, EntityStatistics> statisticsCache;
@@ -76,6 +78,14 @@ public class PersistenceManager implements PersistenceManagerAPI {
         ArrayList<String> list = new ArrayList<>(softDeleteTables);
         Collections.sort(list);
         return list;
+    }
+
+    @Override
+    public boolean isLinkTable(String table) {
+        if (linkTables == null) {
+            initLinkTables();
+        }
+        return linkTables.contains(table);
     }
 
     @Override
@@ -128,9 +138,9 @@ public class PersistenceManager implements PersistenceManagerAPI {
         }
     }
 
-    protected synchronized void initSecondaryTables() {
-        if (secondaryTables == null) { // double checked locking
-            log.debug("Searching for secondary tables");
+    protected synchronized void initLinkTables() {
+        if (linkTables == null) { // double checked locking
+            log.debug("Searching for link tables");
             HashSet<String> set = new HashSet<>();
 
             Collection<MetaClass> metaClasses = metadata.getTools().getAllPersistentMetaClasses();
@@ -141,7 +151,19 @@ public class PersistenceManager implements PersistenceManagerAPI {
                         set.add(joinTable.name());
                     }
                 }
+            }
 
+            linkTables = set;
+        }
+    }
+
+    protected synchronized void initSecondaryTables() {
+        if (secondaryTables == null) { // double checked locking
+            log.debug("Searching for secondary tables");
+            HashSet<String> set = new HashSet<>();
+
+            Collection<MetaClass> metaClasses = metadata.getTools().getAllPersistentMetaClasses();
+            for (MetaClass metaClass : metaClasses) {
                 if (isJoinTableInheritance(metaClass)) {
                     Table table = (Table) metaClass.getJavaClass().getAnnotation(Table.class);
                     if (table != null) {
