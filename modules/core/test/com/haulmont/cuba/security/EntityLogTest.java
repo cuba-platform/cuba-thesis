@@ -297,6 +297,64 @@ public class EntityLogTest extends CubaTestCase {
         assertEquals("changed-3@test.com", attr.getValue());
     }
 
+    public void testCommitRetaining() throws Exception {
+        Transaction tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+
+            Group group = em.find(Group.class, UUID.fromString("0fa2b1a5-1d68-4d69-9fbd-dff348347f93"));
+
+            User user = new User();
+            userId = user.getId();
+            user.setGroup(group);
+            user.setLogin("test");
+            user.setName("test-name");
+            user.setEmail("name@test.com");
+            em.persist(user);
+
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+
+        ////////
+
+        tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+
+            User user = em.find(User.class, userId);
+            assertNotNull(user);
+            user.setEmail("changed-2@test.com");
+
+            tx.commitRetaining();
+
+            em = persistence.getEntityManager();
+            user = em.find(User.class, userId);
+            assertNotNull(user);
+            user.setEmail("changed-3@test.com");
+
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+
+        List<EntityLogItem> items = getEntityLogItems();
+        assertNotNull(items);
+        assertEquals(3, items.size());
+
+        EntityLogItem item = items.get(0); // the last because of sorting in query
+        assertEquals(EntityLogItem.Type.MODIFY, item.getType());
+
+        EntityLogAttr attr = Iterables.find(item.getAttributes(), new Predicate<EntityLogAttr>() {
+            @Override
+            public boolean apply(EntityLogAttr attr) {
+                return "email".equals(attr.getName());
+            }
+        });
+        assertEquals("changed-3@test.com", attr.getValue());
+    }
+
     private List<EntityLogItem> getEntityLogItems() {
         Transaction tx;
         List<EntityLogItem> items;
