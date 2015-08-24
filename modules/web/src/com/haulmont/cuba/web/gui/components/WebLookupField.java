@@ -26,10 +26,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 import static com.vaadin.event.ShortcutAction.KeyCode;
 import static com.vaadin.event.ShortcutAction.ModifierKey;
@@ -114,7 +111,7 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
 
     @Override
     public void setMultiSelect(boolean multiselect) {
-        // Don't support multiselection for Lookup
+        // Don't support multiselect for LookupField
     }
 
     protected Object getValueFromOptions(Object value) {
@@ -134,6 +131,17 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
     @Override
     public void setValue(@Nullable Object value) {
         super.setValue(getValueFromOptions(value));
+
+        checkMissingValue();
+    }
+
+    protected void checkMissingValue() {
+        if (missingValue != null && component.getValue() != missingValue) {
+            missingValue = null;
+            if (component.getContainerDataSource() instanceof LookupFieldDsWrapper) {
+                ((LookupFieldDsWrapper) component.getContainerDataSource()).forceItemSetNotification();
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -186,6 +194,8 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
                     optionsDatasource.setItem((Entity) value);
                 }
                 fireValueChanged(oldValue, newValue);
+
+                checkMissingValue();
             }
         });
     }
@@ -246,7 +256,23 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
             initNullEntity();
         }
 
+        checkMissingValue();
+
         assignAutoDebugId();
+    }
+
+    @Override
+    public void setOptionsList(List optionsList) {
+        super.setOptionsList(optionsList);
+
+        checkMissingValue();
+    }
+
+    @Override
+    public void setOptionsMap(Map<String, Object> options) {
+        super.setOptionsMap(options);
+
+        checkMissingValue();
     }
 
     @Override
@@ -314,10 +340,19 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
 //        }
     }
 
-    protected class LookupOptionsDsWrapper extends OptionsDsWrapper {
+    protected interface LookupFieldDsWrapper {
+        void forceItemSetNotification();
+    }
+
+    protected class LookupOptionsDsWrapper extends OptionsDsWrapper implements LookupFieldDsWrapper {
 
         public LookupOptionsDsWrapper(CollectionDatasource datasource, boolean autoRefresh) {
             super(datasource, autoRefresh);
+        }
+
+        @Override
+        public void forceItemSetNotification() {
+            fireItemSetChanged();
         }
 
         @Override
@@ -434,10 +469,15 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
         }
     }
 
-    protected class NullNameAwareEnumContainer extends EnumerationContainer {
+    protected class NullNameAwareEnumContainer extends EnumerationContainer implements LookupFieldDsWrapper {
 
         public NullNameAwareEnumContainer(List<Enum> values) {
             super(values);
+        }
+
+        @Override
+        public void forceItemSetNotification() {
+            fireItemSetChanged();
         }
 
         @Override
@@ -498,9 +538,14 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
         }
     }
 
-    protected class NullNameAwareObjectContainer extends ObjectContainer {
+    protected class NullNameAwareObjectContainer extends ObjectContainer implements LookupFieldDsWrapper {
         public NullNameAwareObjectContainer(List values) {
             super(values);
+        }
+
+        @Override
+        public void forceItemSetNotification() {
+            fireItemSetChanged();
         }
 
         @Override
@@ -579,7 +624,7 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
             itemProperty.setValue(newValue);
         }
 
-        private void adoptMissingValue(Object value) {
+        protected void adoptMissingValue(Object value) {
             if (!ObjectUtils.equals(missingValue, value)) {
                 if (optionsDatasource != null && !optionsDatasource.containsItem(value)) {
                     missingValue = value;
