@@ -31,11 +31,8 @@ import java.util.*;
  * @author gorodnov
  * @version $Id$
  */
-public class WebFieldGroup
-        extends
-        WebAbstractComponent<CubaFieldGroup>
-        implements
-        com.haulmont.cuba.gui.components.FieldGroup {
+public class WebFieldGroup extends WebAbstractComponent<CubaFieldGroup>
+        implements com.haulmont.cuba.gui.components.FieldGroup {
 
     protected Map<String, FieldConfig> fields = new LinkedHashMap<>();
     protected Map<FieldConfig, Integer> fieldsColumn = new HashMap<>();
@@ -858,10 +855,13 @@ public class WebFieldGroup
     @Override
     public void requestFocus() {
         for (Component component : fieldComponents.values()) {
-            com.vaadin.ui.Component vComponent = WebComponentsHelper.unwrap(component);
-            if (vComponent instanceof com.vaadin.ui.Component.Focusable) {
-                ((com.vaadin.ui.Component.Focusable) vComponent).focus();
-                break;
+            if (component.isEnabled() && component.isVisible()) {
+                com.vaadin.ui.Component vComponent = WebComponentsHelper.unwrap(component);
+
+                if (vComponent instanceof com.vaadin.ui.Component.Focusable) {
+                    ((com.vaadin.ui.Component.Focusable) vComponent).focus();
+                    break;
+                }
             }
         }
     }

@@ -22,7 +22,6 @@ import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.DsContext;
-import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
@@ -163,10 +162,12 @@ public class DesktopFieldGroup extends DesktopAbstractComponent<JPanel> implemen
             @Override
             public void run() {
                 for (Component component : fieldComponents.values()) {
-                    JComponent jComponent = DesktopComponentsHelper.unwrap(component);
-                    if (jComponent.isFocusable()) {
-                        jComponent.requestFocus();
-                        break;
+                    if (component.isEnabled() && component.isVisible()) {
+                        JComponent jComponent = DesktopComponentsHelper.unwrap(component);
+                        if (jComponent.isFocusable()) {
+                            jComponent.requestFocus();
+                            break;
+                        }
                     }
                 }
             }
