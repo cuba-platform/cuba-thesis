@@ -132,8 +132,9 @@ public class LoadContext implements Serializable {
     /**
      * @param softDeletion whether to use soft deletion when loading entities
      */
-    public void setSoftDeletion(boolean softDeletion) {
+    public LoadContext setSoftDeletion(boolean softDeletion) {
         this.softDeletion = softDeletion;
+        return this;
     }
 
     /**
@@ -146,8 +147,9 @@ public class LoadContext implements Serializable {
     /**
      * @param useSecurityConstraints whether to use security constraints (row-level security) when loading entities
      */
-    public void setUseSecurityConstraints(boolean useSecurityConstraints) {
+    public LoadContext setUseSecurityConstraints(boolean useSecurityConstraints) {
         this.useSecurityConstraints = useSecurityConstraints;
+        return this;
     }
 
     /**
@@ -168,8 +170,9 @@ public class LoadContext implements Serializable {
     /**
      * @param queryKey key of the current stack of sequential queries, which is unique for the current user session
      */
-    public void setQueryKey(int queryKey) {
+    public LoadContext setQueryKey(int queryKey) {
         this.queryKey = queryKey;
+        return this;
     }
 
     /**
@@ -189,8 +192,9 @@ public class LoadContext implements Serializable {
     /**
      * @param loadDynamicAttributes whether to load dynamic attributes
      */
-    public void setLoadDynamicAttributes(boolean loadDynamicAttributes) {
+    public LoadContext setLoadDynamicAttributes(boolean loadDynamicAttributes) {
         this.loadDynamicAttributes = loadDynamicAttributes;
+        return this;
     }
 
     @Override
