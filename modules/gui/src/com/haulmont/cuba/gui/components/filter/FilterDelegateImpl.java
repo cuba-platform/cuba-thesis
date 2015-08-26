@@ -25,6 +25,8 @@ import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.WindowParams;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.Action.Status;
+import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.components.filter.condition.AbstractCondition;
@@ -1134,7 +1136,7 @@ public class FilterDelegateImpl implements FilterDelegate {
                 windowManager.showOptionDialog(messages.getMainMessage("removeApplied.title"),
                         messages.getMainMessage("removeApplied.message"), IFrame.MessageType.WARNING,
                         new Action[]{
-                                new DialogAction(DialogAction.Type.YES) {
+                                new DialogAction(Type.YES) {
                                     @Override
                                     public void actionPerform(Component component) {
                                         for (AppliedFilterHolder holder : appliedFilters) {
@@ -1145,7 +1147,7 @@ public class FilterDelegateImpl implements FilterDelegate {
                                         ((CollectionDatasource.SupportsApplyToSelected) datasource).unpinAllQuery();
                                     }
                                 },
-                                new DialogAction(DialogAction.Type.NO)
+                                new DialogAction(Type.NO, Status.PRIMARY)
                         });
             }
         }
@@ -2037,13 +2039,13 @@ public class FilterDelegateImpl implements FilterDelegate {
                     getMessage("Filter.removeDialogMessage"),
                     IFrame.MessageType.CONFIRMATION,
                     new Action[]{
-                            new DialogAction(DialogAction.Type.YES) {
+                            new DialogAction(Type.YES) {
                                 @Override
                                 public void actionPerform(Component component) {
                                     removeFilterEntity();
                                 }
                             },
-                            new DialogAction(DialogAction.Type.NO)
+                            new DialogAction(Type.NO, Status.PRIMARY)
                     });
         }
 
