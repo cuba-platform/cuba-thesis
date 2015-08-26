@@ -15,6 +15,7 @@ import com.haulmont.cuba.core.entity.BaseEntity;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.core.sys.AppContext;
+import com.haulmont.cuba.core.sys.EntityManagerContext;
 import com.haulmont.cuba.core.sys.persistence.DbTypeConverter;
 import com.haulmont.cuba.security.entity.*;
 import org.apache.commons.lang.BooleanUtils;
@@ -73,7 +74,8 @@ public class EntityLog implements EntityLogAPI {
 
     @Override
     public void flush() {
-        List<EntityLogItem> items = persistence.getEntityManagerContext().getAttribute(EntityLog.class.getName());
+        EntityManagerContext context = persistence.getEntityManagerContext();
+        List<EntityLogItem> items = context.getAttribute(EntityLog.class.getName());
         if (items == null || items.isEmpty())
             return;
 
@@ -253,10 +255,11 @@ public class EntityLog implements EntityLogAPI {
     }
 
     private void enqueueItem(EntityLogItem item) {
-        List<EntityLogItem> items = persistence.getEntityManagerContext().getAttribute(EntityLog.class.getName());
+        EntityManagerContext context = persistence.getEntityManagerContext();
+        List<EntityLogItem> items = context.getAttribute(EntityLog.class.getName());
         if (items == null) {
             items = new ArrayList<>();
-            persistence.getEntityManagerContext().setAttribute(EntityLog.class.getName(), items);
+            context.setAttribute(EntityLog.class.getName(), items);
         }
         items.add(item);
     }
