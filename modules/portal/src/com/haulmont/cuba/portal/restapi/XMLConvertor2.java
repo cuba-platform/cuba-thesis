@@ -460,7 +460,8 @@ public class XMLConvertor2 implements Convertor {
         MetaClass metaClass = loadInfo.getMetaClass();
         Entity instance = metaClass.createInstance();
         for (MetaProperty metaProperty : metaClass.getProperties()) {
-            instance.setValue(metaProperty.getName(), null);
+            if (!metaProperty.isReadOnly())
+                instance.setValue(metaProperty.getName(), null);
         }
         return instance;
     }
