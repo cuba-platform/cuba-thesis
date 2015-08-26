@@ -86,7 +86,7 @@ public class Param {
     protected ComponentsFactory componentsFactory = AppBeans.get(ComponentsFactory.NAME);
     protected ThemeConstants theme = AppBeans.get(ThemeConstantsManager.class).getConstants();
 
-    private List<ValueListener> listeners = new ArrayList<>();
+    protected List<ValueListener> listeners = new ArrayList<>();
 
     public Param(String name, Class javaClass, String entityWhere, String entityView,
                  Datasource datasource, boolean inExpr, boolean required) {
@@ -195,7 +195,7 @@ public class Param {
         }
     }
 
-    private Object parseSingleValue(String text) {
+    protected Object parseSingleValue(String text) {
         Object value;
         switch (type) {
             case ENTITY:
@@ -239,7 +239,7 @@ public class Param {
         return value;
     }
 
-    private Object loadEntity(String id) {
+    protected Object loadEntity(String id) {
         LoadContext ctx = new LoadContext(javaClass).setId(UUID.fromString(id));
         DataService dataService = AppBeans.get(DataService.NAME);
         Entity entity = dataService.load(ctx);
@@ -264,7 +264,7 @@ public class Param {
         }
     }
 
-    private String formatSingleValue(Object v) {
+    protected String formatSingleValue(Object v) {
         switch (type) {
             case ENTITY:
                 if (v instanceof UUID)
@@ -349,7 +349,7 @@ public class Param {
         return component;
     }
 
-    private CheckBox createUnaryField(final ValueProperty valueProperty) {
+    protected CheckBox createUnaryField(final ValueProperty valueProperty) {
         CheckBox field = componentsFactory.createComponent(CheckBox.NAME);
         field.addListener(new ValueListener() {
             @Override
@@ -363,7 +363,7 @@ public class Param {
         return field;
     }
 
-    private Component createDatatypeField(Datatype datatype, ValueProperty valueProperty) {
+    protected Component createDatatypeField(Datatype datatype, ValueProperty valueProperty) {
         Component component;
 
         if (String.class.equals(javaClass)) {
@@ -382,7 +382,7 @@ public class Param {
         return component;
     }
 
-    private void _setValue(Object value, ValueProperty valueProperty) {
+    protected void _setValue(Object value, ValueProperty valueProperty) {
         switch (valueProperty) {
             case VALUE:
                 setValue(value, false);
@@ -395,7 +395,7 @@ public class Param {
         }
     }
 
-    private Object _getValue(ValueProperty valueProperty) {
+    protected Object _getValue(ValueProperty valueProperty) {
         switch (valueProperty) {
             case VALUE:
                 return value;
@@ -407,7 +407,7 @@ public class Param {
     }
 
 
-    private Component createTextField(final ValueProperty valueProperty) {
+    protected Component createTextField(final ValueProperty valueProperty) {
         TextField field = componentsFactory.createComponent(TextField.NAME);
 
         field.setWidth(theme.get("cuba.gui.filter.Param.textComponent.width"));
@@ -456,7 +456,7 @@ public class Param {
         return field;
     }
 
-    private Component createDateField(Class javaClass, final ValueProperty valueProperty) {
+    protected Component createDateField(Class javaClass, final ValueProperty valueProperty) {
         if (inExpr) {
             if (property != null) {
                 TemporalType tt = (TemporalType) property.getAnnotations().get("temporal");
@@ -503,7 +503,7 @@ public class Param {
         return dateField;
     }
 
-    private Component createNumberField(final Datatype datatype, final ValueProperty valueProperty) {
+    protected Component createNumberField(final Datatype datatype, final ValueProperty valueProperty) {
         TextField field = componentsFactory.createComponent(TextField.NAME);
 
         field.addListener(new ValueListener() {
@@ -552,7 +552,7 @@ public class Param {
         return field;
     }
 
-    private Component createBooleanField(final ValueProperty valueProperty) {
+    protected Component createBooleanField(final ValueProperty valueProperty) {
         Messages messages = AppBeans.get(Messages.NAME);
         ThemeConstants theme = AppBeans.get(ThemeConstantsManager.class).getConstants();
 
@@ -576,7 +576,7 @@ public class Param {
         return field;
     }
 
-    private Component createUuidField(final ValueProperty valueProperty) {
+    protected Component createUuidField(final ValueProperty valueProperty) {
         TextField field = componentsFactory.createComponent(TextField.NAME);
 
         field.addListener(new ValueListener() {
@@ -630,7 +630,7 @@ public class Param {
     }
 
 
-    private Component createEntityLookup(final ValueProperty valueProperty) {
+    protected Component createEntityLookup(final ValueProperty valueProperty) {
         Metadata metadata = AppBeans.get(Metadata.NAME);
         MetaClass metaClass = metadata.getSession().getClass(javaClass);
 
@@ -723,7 +723,7 @@ public class Param {
         }
     }
 
-    private Component createEnumLookup(final ValueProperty valueProperty) {
+    protected Component createEnumLookup(final ValueProperty valueProperty) {
         if (inExpr) {
             final InListParamComponent inListParamComponent = new InListParamComponent(javaClass);
             initListEdit(inListParamComponent, valueProperty);
@@ -751,7 +751,7 @@ public class Param {
         }
     }
 
-    private Component createRuntimeEnumLookup(final ValueProperty valueProperty) {
+    protected Component createRuntimeEnumLookup(final ValueProperty valueProperty) {
         DataService dataService = AppBeans.get(DataService.NAME);
         LoadContext context = new LoadContext(CategoryAttribute.class);
         LoadContext.Query q = context.setQueryString("select a from sys$CategoryAttribute a where a.id = :id");
@@ -790,7 +790,7 @@ public class Param {
         }
     }
 
-    private void initListEdit(final InListParamComponent component, final ValueProperty valueProperty) {
+    protected void initListEdit(final InListParamComponent component, final ValueProperty valueProperty) {
         component.addValueListener(new ValueListener() {
             @Override
             public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
