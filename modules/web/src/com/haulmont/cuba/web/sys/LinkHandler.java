@@ -7,8 +7,7 @@ package com.haulmont.cuba.web.sys;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.entity.AbstractSearchFolder;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.entity.Folder;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.entity.Folder;import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.NoSuchScreenException;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.Action;
@@ -276,7 +275,7 @@ public class LinkHandler {
         }
 
         if (itemStr == null) {
-            app.getWindowManager().openWindow(windowInfo, openType, getParamsMap());
+            app.getWindowManager().openWindow(windowInfo, openType, getParamsMap(requestParams));
         } else {
             EntityLoadInfo info = EntityLoadInfo.parse(itemStr);
             if (info == null) {
@@ -284,14 +283,14 @@ public class LinkHandler {
             } else {
                 Entity entity = loadEntityInstance(info);
                 if (entity != null)
-                    app.getWindowManager().openEditor(windowInfo, entity, openType, getParamsMap());
+                    app.getWindowManager().openEditor(windowInfo, entity, openType, getParamsMap(requestParams));
                 else
                     throw new EntityAccessException();
             }
         }
     }
 
-    protected Map<String, Object> getParamsMap() {
+    protected Map<String, Object> getParamsMap(Map<String, String> requestParams) {
         Map<String, Object> params = new HashMap<>();
         String paramsStr = requestParams.get("params");
         if (paramsStr == null)
