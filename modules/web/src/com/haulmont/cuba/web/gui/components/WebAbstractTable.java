@@ -828,7 +828,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             datasource.addListener(createAggregationDatasourceListener());
         }
 
-        setVisibleColumns(getPropertyColumns());
+        createStubsForGeneratedColumns();
+
+        setVisibleColumns(getInitialVisibleColumns());
 
         if (security.isSpecificPermitted(ShowInfoAction.ACTION_PERMISSION)) {
             ShowInfoAction action = (ShowInfoAction) getAction(ShowInfoAction.ACTION_ID);
@@ -940,6 +942,39 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             return ((MetaPropertyPath) columnId).getMetaProperty().getName();
         else
             return columnId.toString();
+    }
+
+    protected void createStubsForGeneratedColumns() {
+        com.vaadin.ui.Table.ColumnGenerator columnGeneratorStub = new com.vaadin.ui.Table.ColumnGenerator() {
+            @Override
+            public Object generateCell(com.vaadin.ui.Table source, Object itemId, Object columnId) {
+                return null;
+            }
+        };
+
+        for (Column column : columnsOrder) {
+            if (!(column.getId() instanceof MetaPropertyPath)
+                    && component.getColumnGenerator(column.getId()) == null) {
+                component.addGeneratedColumn(column.getId(), columnGeneratorStub);
+            }
+        }
+    }
+
+    protected List<Object> getInitialVisibleColumns() {
+        List<Object> result = new ArrayList<>();
+
+        MetaClass metaClass = datasource.getMetaClass();
+        for (Column column : columnsOrder) {
+            if (column.getId() instanceof MetaPropertyPath) {
+                MetaPropertyPath propertyPath = (MetaPropertyPath) column.getId();
+                if (security.isEntityAttrReadPermitted(metaClass, propertyPath.toString())) {
+                    result.add(column.getId());
+                }
+            } else {
+                result.add(column.getId());
+            }
+        }
+        return result;
     }
 
     protected List<MetaPropertyPath> getPropertyColumns() {
@@ -1361,6 +1396,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             newColumn.setOwner(this);
         }
 
+        // save column order
+        Object[] visibleColumns = component.getVisibleColumns();
+
         // replace generator for column if exist
         if (component.getColumnGenerator(generatedColumnId) != null) {
             component.removeGeneratedColumn(generatedColumnId);
@@ -1410,6 +1448,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
                     }
                 }
         );
+
+        // restore column order
+        component.setVisibleColumns(visibleColumns);
     }
 
     @Override
