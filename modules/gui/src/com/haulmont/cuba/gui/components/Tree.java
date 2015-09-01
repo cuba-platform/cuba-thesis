@@ -19,6 +19,13 @@ public interface Tree extends ListComponent, Component.Editable {
     void collapseTree();
     void collapse(Object itemId);
 
+    /**
+     * Expand tree table including specified level
+     *
+     * @param expandLevelCount count of levels to expand
+     */
+    void expandLevels(int expandLevelCount);
+
     boolean isExpanded(Object itemId);
 
     CaptionMode getCaptionMode();

@@ -23,6 +23,13 @@ public interface TreeTable extends Table {
     void collapseAll();
     void collapse(Object itemId);
 
+    /**
+     * Expand tree table including specified level
+     *
+     * @param expandLevelCount count of levels to expand
+     */
+    void expandLevels(int expandLevelCount);
+
     int getLevel(Object itemId);
 
     boolean isExpanded(Object itemId);

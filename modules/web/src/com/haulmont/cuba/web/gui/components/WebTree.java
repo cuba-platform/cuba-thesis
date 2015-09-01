@@ -150,18 +150,17 @@ public class WebTree extends WebAbstractList<CubaTree> implements Tree {
 
     @Override
     public void expandTree() {
-        com.vaadin.data.Container.Hierarchical container =
-                (com.vaadin.data.Container.Hierarchical) component.getContainerDataSource();
-        if (container != null) {
-            for (Object id : container.rootItemIds()) {
-                component.expandItemsRecursively(id);
-            }
-        }
+        component.expandAll();
     }
 
     @Override
     public void collapse(Object itemId) {
         component.collapseItem(itemId);
+    }
+
+    @Override
+    public void expandLevels(int expandLevelCount) {
+        component.expandLevels(expandLevelCount);
     }
 
     @Override
@@ -171,13 +170,7 @@ public class WebTree extends WebAbstractList<CubaTree> implements Tree {
 
     @Override
     public void collapseTree() {
-        com.vaadin.data.Container.Hierarchical container =
-                (com.vaadin.data.Container.Hierarchical) component.getContainerDataSource();
-        if (container != null) {
-            for (Object id : container.rootItemIds()) {
-                component.collapseItemsRecursively(id);
-            }
-        }
+        component.collapseAll();
     }
 
     @Override
