@@ -71,33 +71,33 @@ public class WebWidgetsTree extends WebAbstractList<CubaWidgetsTree> implements 
     }
 
     @Override
-    public void expandTree() {
-        component.expandAll();
-    }
-
-    @Override
     public void collapseTree() {
         component.collapseAll();
     }
 
     @Override
-    public boolean isExpanded(Object itemId) {
-        return component.isExpanded(itemId);
-    }
-
-    @Override
-    public void expand(Object itemId) {
-        component.expandItem(itemId);
+    public void expandTree() {
+        component.expandAll();
     }
 
     @Override
     public void collapse(Object itemId) {
-        component.collapseItem(itemId);
+        component.collapseItemRecursively(itemId);
+    }
+
+    @Override
+    public void expand(Object itemId) {
+        component.expandItemWithParents(itemId);
     }
 
     @Override
     public void expandUpTo(int level) {
         component.expandUpTo(level);
+    }
+
+    @Override
+    public boolean isExpanded(Object itemId) {
+        return component.isExpanded(itemId);
     }
 
     @Override

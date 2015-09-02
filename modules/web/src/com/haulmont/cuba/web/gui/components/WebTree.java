@@ -149,28 +149,28 @@ public class WebTree extends WebAbstractList<CubaTree> implements Tree {
     }
 
     @Override
+    public void collapseTree() {
+        component.collapseAll();
+    }
+
+    @Override
     public void expandTree() {
         component.expandAll();
     }
 
     @Override
     public void collapse(Object itemId) {
-        component.collapseItem(itemId);
+        component.collapseItemRecursively(itemId);
+    }
+
+    @Override
+    public void expand(Object itemId) {
+        component.expandItemWithParents(itemId);
     }
 
     @Override
     public void expandUpTo(int level) {
         component.expandUpTo(level);
-    }
-
-    @Override
-    public void expand(Object itemId) {
-        component.expandItem(itemId);
-    }
-
-    @Override
-    public void collapseTree() {
-        component.collapseAll();
     }
 
     @Override
