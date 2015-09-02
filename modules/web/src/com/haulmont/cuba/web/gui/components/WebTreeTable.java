@@ -104,8 +104,8 @@ public class WebTreeTable extends WebAbstractTable<CubaTreeTable> implements Tre
     }
 
     @Override
-    public void expandLevels(int level) {
-        component.expandLevels(level);
+    public void expandUpTo(int level) {
+        component.expandUpTo(level);
     }
 
     @Override

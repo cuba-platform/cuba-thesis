@@ -26,9 +26,9 @@ public interface TreeTable extends Table {
     /**
      * Expand tree table including specified level
      *
-     * @param expandLevelCount count of levels to expand
+     * @param level level of TreeTable nodes to expand
      */
-    void expandLevels(int expandLevelCount);
+    void expandUpTo(int level);
 
     int getLevel(Object itemId);
 

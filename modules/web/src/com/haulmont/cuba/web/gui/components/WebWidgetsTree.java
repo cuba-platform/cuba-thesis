@@ -96,8 +96,8 @@ public class WebWidgetsTree extends WebAbstractList<CubaWidgetsTree> implements 
     }
 
     @Override
-    public void expandLevels(int expandLevelCount) {
-        component.expandLevels(expandLevelCount);
+    public void expandUpTo(int level) {
+        component.expandUpTo(level);
     }
 
     @Override

@@ -159,8 +159,8 @@ public class WebTree extends WebAbstractList<CubaTree> implements Tree {
     }
 
     @Override
-    public void expandLevels(int expandLevelCount) {
-        component.expandLevels(expandLevelCount);
+    public void expandUpTo(int level) {
+        component.expandUpTo(level);
     }
 
     @Override
