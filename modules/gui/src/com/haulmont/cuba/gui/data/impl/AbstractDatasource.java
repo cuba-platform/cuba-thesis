@@ -244,8 +244,10 @@ public abstract class AbstractDatasource<T extends Entity> implements Datasource
             if (!listenersEnabled)
                 return;
 
-            log.trace("propertyChanged: item=" + item + ", property=" + property +
-                    ", value=" + value + ", prevValue=" + prevValue);
+            if (log.isTraceEnabled()) {
+                log.trace("propertyChanged: item=" + item + ", property=" + property +
+                        ", value=" + value + ", prevValue=" + prevValue);
+            }
 
             if (!metadata.getTools().isTransient(item, property)) {
                 modified((T) item);

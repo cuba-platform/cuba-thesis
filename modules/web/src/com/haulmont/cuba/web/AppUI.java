@@ -51,7 +51,9 @@ public class AppUI extends UI implements ErrorHandler {
     protected boolean testMode = false;
 
     public AppUI() {
-        log.trace("Creating UI " + this);
+        if (log.isTraceEnabled()) {
+            log.trace("Creating UI " + this);
+        }
         if (!App.isBound()) {
             app = createApplication();
 
@@ -278,7 +280,9 @@ public class AppUI extends UI implements ErrorHandler {
 
     @Override
     public void detach() {
-        log.trace("Detaching UI " + this);
+        if (log.isTraceEnabled()) {
+            log.trace("Detaching UI " + this);
+        }
         super.detach();
     }
 

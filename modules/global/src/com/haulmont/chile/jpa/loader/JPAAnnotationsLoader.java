@@ -182,7 +182,9 @@ public class JPAAnnotationsLoader extends ChileAnnotationsLoader {
 
         if ((entityAnnotation == null && mappedSuperclassAnnotation == null) &&
                 (embeddableAnnotation == null) && (metaClassAnntotation == null)) {
-            log.trace(String.format("Class '%s' isn't annotated as metadata entity, ignore it", clazz.getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Class '%s' isn't annotated as metadata entity, ignore it", clazz.getName()));
+            }
             return null;
         }
 

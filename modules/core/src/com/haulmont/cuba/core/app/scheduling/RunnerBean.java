@@ -133,7 +133,9 @@ public class RunnerBean implements Runner {
         if (!BooleanUtils.isTrue(task.getLogStart()) && !BooleanUtils.isTrue(task.getSingleton()))
             return null;
 
-        log.trace(task + ": registering execution start");
+        if (log.isTraceEnabled()) {
+            log.trace(task + ": registering execution start");
+        }
 
         Transaction tx = persistence.createTransaction();
         try {
@@ -157,7 +159,9 @@ public class RunnerBean implements Runner {
         if ((!BooleanUtils.isTrue(task.getLogFinish()) && !BooleanUtils.isTrue(task.getSingleton())) || execution == null)
             return;
 
-        log.trace(task + ": registering execution finish");
+        if (log.isTraceEnabled()) {
+            log.trace(task + ": registering execution finish");
+        }
         Transaction tx = persistence.createTransaction();
         try {
             EntityManager em = persistence.getEntityManager();
@@ -175,7 +179,9 @@ public class RunnerBean implements Runner {
     protected Object executeTask(ScheduledTask task) {
         switch (task.getDefinedBy()) {
             case BEAN: {
-                log.trace(task + ": invoking bean");
+                if (log.isTraceEnabled()) {
+                    log.trace(task + ": invoking bean");
+                }
                 Object bean = AppBeans.get(task.getBeanName());
                 try {
                     List<MethodParameterInfo> methodParams = task.getMethodParameters();

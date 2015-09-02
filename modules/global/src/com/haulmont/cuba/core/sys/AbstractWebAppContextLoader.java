@@ -91,7 +91,9 @@ public abstract class AbstractWebAppContextLoader extends AbstractAppContextLoad
         StrTokenizer tokenizer = new StrTokenizer(propsConfigName);
         tokenizer.setQuoteChar('"');
         for (String str : tokenizer.getTokenArray()) {
-            log.trace("Processing properties location: " + str);
+            if (log.isTraceEnabled()) {
+                log.trace("Processing properties location: " + str);
+            }
             InputStream stream = null;
             try {
                 if (ResourceUtils.isUrl(str) || str.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
@@ -103,13 +105,15 @@ public abstract class AbstractWebAppContextLoader extends AbstractAppContextLoad
                 }
 
                 if (stream != null) {
-                    log.trace("Loading app properties from " + str);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Loading app properties from " + str);
+                    }
                     try (Reader reader = new InputStreamReader(stream, "UTF-8")) {
                         properties.load(reader);
                     }
-                } else
+                } else if (log.isTraceEnabled()) {
                     log.trace("Resource " + str + " not found, ignore it");
-
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {

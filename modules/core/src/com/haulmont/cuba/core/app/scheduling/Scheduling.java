@@ -110,7 +110,9 @@ public class Scheduling implements SchedulingAPI {
 
     @Override
     public void setRunning(ScheduledTask task, boolean running) {
-        log.trace(task + ": mark running=" + running);
+        if (log.isTraceEnabled()) {
+            log.trace(task + ": mark running=" + running);
+        }
         if (running)
             runningTasks.put(task, timeSource.currentTimeMillis());
         else
@@ -149,7 +151,9 @@ public class Scheduling implements SchedulingAPI {
 
     protected void processTask(ScheduledTask task) {
         if (isRunning(task)) {
-            log.trace(task + " is running");
+            if (log.isTraceEnabled()) {
+                log.trace(task + " is running");
+            }
             return;
         }
 
@@ -175,7 +179,9 @@ public class Scheduling implements SchedulingAPI {
                     if (needToStartNow(now, frame, task.getLastStart(), currentStart)) {
                         runSingletonTask(task, now, me);
                     } else {
-                        log.trace(task + "\n not in time frame to start");
+                        if (log.isTraceEnabled()) {
+                            log.trace(task + "\n not in time frame to start");
+                        }
                     }
                 } else {
                     Integer lastServerPriority = task.getLastStartServer() == null ?
@@ -199,7 +205,9 @@ public class Scheduling implements SchedulingAPI {
                             || (task.getLastStart() + (giveChanceToPreviousHost ? period + period / 2 : period) <= now)) {
                         runSingletonTask(task, now, me);
                     } else {
-                        log.trace(task + "\n time has not come and we shouldn't switch");
+                        if (log.isTraceEnabled()) {
+                            log.trace(task + "\n time has not come and we shouldn't switch");
+                        }
                     }
                 }
             } else {
@@ -213,7 +221,9 @@ public class Scheduling implements SchedulingAPI {
                     if (needToStartNow(now, frame, lastStart, currentStart)) {
                         runTask(task, now);
                     } else {
-                        log.trace(task + "\n not in time frame to start");
+                        if (log.isTraceEnabled()) {
+                            log.trace(task + "\n not in time frame to start");
+                        }
                     }
                 } else {
                     if (log.isTraceEnabled())
@@ -221,7 +231,7 @@ public class Scheduling implements SchedulingAPI {
 
                     if (now >= lastStart + period) {
                         runTask(task, now);
-                    } else {
+                    } else if (log.isTraceEnabled()) {
                         log.trace(task + "\n time has not come");
                     }
                 }
@@ -255,16 +265,20 @@ public class Scheduling implements SchedulingAPI {
                 currentStart = nextDate;
             }
 
-            log.trace(task + "\n now=" + now + " frame=" + frame
-                    + " currentStart=" + currentStart + " lastStart=" + lastStart + " cron=" + cron);
+            if (log.isTraceEnabled()) {
+                log.trace(task + "\n now=" + now + " frame=" + frame
+                        + " currentStart=" + currentStart + " lastStart=" + lastStart + " cron=" + cron);
+            }
             sw.stop();
             return currentStart.getTime();
         } else {
             long repetitions = (now - task.getStartDate().getTime()) / period;
             long currentStart = task.getStartDate().getTime() + repetitions * period;
 
-            log.trace(task + "\n now=" + now + " frame=" + frame + " repetitions=" + repetitions +
-                    " currentStart=" + currentStart + " lastStart=" + lastStart);
+            if (log.isTraceEnabled()) {
+                log.trace(task + "\n now=" + now + " frame=" + frame + " repetitions=" + repetitions +
+                        " currentStart=" + currentStart + " lastStart=" + lastStart);
+            }
             return currentStart;
         }
     }
@@ -287,8 +301,9 @@ public class Scheduling implements SchedulingAPI {
             task.setLastStartTime(new Date(now));
             task.setLastStartServer(server);
             runner.runTask(task, now, getUserSession(task));
-        } else
+        } else if (log.isTraceEnabled()) {
             log.trace(task + "\n not finished");
+        }
     }
 
     protected void runTask(ScheduledTask task, long time) throws LoginException {
@@ -298,17 +313,23 @@ public class Scheduling implements SchedulingAPI {
 
     protected boolean checkFirst(ScheduledTask task, Integer serverPriority, long now) {
         if (serverPriority == null) {
-            log.trace(task + ": not in permitted hosts or not a master");
+            if (log.isTraceEnabled()) {
+                log.trace(task + ": not in permitted hosts or not a master");
+            }
             return false;
         }
         if (task.getStartDelay() != null) {
             if ((schedulingStartTime + task.getStartDelay() * 1000) < now) {
-                log.trace(task + ": delayed");
+                if (log.isTraceEnabled()) {
+                    log.trace(task + ": delayed");
+                }
                 return false;
             }
         }
         if (task.getStartDate() != null && task.getStartDate().getTime() > now) {
-            log.trace(task + ": startDate is in the future");
+            if (log.isTraceEnabled()) {
+                log.trace(task + ": startDate is in the future");
+            }
             return false;
         }
         return true;

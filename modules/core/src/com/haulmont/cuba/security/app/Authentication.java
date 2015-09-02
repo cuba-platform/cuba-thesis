@@ -87,7 +87,10 @@ public class Authentication {
             login = getSystemLogin();
 
         UserSession session = null;
-        log.trace("Authenticating as " + login);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Authenticating as " + login);
+        }
         UUID sessionId = sessions.get(login);
         if (sessionId != null) {
             session = userSessionManager.findSession(sessionId);

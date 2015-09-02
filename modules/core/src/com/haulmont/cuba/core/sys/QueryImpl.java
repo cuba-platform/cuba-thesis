@@ -58,7 +58,9 @@ public class QueryImpl<T> implements TypedQuery<T> {
     private OpenJPAQuery<T> getQuery() {
         if (query == null) {
             if (isNative) {
-                log.trace("Creating SQL query: " + queryString);
+                if (log.isTraceEnabled()) {
+                    log.trace("Creating SQL query: " + queryString);
+                }
                 if (resultClass == null)
                     query = emDelegate.createNativeQuery(queryString);
                 else {
@@ -67,9 +69,13 @@ public class QueryImpl<T> implements TypedQuery<T> {
                 }
                 query.setFlushMode(FlushModeType.COMMIT);
             } else {
-                log.trace("Creating JPQL query: " + queryString);
+                if (log.isTraceEnabled()) {
+                    log.trace("Creating JPQL query: " + queryString);
+                }
                 String s = transformQueryString();
-                log.trace("Transformed JPQL query: " + s);
+                if (log.isTraceEnabled()) {
+                    log.trace("Transformed JPQL query: " + s);
+                }
                 if (resultClass != null) {
                     query = (OpenJPAQuery) emDelegate.createQuery(s, resultClass);
                 } else {

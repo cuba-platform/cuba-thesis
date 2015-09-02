@@ -108,18 +108,26 @@ public class PersistenceManager implements PersistenceManagerAPI {
                 DatabaseMetaData metaData = conn.getMetaData();
 
                 String schema = "oracle".equals(DbmsType.getType()) ? metaData.getUserName() : null;
-                log.trace("[initSoftDeleteTables] schema=" + schema);
+
+                if (log.isTraceEnabled()) {
+                    log.trace("[initSoftDeleteTables] schema=" + schema);
+                }
 
                 ResultSet tables = metaData.getTables(null, schema, null, new String[]{"TABLE"});
                 while (tables.next()) {
                     String table = tables.getString("TABLE_NAME");
-                    log.trace("[initSoftDeleteTables] found table " + table);
+
+                    if (log.isTraceEnabled()) {
+                        log.trace("[initSoftDeleteTables] found table " + table);
+                    }
 
                     if (table != null) {
                         String deleteTsColumn = DbmsSpecificFactory.getDbmsFeatures().getDeleteTsColumn();
                         ResultSet columns = metaData.getColumns(null, schema, table, deleteTsColumn);
                         if (columns.next()) {
-                            log.trace("[initSoftDeleteTables] table " + table + " has column " + deleteTsColumn);
+                            if (log.isTraceEnabled()) {
+                                log.trace("[initSoftDeleteTables] table " + table + " has column " + deleteTsColumn);
+                            }
                             set.add(table.toLowerCase());
                         }
                         columns.close();

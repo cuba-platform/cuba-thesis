@@ -71,7 +71,9 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
     protected Messages messages = AppBeans.get(Messages.NAME);
 
     public AppWindow(AppUI ui) {
-        log.trace("Creating " + this);
+        if (log.isTraceEnabled()) {
+            log.trace("Creating " + this);
+        }
 
         this.ui = ui;
         this.app = ui.getApp();

@@ -382,7 +382,9 @@ public abstract class AbstractMessages implements Messages {
             if (msg != null)
                 return msg;
 
-            log.trace("searchFiles: " + cacheKey);
+            if (log.isTraceEnabled()) {
+                log.trace("searchFiles: " + cacheKey);
+            }
 
             String packPath = confDir + "/" + pack.replaceAll("\\.", "/");
             while (packPath != null && !packPath.equals(confDir)) {
@@ -414,7 +416,9 @@ public abstract class AbstractMessages implements Messages {
             if (msg != null)
                 return msg;
 
-            log.trace("searchClasspath: " + cacheKey);
+            if (log.isTraceEnabled()) {
+                log.trace("searchClasspath: " + cacheKey);
+            }
 
             String packPath = "/" + pack.replaceAll("\\.", "/");
             while (packPath != null) {

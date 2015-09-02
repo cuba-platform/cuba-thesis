@@ -108,7 +108,9 @@ public class WindowDelegate {
                         @Override
                         public void visit(Component component, String name) {
                             if (component instanceof Component.HasSettings) {
-                                log.trace("Saving settings for : " + name + " : " + component);
+                                if (log.isTraceEnabled()) {
+                                    log.trace("Saving settings for : " + name + " : " + component);
+                                }
 
                                 if (visitedIds.contains(name)) {
                                     log.warn("Names of some HasSettings components clashed, set Id for component explicitly, name=" + name);
@@ -149,7 +151,9 @@ public class WindowDelegate {
                     @Override
                     public void visit(Component component, String name) {
                         if (component instanceof Component.HasSettings) {
-                            log.trace("Applying settings for : " + name + " : " + component);
+                            if (log.isTraceEnabled()) {
+                                log.trace("Applying settings for : " + name + " : " + component);
+                            }
                             Element e = WindowDelegate.this.settings.get(name);
                             ((Component.HasSettings) component).applySettings(e);
                             if (component instanceof Component.HasPresentations && e.attributeValue("presentation") != null) {

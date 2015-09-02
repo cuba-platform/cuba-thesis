@@ -52,7 +52,10 @@ public class CubaOpenJpaDialect extends OpenJpaDialect {
             timeoutMs = defaultTimeout * 1000;
 
         if (timeoutMs != 0) {
-            log.trace("Applying query timeout " + timeoutMs + "ms");
+            if (log.isTraceEnabled()) {
+                log.trace("Applying query timeout " + timeoutMs + "ms");
+            }
+
             entityManager.setProperty("javax.persistence.query.timeout", timeoutMs);
 
             String s = DbmsSpecificFactory.getDbmsFeatures().getTransactionTimeoutStatement();

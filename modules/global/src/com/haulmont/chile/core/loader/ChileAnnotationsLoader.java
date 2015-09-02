@@ -151,7 +151,9 @@ public class ChileAnnotationsLoader implements MetaClassLoader {
                 clazz.getAnnotation(com.haulmont.chile.core.annotations.MetaClass.class);
 
         if (metaClassAnnotaion == null) {
-            log.trace(String.format("Class %s isn't annotated as metadata entity, ignore it", clazz.getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Class %s isn't annotated as metadata entity, ignore it", clazz.getName()));
+            }
             return null;
         }
 

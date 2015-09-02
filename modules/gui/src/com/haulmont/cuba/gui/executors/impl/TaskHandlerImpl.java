@@ -77,7 +77,10 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
             UUID userId = getUserSession().getId();
             IFrame ownerFrame = getTask().getOwnerFrame();
             String windowClass = ownerFrame.getClass().getCanonicalName();
-            log.trace("Window closed. User: " + userId + " Window: " + windowClass);
+
+            if (log.isTraceEnabled()) {
+                log.trace("Window closed. User: " + userId + " Window: " + windowClass);
+            }
 
             taskExecutor.cancelExecution();
         }
@@ -95,7 +98,9 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
         this.watchDog.manageTask(this);
 
         UUID userId = getUserSession().getId();
-        log.trace("Run task. User: " + userId);
+        if (log.isTraceEnabled()) {
+            log.trace("Run task. User: " + userId);
+        }
 
         taskExecutor.startExecution();
     }
@@ -157,11 +162,13 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
 
             disposeResources();
 
-            if (ownerFrame != null) {
-                String windowClass = ownerFrame.getClass().getCanonicalName();
-                log.trace("Task killed. User: " + userId + " Frame: " + windowClass);
-            } else {
-                log.trace("Task killed. User: " + userId);
+            if (log.isTraceEnabled()) {
+                if (ownerFrame != null) {
+                    String windowClass = ownerFrame.getClass().getCanonicalName();
+                    log.trace("Task killed. User: " + userId + " Frame: " + windowClass);
+                } else {
+                    log.trace("Task killed. User: " + userId);
+                }
             }
         }
 

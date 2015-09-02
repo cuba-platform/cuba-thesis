@@ -80,7 +80,9 @@ public class LoginWindow extends UIView {
     protected Messages messages = AppBeans.get(Messages.NAME);
 
     public LoginWindow(AppUI ui) {
-        log.trace("Creating " + this);
+        if (log.isTraceEnabled()) {
+            log.trace("Creating " + this);
+        }
         this.ui = ui;
 
         Configuration configuration = AppBeans.get(Configuration.NAME);

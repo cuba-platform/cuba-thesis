@@ -209,7 +209,10 @@ public class EntityListenerManager {
     }
 
     protected List<?> findListener(Class<? extends BaseEntity> entityClass, EntityListenerType type) {
-        log.trace("get listener " + type + " for class " + entityClass.getName());
+        if (log.isTraceEnabled()) {
+            log.trace("get listener " + type + " for class " + entityClass.getName());
+        }
+
         List<String> names = getDeclaredListeners(entityClass);
         if (names.isEmpty()) {
             log.trace("no annotations, exiting");
@@ -220,22 +223,34 @@ public class EntityListenerManager {
         for (String name : names) {
             if (AppBeans.containsBean(name)) {
                 Object bean = AppBeans.get(name);
-                log.trace("listener bean found: " + bean);
+
+                if (log.isTraceEnabled()) {
+                    log.trace("listener bean found: " + bean);
+                }
+
                 List<Class> interfaces = ClassUtils.getAllInterfaces(bean.getClass());
                 for (Class intf : interfaces) {
                     if (intf.equals(type.getListenerInterface())) {
-                        log.trace("listener implements " + type.getListenerInterface());
+                        if (log.isTraceEnabled()) {
+                            log.trace("listener implements " + type.getListenerInterface());
+                        }
+
                         result.add(bean);
                     }
                 }
             } else {
                 try {
                     Class aClass = Thread.currentThread().getContextClassLoader().loadClass(name);
-                    log.trace("listener class found: " + aClass);
+                    if (log.isTraceEnabled()) {
+                        log.trace("listener class found: " + aClass);
+                    }
+
                     List<Class> interfaces = ClassUtils.getAllInterfaces(aClass);
                     for (Class intf : interfaces) {
                         if (intf.equals(type.getListenerInterface())) {
-                            log.trace("listener implements " + type.getListenerInterface());
+                            if (log.isTraceEnabled()) {
+                                log.trace("listener implements " + type.getListenerInterface());
+                            }
                             result.add(aClass.newInstance());
                         }
                     }

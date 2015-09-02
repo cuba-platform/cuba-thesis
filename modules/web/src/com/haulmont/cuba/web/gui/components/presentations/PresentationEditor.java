@@ -148,7 +148,9 @@ public class PresentationEditor extends CubaWindow {
                 boolean userOnly = !allowGlobalPresentations || !BooleanUtils.isTrue(globalField.getValue());
                 presentation.setUser(userOnly ? user : null);
 
-                log.trace(String.format("XML: %s", Dom4j.writeDocument(doc, true)));
+                if (log.isTraceEnabled()) {
+                    log.trace(String.format("XML: %s", Dom4j.writeDocument(doc, true)));
+                }
 
                 if (isNew) {
                     presentations.add(presentation);

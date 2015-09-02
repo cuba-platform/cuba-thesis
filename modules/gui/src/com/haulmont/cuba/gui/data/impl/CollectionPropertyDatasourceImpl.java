@@ -73,7 +73,9 @@ public class CollectionPropertyDatasourceImpl<T extends Entity<K>, K>
 
             @Override
             public void itemChanged(Datasource<Entity> ds, Entity prevItem, Entity item) {
-                log.trace("itemChanged: prevItem=" + prevItem + ", item=" + item);
+                if (log.isTraceEnabled()) {
+                    log.trace("itemChanged: prevItem=" + prevItem + ", item=" + item);
+                }
 
                 Collection prevColl = prevItem == null ? null : (Collection) prevItem.getValue(metaProperty.getName());
                 Collection coll = item == null ? null : (Collection) item.getValue(metaProperty.getName());
@@ -103,7 +105,9 @@ public class CollectionPropertyDatasourceImpl<T extends Entity<K>, K>
             @Override
             public void valueChanged(Entity source, String property, Object prevValue, Object value) {
                 if (property.equals(metaProperty.getName()) && !ObjectUtils.equals(prevValue, value)) {
-                    log.trace("valueChanged: prop=" + property + ", prevValue=" + prevValue + ", value=" + value);
+                    if (log.isTraceEnabled()) {
+                        log.trace("valueChanged: prop=" + property + ", prevValue=" + prevValue + ", value=" + value);
+                    }
 
                     reattachListeners((Collection) prevValue, (Collection) value);
 

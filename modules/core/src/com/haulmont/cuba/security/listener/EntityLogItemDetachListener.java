@@ -51,7 +51,9 @@ public class EntityLogItemDetachListener implements BeforeDetachEntityListener<E
     }
 
     protected void fillAttributesFromChangesField(EntityLogItem item) {
-        log.trace("fillAttributesFromChangesField for " + item);
+        if (log.isTraceEnabled()) {
+            log.trace("fillAttributesFromChangesField for " + item);
+        }
         List<EntityLogAttr> attributes = new ArrayList<>();
 
         StringReader reader = new StringReader(item.getChanges());
@@ -94,7 +96,9 @@ public class EntityLogItemDetachListener implements BeforeDetachEntityListener<E
     }
 
     protected void fillAttributesFromTable(EntityLogItem item, EntityManager entityManager) {
-        log.trace("fillAttributesFromTable for " + item);
+        if (log.isTraceEnabled()) {
+            log.trace("fillAttributesFromTable for " + item);
+        }
         DbTypeConverter converter = persistence.getDbTypeConverter();
         QueryRunner queryRunner = new QueryRunner();
         try {

@@ -85,7 +85,9 @@ public abstract class App {
     protected ThemeConstants themeConstants;
 
     public App() {
-        log.trace("Creating application " + this);
+        if (log.isTraceEnabled()) {
+            log.trace("Creating application " + this);
+        }
         try {
             Configuration configuration = AppBeans.get(Configuration.NAME);
 

@@ -108,7 +108,9 @@ public class FilterParser {
             }
             xml = Dom4j.writeDocument(document, true);
         }
-        log.trace("toXML: " + xml);
+        if (log.isTraceEnabled()) {
+            log.trace("toXML: " + xml);
+        }
         return xml;
     }
 

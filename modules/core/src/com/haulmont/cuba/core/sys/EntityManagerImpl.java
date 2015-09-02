@@ -283,7 +283,9 @@ public class EntityManagerImpl implements EntityManager {
                     }
                 } else if (value instanceof Instance) {
                     if (PersistenceHelper.isDetached(value) && !(value instanceof EmbeddableEntity)) {
-                        log.trace("Object " + value + " is detached, loading it");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Object " + value + " is detached, loading it");
+                        }
                         Entity entity = (Entity) value;
                         value = find(entity.getClass(), entity.getId());
                         if (value == null) {
