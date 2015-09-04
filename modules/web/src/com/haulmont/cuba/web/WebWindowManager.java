@@ -1024,7 +1024,7 @@ public class WebWindowManager extends WindowManager {
         layout.addComponent(buttonsContainer);
 
         messageLab.setWidth("100%");
-        layout.setComponentAlignment(buttonsContainer, com.vaadin.ui.Alignment.BOTTOM_RIGHT);
+        layout.setComponentAlignment(buttonsContainer, Alignment.BOTTOM_RIGHT);
 
         float width;
         DialogParams dialogParams = getDialogParams();
@@ -1122,7 +1122,7 @@ public class WebWindowManager extends WindowManager {
             }
 
             if (action instanceof AbstractAction && ((AbstractAction)action).isPrimary()) {
-                button.addStyleName("primary");
+                button.addStyleName("cuba-primary-action");
                 button.focus();
             }
 
@@ -1144,7 +1144,7 @@ public class WebWindowManager extends WindowManager {
 
         messageLab.setSizeFull();
         layout.setExpandRatio(messageLab, 1);
-        layout.setComponentAlignment(actionsBar, com.vaadin.ui.Alignment.BOTTOM_RIGHT);
+        layout.setComponentAlignment(actionsBar, Alignment.BOTTOM_RIGHT);
 
         ui.addWindow(window);
         window.center();
