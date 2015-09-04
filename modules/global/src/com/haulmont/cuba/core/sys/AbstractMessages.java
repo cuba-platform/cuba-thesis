@@ -35,6 +35,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
+
 /**
  * <code>Messages</code> implementation common for all tiers.
  *
@@ -171,12 +173,16 @@ public abstract class AbstractMessages implements Messages {
 
     @Override
     public String getMessage(Enum caller) {
+        checkNotNullArgument(caller, "Enum parameter 'caller' is null");
+
         Locale loc = getUserLocale();
         return getMessage(caller, loc);
     }
 
     @Override
     public String getMessage(Enum caller, Locale locale) {
+        checkNotNullArgument(caller, "Enum parameter 'caller' is null");
+
         String className = caller.getClass().getName();
         int i = className.lastIndexOf('.');
         if (i > -1)
@@ -207,7 +213,7 @@ public abstract class AbstractMessages implements Messages {
 
     @Override
     public String getMainMessage(String key, Locale locale) {
-        Preconditions.checkNotNullArgument(key, "Message key is null");
+        checkNotNullArgument(key, "Message key is null");
         return internalGetMessage(mainMessagePack, key, locale, key, false);
     }
 
@@ -231,8 +237,8 @@ public abstract class AbstractMessages implements Messages {
 
     @Override
     public String getMessage(String packs, String key, Locale locale) {
-        Preconditions.checkNotNullArgument(packs, "Messages pack name is null");
-        Preconditions.checkNotNullArgument(key, "Message key is null");
+        checkNotNullArgument(packs, "Messages pack name is null");
+        checkNotNullArgument(key, "Message key is null");
 
         String compositeKey = packs + "/" + key;
         String msg = internalGetMessage(mainMessagePack, compositeKey, locale, null, false);
@@ -245,8 +251,8 @@ public abstract class AbstractMessages implements Messages {
     @Nullable
     @Override
     public String findMessage(String packs, String key, @Nullable Locale locale) {
-        Preconditions.checkNotNullArgument(packs, "Messages pack name is null");
-        Preconditions.checkNotNullArgument(key, "Message key is null");
+        checkNotNullArgument(packs, "Messages pack name is null");
+        checkNotNullArgument(key, "Message key is null");
 
         if (locale == null)
             locale = getUserLocale();
