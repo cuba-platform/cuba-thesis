@@ -494,6 +494,7 @@ configure(webToolkitModule) {
     }
 
     task buildDebugWidgetSet(type: CubaWidgetSetBuilding) {
+        widgetSetsDir = "$project.buildDir/web-debug/VAADIN/widgetsets"
         widgetSetClass = 'com.haulmont.cuba.web.toolkit.ui.WidgetSet'
         // Performance and widgetset size:
         style = 'PRETTY'
@@ -519,7 +520,9 @@ configure(webToolkitModule) {
 
     artifacts {
         archives webArchive
-        archives webDebugArchive
+        if (!isSnapshot) {
+            archives webDebugArchive
+        }
     }
 
     task deploy(dependsOn: buildWidgetSet) << {
