@@ -60,9 +60,7 @@
 @import "app/table-showlink";
 @import "app/app-menu";
 @import "app/app-window";
-//@if $cuba-scrollbars-style-enabled == true {
-  @import "app/app-scrollbar";
-//}
+@import "app/app-scrollbar";
 @import "app/folders-pane";
 
 @mixin halo {
