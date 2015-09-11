@@ -69,7 +69,7 @@ public class XmlInheritanceTest extends CubaClientTestCase {
     public void testExtIndexExtendedUp() {
         Document document = Dom4j.readDocument(resources.getResourceAsStream("com/haulmont/cuba/gui/xml/test-extends-screen-old-up.xml"));
 
-        XmlInheritanceProcessor processor = new XmlInheritanceProcessor(document, Collections.emptyMap());
+        XmlInheritanceProcessor processor = new XmlInheritanceProcessor(document, Collections.<String, Object>emptyMap());
         Element resultXml = processor.getResultRoot();
 
         Element layoutElement = resultXml.element("layout");
@@ -92,7 +92,7 @@ public class XmlInheritanceTest extends CubaClientTestCase {
     private int getIndexOfMovedField(String extendedXml, String fieldName) {
         Document document = Dom4j.readDocument(resources.getResourceAsStream(extendedXml));
 
-        XmlInheritanceProcessor processor = new XmlInheritanceProcessor(document, Collections.emptyMap());
+        XmlInheritanceProcessor processor = new XmlInheritanceProcessor(document, Collections.<String, Object>emptyMap());
         Element resultXml = processor.getResultRoot();
 
         Element layoutElement = resultXml.element("layout");
