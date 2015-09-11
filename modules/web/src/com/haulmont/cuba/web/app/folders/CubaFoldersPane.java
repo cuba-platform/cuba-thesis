@@ -623,9 +623,13 @@ public class CubaFoldersPane extends VerticalLayout {
             if (getItemClickable(folder)) {
                 if (event.getButton() == MouseEventDetails.MouseButton.RIGHT) {
                     if (appFoldersTree != null && appFoldersTree.containsId(event.getItemId())) {
-                        appFoldersTree.select(event.getItemId());
+                        if (appFoldersTree.isSelectable()) {
+                            appFoldersTree.select(event.getItemId());
+                        }
                     } else if (searchFoldersTree != null && searchFoldersTree.containsId(event.getItemId())) {
-                        searchFoldersTree.select(event.getItemId());
+                        if (searchFoldersTree.isSelectable()) {
+                            searchFoldersTree.select(event.getItemId());
+                        }
                     }
                 } else {
                     openFolder((AbstractSearchFolder) event.getItemId());
