@@ -120,6 +120,16 @@ public class WebResizableTextArea
     }
 
     @Override
+    public boolean isEditable() {
+        return wrapper.isEditable();
+    }
+
+    @Override
+    public void setEditable(boolean editable) {
+        wrapper.setEditable(editable);
+    }
+
+    @Override
     public void setRequiredMessage(String msg) {
         wrapper.setRequiredError(msg);
     }
