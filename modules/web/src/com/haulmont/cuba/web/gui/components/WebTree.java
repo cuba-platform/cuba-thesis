@@ -208,6 +208,8 @@ public class WebTree extends WebAbstractList<CubaTree> implements Tree {
         datasource.addListener(new CollectionDsActionsNotifier(this) {
             @Override
             public void collectionChanged(CollectionDatasource ds, Operation operation, List<Entity> items) {
+                super.collectionChanged(ds, operation, items);
+
                 // #PL-2035, reload selection from ds
                 Set<Object> selectedItemIds = getSelectedItemIds();
                 if (selectedItemIds == null) {
