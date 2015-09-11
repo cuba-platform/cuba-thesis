@@ -15,8 +15,8 @@ import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.Action.Status;
 import com.haulmont.cuba.gui.components.DialogAction;
-import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
+import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.executors.BackgroundTask;
 import com.haulmont.cuba.gui.executors.BackgroundTaskWrapper;
@@ -37,7 +37,6 @@ import com.haulmont.cuba.web.toolkit.ui.CubaTimer;
 import com.haulmont.cuba.web.toolkit.ui.CubaTree;
 import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import org.apache.commons.io.FileUtils;
@@ -621,19 +620,7 @@ public class CubaFoldersPane extends VerticalLayout {
         public void itemClick(ItemClickEvent event) {
             Folder folder = (Folder) event.getItemId();
             if (getItemClickable(folder)) {
-                if (event.getButton() == MouseEventDetails.MouseButton.RIGHT) {
-                    if (appFoldersTree != null && appFoldersTree.containsId(event.getItemId())) {
-                        if (appFoldersTree.isSelectable()) {
-                            appFoldersTree.select(event.getItemId());
-                        }
-                    } else if (searchFoldersTree != null && searchFoldersTree.containsId(event.getItemId())) {
-                        if (searchFoldersTree.isSelectable()) {
-                            searchFoldersTree.select(event.getItemId());
-                        }
-                    }
-                } else {
-                    openFolder((AbstractSearchFolder) event.getItemId());
-                }
+                openFolder((AbstractSearchFolder) event.getItemId());
             } else if (isItemExpandable(folder)) {
                 Component tree = event.getComponent();
                 if (tree instanceof Tree) {
