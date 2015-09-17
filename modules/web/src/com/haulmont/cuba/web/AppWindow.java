@@ -22,14 +22,11 @@ import com.haulmont.cuba.gui.theme.ThemeConstantsRepository;
 import com.haulmont.cuba.security.app.UserSessionService;
 import com.haulmont.cuba.web.app.UserSettingsTools;
 import com.haulmont.cuba.web.gui.components.mainwindow.WebAppWorkArea;
-import com.haulmont.cuba.web.gui.components.mainwindow.WebFoldersPane;
 import com.haulmont.cuba.web.toolkit.ui.*;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.server.Extension;
 import com.vaadin.shared.MouseEventDetails;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.vaadin.peter.contextmenu.ContextMenu;
@@ -116,17 +113,10 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
                     if (event.getButton() == MouseEventDetails.MouseButton.RIGHT) {
                         Component targetComponent = event.getClickedComponent();
 
-                        if (targetComponent != null) {
-                            if (getMainWindow().getFoldersPane() != null) {
-                                WebFoldersPane foldersPane = (WebFoldersPane) getMainWindow().getFoldersPane();
-                                Component parent = targetComponent;
-                                while (parent != null) {
-                                    if (parent == foldersPane.getComponent()) {
-                                        return;
-                                    }
-                                    parent = parent.getParent();
-                                }
-                            }
+                        System.out.println(targetComponent.getClass().getName());
+                        if (targetComponent != null
+                                && targetComponent instanceof ComponentContainer
+                                && !(targetComponent instanceof Field)) {
                             if (getMainWindow().getWorkArea() != null) {
                                 WebAppWorkArea workArea = (WebAppWorkArea) getMainWindow().getWorkArea();
                                 CubaTabSheet tabbedWindowContainer = workArea.getTabbedWindowContainer();
