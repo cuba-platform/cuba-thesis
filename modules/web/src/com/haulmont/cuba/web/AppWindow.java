@@ -113,7 +113,6 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
                     if (event.getButton() == MouseEventDetails.MouseButton.RIGHT) {
                         Component targetComponent = event.getClickedComponent();
 
-                        System.out.println(targetComponent.getClass().getName());
                         if (targetComponent != null
                                 && targetComponent instanceof ComponentContainer
                                 && !(targetComponent instanceof Field)) {
