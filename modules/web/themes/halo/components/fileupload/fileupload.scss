@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2008-2015 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ */
+
+// Version: $Id$
+
+@mixin halo-cuba-fileupload($primary-stylename: cuba-fileupload) {
+  .#{$primary-stylename} {
+    position: relative;
+
+    .v-button {
+      @include box-defaults;
+    }
+  }
+
+  .#{$primary-stylename}:hover .v-button {
+    &:after {
+      @if $v-background-color {
+        $bg: darken($v-background-color, 25%);
+        @if is-dark-color($v-background-color) {
+          $bg: lighten($v-background-color, 15%);
+        }
+        background-color: rgba($bg, .1);
+      }
+    }
+  }
+
+  .#{$primary-stylename} input {
+    display: block;
+    cursor: pointer;
+    position: absolute;
+    //z-index: -1;
+    opacity: 0;
+
+    text-align: right;
+
+    margin: 0;
+    top: 0;
+    right: 0;
+    font-size: 200px;
+
+    @include box-defaults;
+  }
+
+  .#{$primary-stylename}.v-has-width .v-button {
+    width: 100%;
+  }
+
+  .#{$primary-stylename}.v-has-height .v-button {
+    height: 100%;
+  }
+
+  .#{$primary-stylename}-progresswindow.v-window {
+    width: 500px;
+
+    .content-pane {
+      outline: 0;
+    }
+
+    .vertical-panel {
+      width: 100%;
+      @include box-defaults;
+
+      display: inline-block;
+    }
+
+    .v-label.upload-file-label {
+      font-family: $v-font-family;
+      font-size: $v-font-size;
+      line-height: $v-line-height;
+    }
+
+    .v-label.upload-file-label,
+    .upload-progressbar,
+    .v-button.upload-cancel-button {
+      margin-top: $v-layout-margin-top;
+    }
+
+    .upload-cancel-button {
+      float: right;
+    }
+  }
+}

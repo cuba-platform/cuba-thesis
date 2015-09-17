@@ -244,6 +244,10 @@
         <xs:attribute name="rowspan" type="xs:integer"/>
     </xs:attributeGroup>
 
+    <xs:attributeGroup name="hasIcon">
+        <xs:attribute name="icon" type="xs:string"/>
+    </xs:attributeGroup>
+
     <xs:attributeGroup name="hasGridConstraints">
         <xs:attribute name="colspan" type="xs:integer"/>
         <xs:attribute name="rowspan" type="xs:integer"/>
@@ -472,7 +476,8 @@
         <xs:attributeGroup ref="hasCaption"/>
         <xs:attributeGroup ref="hasEnableProp"/>
         <xs:attributeGroup ref="hasVisibility"/>
-        <xs:attribute name="icon" type="xs:string"/>
+        <xs:attributeGroup ref="hasIcon"/>
+
         <xs:attribute name="invoke" type="xs:string"/>
         <xs:attribute name="shortcut" type="xs:string"/>
     </xs:complexType>
@@ -482,8 +487,9 @@
         <xs:attributeGroup ref="hasCaption"/>
         <xs:attributeGroup ref="hasEnableProp"/>
         <xs:attributeGroup ref="hasVisibility"/>
+        <xs:attributeGroup ref="hasIcon"/>
+
         <xs:attribute name="openType" type="openType"/>
-        <xs:attribute name="icon" type="xs:string"/>
         <xs:attribute name="trackSelection" type="xs:boolean"/>
         <xs:attribute name="invoke" type="xs:string"/>
         <xs:attribute name="shortcut" type="xs:string"/>
@@ -525,10 +531,10 @@
         <xs:attributeGroup ref="hasAlign"/>
         <xs:attributeGroup ref="hasStyle"/>
         <xs:attributeGroup ref="hasCaption"/>
+        <xs:attributeGroup ref="hasIcon"/>
 
         <xs:attribute name="url" type="xs:anyURI"/>
         <xs:attribute name="target" type="linkTarget"/>
-        <xs:attribute name="icon" type="xs:string"/>
     </xs:complexType>
 
     <!-- CheckBox -->
@@ -782,6 +788,7 @@
         <xs:attributeGroup ref="hasId"/>
         <xs:attributeGroup ref="hasSize"/>
         <xs:attributeGroup ref="hasAlign"/>
+        <xs:attributeGroup ref="hasIcon"/>
         <xs:attributeGroup ref="hasCaption"/>
         <xs:attributeGroup ref="hasVisibility"/>
         <xs:attributeGroup ref="hasEnableProp"/>
@@ -795,6 +802,7 @@
         <xs:attributeGroup ref="hasCaption"/>
         <xs:attributeGroup ref="hasVisibility"/>
         <xs:attributeGroup ref="hasEnableProp"/>
+        <xs:attributeGroup ref="hasIcon"/>
     </xs:complexType>
 
     <!-- Embedded -->
@@ -840,9 +848,9 @@
         <xs:attributeGroup ref="hasWidthProp"/>
         <xs:attributeGroup ref="hasGridConstraints"/>
         <xs:attributeGroup ref="hasAlign"/>
+        <xs:attributeGroup ref="hasIcon"/>
 
         <xs:attribute name="action" type="xs:string"/>
-        <xs:attribute name="icon" type="xs:string"/>
 
         <xs:attribute name="invoke" type="xs:string"/>
     </xs:complexType>
@@ -870,8 +878,7 @@
         <xs:attributeGroup ref="hasWidthProp"/>
         <xs:attributeGroup ref="hasGridConstraints"/>
         <xs:attributeGroup ref="hasAlign"/>
-
-        <xs:attribute name="icon" type="xs:string"/>
+        <xs:attributeGroup ref="hasIcon"/>
     </xs:complexType>
 
     <!-- ButtonsPanel -->
@@ -1115,7 +1122,8 @@
             <xs:element name="button" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                     <xs:attribute name="caption" type="xs:string" default="msg://"/>
-                    <xs:attribute name="icon" type="xs:string"/>
+
+                    <xs:attributeGroup ref="hasIcon"/>
                 </xs:complexType>
             </xs:element>
         </xs:all>
@@ -1426,8 +1434,7 @@
         <xs:attributeGroup ref="hasWidthProp"/>
         <xs:attributeGroup ref="hasGridConstraints"/>
         <xs:attributeGroup ref="hasAlign"/>
-
-        <xs:attribute name="icon" type="xs:string"/>
+        <xs:attributeGroup ref="hasIcon"/>
 
         <xs:attribute name="openType" type="openType"/>
         <xs:attribute name="for" type="xs:string" use="required"/>

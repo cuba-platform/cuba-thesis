@@ -11,11 +11,11 @@ import java.util.UUID;
  * @author artamonov
  * @version $Id$
  */
-public interface FileMultiUploadField extends Component, Component.HasCaption, Component.BelongToFrame {
+public interface FileMultiUploadField extends Component, Component.HasCaption, Component.BelongToFrame, Component.HasIcon {
 
     String NAME = "multiUpload";
 
-    public abstract class UploadListener {
+    abstract class UploadListener {
 
         /**
          * File upload finished. Executed in uploading thread. <br/>
@@ -48,6 +48,7 @@ public interface FileMultiUploadField extends Component, Component.HasCaption, C
          * @return true if error handled by listener.
          *         If returned false then component shows default upload error notification.
          */
+        @Deprecated
         public boolean uploadError(String fileName) {
             return false;
         }

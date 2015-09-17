@@ -75,7 +75,7 @@ public class LayoutLoaderConfig {
         config.register(SearchPickerField.NAME, SearchPickerFieldLoader.class);
         config.register(OptionsGroup.NAME, OptionsGroupLoader.class);
         config.register(FileUploadField.NAME, FileUploadFieldLoader.class);
-        config.register(FileMultiUploadField.NAME, FileUploadFieldLoader.class);
+        config.register(FileMultiUploadField.NAME, FileMultiUploadFieldLoader.class);
         config.register("multiupload", FileUploadFieldLoader.class); // for backward compatibility
 
         config.register(Table.NAME, TableLoader.class);

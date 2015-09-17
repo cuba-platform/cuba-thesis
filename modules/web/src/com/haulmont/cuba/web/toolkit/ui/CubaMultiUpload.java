@@ -26,8 +26,10 @@ import java.util.Map;
 /**
  * @author artamonov
  * @version $Id$
+ * @deprecated Use {@link CubaFileUpload}
  */
 @JavaScript(value = "resources/swfobject/swfobject-2.2.js")
+@Deprecated
 public class CubaMultiUpload extends AbstractComponent implements LegacyComponent {
 
     private List<UploadListener> uploadListeners = new ArrayList<>();
@@ -219,6 +221,13 @@ public class CubaMultiUpload extends AbstractComponent implements LegacyComponen
         return getState(false).buttonEnabled;
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+
+        setButtonEnabled(enabled);
+    }
+
     public void setButtonTextLeft(int buttonTextLeft) {
         getState().buttonTextLeft = buttonTextLeft;
     }
@@ -364,8 +373,7 @@ public class CubaMultiUpload extends AbstractComponent implements LegacyComponen
          *            the MIME type of the uploaded file.
          * @return Stream to which the uploaded file should be written.
          */
-        public OutputStream receiveUpload(String filename, String mimeType);
-
+        OutputStream receiveUpload(String filename, String mimeType);
     }
 
     public interface BootstrapFailureHandler extends Serializable {
@@ -392,7 +400,7 @@ public class CubaMultiUpload extends AbstractComponent implements LegacyComponen
 
         private int id;
 
-        private UploadErrorType(int id) {
+        UploadErrorType(int id) {
             this.id = id;
         }
 

@@ -11,6 +11,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.sys.DesktopToolTipManager;
 import com.haulmont.cuba.gui.components.FileUploadField;
 import com.haulmont.cuba.gui.components.IFrame;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.haulmont.cuba.gui.upload.FileUploadingAPI.*;
+
 /**
  * @author budarov
  * @version $Id$
@@ -37,6 +40,8 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
 
     protected FileUploadingAPI fileUploading;
     protected Messages messages;
+
+    protected String icon;
 
     protected volatile boolean isUploadingState = false;
 
@@ -77,34 +82,35 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
 
             getFrame().showNotification(warningMsg, IFrame.NotificationType.WARNING);
         } else {
-            boolean succcess = true;
+            boolean success = true;
             try {
                 isUploadingState = true;
 
                 fileName = file.getAbsolutePath();
                 notifyListenersStart(file);
 
-                tempFileId = fileUploading.createEmptyFile();
+                FileInfo fileInfo = fileUploading.createFile();
+                tempFileId = fileInfo.getId();
+                File tmpFile = fileInfo.getFile();
 
-                File tmpFile = fileUploading.getFile(tempFileId);
                 FileUtils.copyFile(file, tmpFile);
 
                 fileId = tempFileId;
 
                 isUploadingState = false;
             } catch (Exception ex) {
-                succcess = false;
+                success = false;
                 try {
                     fileUploading.deleteFile(tempFileId);
                     tempFileId = null;
                 } catch (FileStorageException e) {
-                    throw new RuntimeException(ex);
+                    throw new RuntimeException("Unable to delete file from temp storage", ex);
                 }
                 notifyListenersFail(file, ex);
             } finally {
                 notifyListenersFinish(file);
             }
-            if (succcess) {
+            if (success) {
                 notifyListenersSuccess(file);
             }
         }
@@ -164,7 +170,7 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
                 bytes = byteOutput.toByteArray();
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to read file content from temp storage", e);
         }
 
         return bytes;
@@ -204,5 +210,19 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
     public void setDescription(String description) {
         impl.setToolTipText(description);
         DesktopToolTipManager.getInstance().registerTooltip(impl);
+    }
+
+    @Override
+    public String getIcon() {
+        return icon;
+    }
+
+    @Override
+    public void setIcon(String icon) {
+        this.icon = icon;
+        if (icon != null)
+            impl.setIcon(App.getInstance().getResources().getIcon(icon));
+        else
+            impl.setIcon(null);
     }
 }
