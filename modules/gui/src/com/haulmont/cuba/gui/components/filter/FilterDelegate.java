@@ -97,6 +97,8 @@ public interface FilterDelegate {
     boolean isCollapsable();
     void setCollapsable(boolean collapsable);
 
+    void requestFocus();
+
     void addListener(Component.Collapsable.ExpandListener listener);
     void removeListener(Component.Collapsable.ExpandListener listener);
 

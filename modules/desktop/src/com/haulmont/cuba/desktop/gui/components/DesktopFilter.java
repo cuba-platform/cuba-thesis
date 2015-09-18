@@ -289,4 +289,9 @@ public class DesktopFilter extends DesktopAbstractComponent<JPanel> implements F
     public void removeListener(CollapseListener listener) {
         delegate.removeListener(listener);
     }
+
+    @Override
+    public void requestFocus() {
+        delegate.requestFocus();
+    }
 }

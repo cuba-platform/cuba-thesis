@@ -261,4 +261,9 @@ public class WebFilter extends WebAbstractComponent<CubaVerticalActionsLayout> i
     public void setMaxResults(int maxResults) {
         delegate.setMaxResults(maxResults);
     }
+
+    @Override
+    public void requestFocus() {
+        delegate.requestFocus();
+    }
 }
