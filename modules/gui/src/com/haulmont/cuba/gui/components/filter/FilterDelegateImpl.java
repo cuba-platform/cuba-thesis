@@ -368,7 +368,14 @@ public class FilterDelegateImpl implements FilterDelegate {
                     setFilterActionsEnabled();
                     initFilterSelectComponents();
                 }
-                requestFocusToParamEditComponent();
+                if (paramEditComponentToFocus != null)
+                    requestFocusToParamEditComponent();
+                else if (filtersPopupDisplayed)
+                    filtersPopupButton.requestFocus();
+                else if (filtersLookupDisplayed) {
+                    filtersLookup.requestFocus();
+                }
+
                 updateWindowCaption();
             }
         });
@@ -2038,6 +2045,8 @@ public class FilterDelegateImpl implements FilterDelegate {
                         fillConditionsLayout(ConditionsFocusType.FIRST);
                         requestFocusToParamEditComponent();
                         updateFilterModifiedIndicator();
+                    } else {
+                        requestFocusToParamEditComponent();
                     }
                 }
             });
