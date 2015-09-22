@@ -250,10 +250,10 @@ public interface WebConfig extends Config {
     double getTableCacheRate();
 
     /**
-     * @return Whether to redirect by blank html page on getting URL request action
+     * @return Whether to redirect with blank html page on getting URL request action
      */
-    @Property("cuba.web.redirectByPageOnLinkActionEnabled")
+    @Property("cuba.web.useRedirectWithBlankPageForLinkAction")
     @DefaultBoolean(false)
-    boolean getRedirectByPageOnLinkActionEnabled();
+    boolean getUseRedirectWithBlankPageForLinkAction();
 
 }
