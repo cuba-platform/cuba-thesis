@@ -191,8 +191,6 @@ public class CubaSearchSelectWidget extends VFilterSelect {
             case KeyCodes.KEY_TAB:
                 keyboardNavigation = false;
                 tabPressedWhenPopupOpen = true;
-//                filterOptions(currentPage);
-                // onBlur() takes care of the rest
                 break;
             case KeyCodes.KEY_ESCAPE:
                 keyboardNavigation = false;
@@ -201,20 +199,11 @@ public class CubaSearchSelectWidget extends VFilterSelect {
                 break;
             case KeyCodes.KEY_ENTER:
                 int selectedIndex = suggestionPopup.menu.getSelectedIndex();
-                if (selectedIndex >= 0) {
-                    /*
-                     * Nothing selected using up/down. Happens e.g. when entering a
-                     * text (causes popup to open) and then pressing enter.
-                     */
-                    if (suggestionPopup.isAttached())
-                        filterOptions(currentPage);
-                } else {
-                    currentSuggestion = currentSuggestions.get(selectedIndex);
-                    if (currentSuggestion != null &&
-                            currentSuggestion.getReplacementString().equals(tb.getText())) {
-                        this.preventFilterAfterSelect = true;
-                        onSuggestionSelected(currentSuggestion);
-                    }
+                currentSuggestion = currentSuggestions.get(selectedIndex);
+                if (currentSuggestion != null &&
+                        currentSuggestion.getReplacementString().equals(tb.getText())) {
+                    this.preventFilterAfterSelect = true;
+                    onSuggestionSelected(currentSuggestion);
                 }
 
                 keyboardNavigation = false;
