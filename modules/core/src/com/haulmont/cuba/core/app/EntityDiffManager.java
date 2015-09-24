@@ -52,7 +52,7 @@ public class EntityDiffManager {
 
     private Log log = LogFactory.getLog(EntityDiffManager.class);
 
-    public EntityDiff getDifference(EntitySnapshot first, EntitySnapshot second) {
+    public EntityDiff getDifference(@Nullable EntitySnapshot first, EntitySnapshot second) {
 
         // Sort snapshots by date, first - old, second - new
         long firstTime = 0;
