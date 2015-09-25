@@ -87,7 +87,25 @@ public class WebDateField extends WebAbstractField<CubaDateFieldWrapper> impleme
         vTimeField.setInvalidAllowed(false);
         vTimeField.setInvalidCommitted(true);
 
-        dateField.addValueChangeListener(new Property.ValueChangeListener() {
+        dateField.addValueChangeListener(createDateValueChangeListener());
+        timeField.addListener(createTimeValueChangeListener());
+
+        setResolution(Resolution.MIN);
+
+        component = new CubaDateFieldWrapper(this, innerLayout);
+    }
+
+    protected ValueListener createTimeValueChangeListener() {
+        return new ValueListener() {
+            @Override
+            public void valueChanged(Object source, String property, Object prevValue, Object value) {
+                updateInstance();
+            }
+        };
+    }
+
+    protected Property.ValueChangeListener createDateValueChangeListener() {
+        return new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 updateInstance();
@@ -97,17 +115,7 @@ public class WebDateField extends WebAbstractField<CubaDateFieldWrapper> impleme
                     component.markAsDirty();
                 }
             }
-        });
-
-        timeField.addListener(new ValueListener() {
-            @Override
-            public void valueChanged(Object source, String property, Object prevValue, Object value) {
-                updateInstance();
-            }
-        });
-        setResolution(Resolution.MIN);
-
-        component = new CubaDateFieldWrapper(this, innerLayout);
+        };
     }
 
     public CubaDateField getDateField() {
