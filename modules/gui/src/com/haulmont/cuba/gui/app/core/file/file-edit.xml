@@ -44,6 +44,6 @@
                 </row>
             </rows>
         </grid>
-        <iframe id="windowActions" src="/com/haulmont/cuba/gui/edit-window.actions.xml" width="AUTO"/>
+        <iframe id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>

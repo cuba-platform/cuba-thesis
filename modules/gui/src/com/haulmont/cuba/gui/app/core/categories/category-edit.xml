@@ -32,6 +32,6 @@
 
         <iframe id="categoryAttrsFrame" src="/com/haulmont/cuba/gui/app/core/categories/category-attrs-frame.xml"/>
 
-        <iframe id="windowActions" src="/com/haulmont/cuba/gui/edit-window.actions.xml"/>
+        <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>
