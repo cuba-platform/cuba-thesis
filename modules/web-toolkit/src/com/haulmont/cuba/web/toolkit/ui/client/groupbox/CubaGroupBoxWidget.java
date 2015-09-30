@@ -134,7 +134,7 @@ public class CubaGroupBoxWidget extends VPanel implements HasEnabled {
 
     @Override
     public void onBrowserEvent(Event event) {
-        if (collapsable && DOM.eventGetType(event) == Event.ONCLICK && enabled
+        if (collapsable && DOM.eventGetType(event) == Event.ONCLICK && isEnabled()
                 && (DOM.eventGetTarget(event) == expander || DOM.eventGetTarget(event) == captionNode.getChild(1))) {
             toggleExpanded(event);
         } else {
