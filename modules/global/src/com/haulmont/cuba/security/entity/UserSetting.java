@@ -35,6 +35,7 @@ public class UserSetting extends BaseUuidEntity {
     @Column(name = "NAME", length = 255)
     private String name;
 
+    @Lob
     @Column(name = "VALUE")
     private String value;
 
