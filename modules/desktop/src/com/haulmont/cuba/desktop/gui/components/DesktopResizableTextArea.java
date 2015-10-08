@@ -14,13 +14,16 @@ import com.haulmont.cuba.gui.components.ResizeListener;
  */
 public class DesktopResizableTextArea extends DesktopTextArea implements ResizableTextArea {
 
+    protected boolean resizable = false;
+
     @Override
     public boolean isResizable() {
-        return false;
+        return resizable;
     }
 
     @Override
     public void setResizable(boolean resizable) {
+        this.resizable = resizable;
         //Do nothing, because desktop text area is not resizable
     }
 
