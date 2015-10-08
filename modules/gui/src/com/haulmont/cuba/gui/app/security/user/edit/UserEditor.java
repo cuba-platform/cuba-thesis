@@ -14,10 +14,7 @@ import com.haulmont.cuba.gui.app.security.user.NameBuilderListener;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
-import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.data.DataSupplier;
-import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.DsContext;
+import com.haulmont.cuba.gui.data.*;
 import com.haulmont.cuba.gui.data.impl.AbstractDatasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
@@ -223,6 +220,12 @@ public class UserEditor extends AbstractEditor<User> {
                     } else {
                         passwField.setRequired(true);
                     }
+                    passwField.addListener(new ValueListener() {
+                        @Override
+                        public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                            ((DatasourceImplementation) userDs).setModified(true);
+                        }
+                    });
                 } else {
                     passwField.setVisible(false);
                 }
@@ -243,6 +246,12 @@ public class UserEditor extends AbstractEditor<User> {
                     } else {
                         confirmPasswField.setRequired(true);
                     }
+                    confirmPasswField.addListener(new ValueListener() {
+                        @Override
+                        public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                            ((DatasourceImplementation) userDs).setModified(true);
+                        }
+                    });
                 } else {
                     confirmPasswField.setVisible(false);
                 }
