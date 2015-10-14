@@ -8,8 +8,7 @@ import junit.framework.TestCase;
 
 import java.util.Set;
 
-public class QueryTransformerRegexTest extends TestCase
-{
+public class QueryTransformerRegexTest extends TestCase {
     public void test() {
         QueryTransformerRegex transformer = new QueryTransformerRegex(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = :par",
@@ -30,7 +29,7 @@ public class QueryTransformerRegexTest extends TestCase
         res = transformer.getResult();
         assertEquals(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = ?1 " +
-                    "and (h.createdBy = :par1) group by c.level having c.level > 0 order by c.level",
+                        "and (h.createdBy = :par1) group by c.level having c.level > 0 order by c.level",
                 res);
         Set<String> set = transformer.getAddedParams();
         assertEquals(1, set.size());
@@ -40,7 +39,7 @@ public class QueryTransformerRegexTest extends TestCase
         res = transformer.getResult();
         assertEquals(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = ?1 " +
-                    "and (h.createdBy = :par1) and ((h.updatedBy = :par2 and h.groupId = :par3)) group by c.level having c.level > 0 order by c.level",
+                        "and (h.createdBy = :par1) and ((h.updatedBy = :par2 and h.groupId = :par3)) group by c.level having c.level > 0 order by c.level",
                 res);
         set = transformer.getAddedParams();
         assertEquals(3, set.size());
@@ -51,7 +50,7 @@ public class QueryTransformerRegexTest extends TestCase
         res = transformer.getResult();
         assertEquals(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = ?1 " +
-                    "and (h.version between 1 and 2) group by c.level having c.level > 0 order by c.level",
+                        "and (h.version between 1 and 2) group by c.level having c.level > 0 order by c.level",
                 res);
 
     }
@@ -65,7 +64,7 @@ public class QueryTransformerRegexTest extends TestCase
         String res = transformer.getResult();
         assertEquals(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = :par and (h.createdBy = :par1" +
-                    " and h.updatedBy = :par2)",
+                        " and h.updatedBy = :par2)",
                 res);
 
         ////////////////////////////////////
@@ -78,7 +77,7 @@ public class QueryTransformerRegexTest extends TestCase
         res = transformer.getResult();
         assertEquals(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = :par and (h.createdBy = :par1" +
-                    " and h.updatedBy = :par2 and c.createTs = :par3)",
+                        " and h.updatedBy = :par2 and c.createTs = :par3)",
                 res);
 
         ////////////////////////////////////
@@ -91,7 +90,7 @@ public class QueryTransformerRegexTest extends TestCase
         res = transformer.getResult();
         assertEquals(
                 "select c from sec$GroupHierarchy h join h.parent.constraints c where h.group = :par and (h.createdBy = :par1" +
-                    " and h.updatedBy = :par2 and c.createTs = :par3)",
+                        " and h.updatedBy = :par2 and c.createTs = :par3)",
                 res);
     }
 
@@ -103,7 +102,7 @@ public class QueryTransformerRegexTest extends TestCase
                 "sec$Group");
         // commented out, because since 3.4 we don't check equality of targetEntity and an entity in the query
 //        try {
-            transformer.addWhere("a.createdBy = :par1");
+        transformer.addWhere("a.createdBy = :par1");
 //            fail();
 //        } catch (Exception e) {
 //            assertTrue(e instanceof RuntimeException);
@@ -380,5 +379,14 @@ public class QueryTransformerRegexTest extends TestCase
         assertEquals(
                 "SELECT    distinct  h.level from sec$Constraint u, sec$GroupHierarchy h join h.parent.constraints c where h.userGroup = :par",
                 res);
+    }
+
+    public void testNpeInReplaceOrderBy() {
+        QueryTransformerRegex transformer = new QueryTransformerRegex(
+                "select drB from taxi$DriverBan drB where drB.driver.id = :ds_driverDs order by drB.from",
+                null);
+        String[] properties = new String[]{"driver.name", "driver.callsignName"};
+
+        transformer.replaceOrderBy(true, properties);
     }
 }
