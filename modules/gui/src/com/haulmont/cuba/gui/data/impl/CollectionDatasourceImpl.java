@@ -472,6 +472,9 @@ public class CollectionDatasourceImpl<T extends Entity<K>, K>
         }
         context.setView(view);
         context.setSoftDeletion(softDeletion);
+
+        prepareLoadContext(context);
+
         return context;
     }
 
