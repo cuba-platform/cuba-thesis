@@ -420,7 +420,7 @@ public class FieldGroupLoader extends AbstractFieldLoader {
 
                 String requiredMessage = element.attributeValue("requiredMessage");
                 if (!Strings.isNullOrEmpty(requiredMessage)) {
-                    component.setRequiredMessage(field, requiredMessage);
+                    component.setRequiredMessage(field, loadResourceString(requiredMessage));
                 }
             }
         }
