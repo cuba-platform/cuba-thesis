@@ -117,6 +117,10 @@ public class RuntimePropsDatasourceImpl
         Collection<CategoryAttributeValue> entityValues = dynamicAttributes.values();
         TimeSource timeSource = AppBeans.get(TimeSource.NAME);
         for (CategoryAttribute attribute : attributes) {
+            if (!attribute.getCategory().equals(category)) {
+                continue;
+            }
+
             CategoryAttributeValue attributeValue = getValue(attribute, entityValues);
             Object value;
             if (attributeValue == null) {

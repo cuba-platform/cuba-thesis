@@ -5,12 +5,13 @@
 
 package com.haulmont.cuba.gui.dynamicattributes;
 
+import com.haulmont.chile.core.common.ValueListener;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributes;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
 import com.haulmont.cuba.core.entity.BaseGenericIdEntity;
+import com.haulmont.cuba.core.entity.Categorized;
 import com.haulmont.cuba.core.entity.CategoryAttribute;
-import com.haulmont.cuba.core.entity.CategoryAttributeValue;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MetadataTools;
@@ -76,16 +77,39 @@ public class DynamicAttributesGuiTools {
     public void initDefaultAttributeValues(BaseGenericIdEntity item) {
         Collection<CategoryAttribute> attributes =
                 dynamicAttributes.getAttributesForMetaClass(item.getMetaClass());
-        item.setDynamicAttributes(new HashMap<String, CategoryAttributeValue>());
+        if (item.getDynamicAttributes() == null) {
+            item.setDynamicAttributes(new HashMap<>());
+        }
         Date currentTimestamp = AppBeans.get(TimeSource.NAME, TimeSource.class).currentTimestamp();
+        boolean entityIsCategorized = item instanceof Categorized && ((Categorized) item).getCategory() != null;
 
         for (CategoryAttribute categoryAttribute : attributes) {
             String code = DynamicAttributesUtils.encodeAttributeCode(categoryAttribute.getCode());
+            if (entityIsCategorized && !categoryAttribute.getCategory().equals(((Categorized) item).getCategory())) {
+                item.setValue(code, null);//cleanup attributes from not dedicated category
+                continue;
+            }
+
+            if (item.getValue(code) != null) {
+                continue;//skip not null attributes
+            }
+
             if (categoryAttribute.getDefaultValue() != null) {
                 item.setValue(code, categoryAttribute.getDefaultValue());
             } else if (Boolean.TRUE.equals(categoryAttribute.getDefaultDateIsCurrent())) {
                 item.setValue(code, currentTimestamp);
             }
+        }
+
+        if (item instanceof Categorized) {
+            item.addListener(new ValueListener() {
+                @Override
+                public void propertyChanged(Object item, String property, Object prevValue, Object value) {
+                    if ("category".equals(property)) {
+                        initDefaultAttributeValues((BaseGenericIdEntity) item);
+                    }
+                }
+            });
         }
     }
 
