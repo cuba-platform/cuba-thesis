@@ -5,7 +5,6 @@
 
 package com.haulmont.cuba.gui.dynamicattributes;
 
-import com.haulmont.chile.core.common.ValueListener;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributes;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
@@ -100,17 +99,18 @@ public class DynamicAttributesGuiTools {
                 item.setValue(code, currentTimestamp);
             }
         }
+    }
 
-        if (item instanceof Categorized) {
-            item.addListener(new ValueListener() {
-                @Override
-                public void propertyChanged(Object item, String property, Object prevValue, Object value) {
-                    if ("category".equals(property)) {
-                        initDefaultAttributeValues((BaseGenericIdEntity) item);
-                    }
+    @SuppressWarnings("unchecked")
+    public void listenCategoryChanges(Datasource ds) {
+        ds.addListener(new DsListenerAdapter() {
+            @Override
+            public void valueChanged(Entity source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                if ("category".equals(property)) {
+                    initDefaultAttributeValues((BaseGenericIdEntity) source);
                 }
-            });
-        }
+            }
+        });
     }
 
     protected boolean attributeShouldBeShownOnTheScreen(String screen, String component, CategoryAttribute attribute) {

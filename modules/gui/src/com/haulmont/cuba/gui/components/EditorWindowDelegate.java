@@ -11,6 +11,7 @@ import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.app.LockService;
 import com.haulmont.cuba.core.entity.BaseGenericIdEntity;
+import com.haulmont.cuba.core.entity.Categorized;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.ComponentsHelper;
@@ -159,6 +160,9 @@ public class EditorWindowDelegate extends WindowDelegate {
         if (ds.getLoadDynamicAttributes() && item instanceof BaseGenericIdEntity) {
             DynamicAttributesGuiTools dynamicAttributesGuiTools = AppBeans.get(DynamicAttributesGuiTools.NAME);
             dynamicAttributesGuiTools.initDefaultAttributeValues((BaseGenericIdEntity) item);
+            if (item instanceof Categorized) {
+                dynamicAttributesGuiTools.listenCategoryChanges(ds);
+            }
         }
 
         this.item = item;
