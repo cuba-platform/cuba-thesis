@@ -56,6 +56,9 @@ public class ClusterManager implements ClusterManagerAPI, AppContext.Listener {
     @Inject
     protected GlobalConfig globalConfig;
 
+    @Inject
+    protected ClusterConfig clusterConfig;
+
     protected static final String STATE_MAGIC = "CUBA_STATE";
 
     public ClusterManager() {
@@ -125,7 +128,7 @@ public class ClusterManager implements ClusterManagerAPI, AppContext.Listener {
             channel.setDiscardOwnMessages(true); // do not receive a copy of our own messages
             channel.setReceiver(new ClusterReceiver());
             channel.connect(getClusterName());
-            channel.getState(null, 5000);
+            channel.getState(null, clusterConfig.getStateReceiveTimeout());
             registerJmxBeans();
         } catch (Exception e) {
             channel = null;
