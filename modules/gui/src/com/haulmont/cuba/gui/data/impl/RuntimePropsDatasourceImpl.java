@@ -11,12 +11,10 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributes;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesMetaClass;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
-import com.haulmont.cuba.core.app.dynamicattributes.PropertyType;
 import com.haulmont.cuba.core.entity.*;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.data.*;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -64,17 +62,6 @@ public class RuntimePropsDatasourceImpl
             this.metaClass.addProperty(metaProperty, attribute);
         }
 
-        mainDs.addListener(new DsListenerAdapter() {
-            @Override
-            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
-                if (property.equals("category")) {
-                    categoryChanged = true;
-                    initMetaClass();
-                }
-            }
-        });
-        mainDs.setLoadDynamicAttributes(true);
-
         ViewRepository viewRepository = AppBeans.get(ViewRepository.NAME);
 
         View baseAttributeValueView = viewRepository.getView(CategoryAttributeValue.class, View.LOCAL);
@@ -90,151 +77,12 @@ public class RuntimePropsDatasourceImpl
         throw new UnsupportedOperationException();
     }
 
-    protected void initMetaClass() {
-        Entity entity = mainDs.getItem();
-        if (!(entity instanceof BaseGenericIdEntity)) {
-            throw new IllegalStateException("This datasource can contain only entity with subclass of BaseGenericIdEntity");
-        }
-        BaseGenericIdEntity baseGenericIdEntity = (BaseGenericIdEntity) entity;
-        if (PersistenceHelper.isNew(baseGenericIdEntity)) {
-            baseGenericIdEntity.setDynamicAttributes(new HashMap<String, CategoryAttributeValue>());
-        }
-        @SuppressWarnings("unchecked")
-        Map<String, CategoryAttributeValue> dynamicAttributes = baseGenericIdEntity.getDynamicAttributes();
-        Preconditions.checkNotNullArgument(dynamicAttributes, "Dynamic attributes should be loaded explicitly");
-
-        if (entity instanceof Categorized) {
-            category = ((Categorized) entity).getCategory();
-        }
-        if (!initializedBefore && category == null) {
-            category = getDefaultCategory();
-            if (entity.getMetaClass().getProperty("category") != null) {
-                entity.setValue("category", category);
-            }
-        }
-
-        item = new DynamicAttributesEntity(metaClass);
-        Collection<CategoryAttributeValue> entityValues = dynamicAttributes.values();
-        TimeSource timeSource = AppBeans.get(TimeSource.NAME);
-        for (CategoryAttribute attribute : attributes) {
-            if (!attribute.getCategory().equals(category)) {
-                continue;
-            }
-
-            CategoryAttributeValue attributeValue = getValue(attribute, entityValues);
-            Object value;
-            if (attributeValue == null) {
-                attributeValue = new CategoryAttributeValue();
-                dynamicAttributes.put(attribute.getCode(), attributeValue);
-
-                attributeValue.setCode(DynamicAttributesUtils.decodeAttributeCode(attribute.getCode()));
-                attributeValue.setCategoryAttribute(attribute);
-                attributeValue.setEntityId(entity.getUuid());
-
-                if (PersistenceHelper.isNew(entity) || categoryChanged) {
-                    attributeValue.setStringValue(StringUtils.trimToNull(attribute.getDefaultString()));
-                    attributeValue.setIntValue(attribute.getDefaultInt());
-                    attributeValue.setDoubleValue(attribute.getDefaultDouble());
-                    attributeValue.setBooleanValue(attribute.getDefaultBoolean());
-                    attributeValue.setDateValue(BooleanUtils.isTrue(attribute.getDefaultDateIsCurrent()) ?
-                            timeSource.currentTimestamp() : attribute.getDefaultDate());
-                    attributeValue.setEntityValue(attribute.getDefaultEntityId());
-                    value = parseValue(attribute, attributeValue);
-                } else {
-                    value = null;
-                }
-            } else {
-                value = parseValue(attribute, attributeValue);
-            }
-
-            item.addAttributeValue(attribute, attributeValue, value);
-        }
-
-        view = new View(DynamicAttributesEntity.class);
-        Collection<MetaProperty> properties = metaClass.getProperties();
-        for (MetaProperty property : properties) {
-            view.addProperty(property.getName());
-        }
-
-        item.addListener(listener);
-        item.addListener(new com.haulmont.chile.core.common.ValueListener() {
-            @Override
-            public void propertyChanged(Object item, String property, Object prevValue, Object value) {
-                modified = true;
-                //noinspection unchecked
-                itemToUpdate.add(((DynamicAttributesEntity) item).getCategoryValue(property));
-            }
-        });
-        this.valid();
-        initializedBefore = true;
-        if (!itemToDelete.isEmpty()) {
-            modified = true;
-        }
-        fireItemChanged(null);
-    }
-
     public MetaClass resolveCategorizedEntityClass() {
         if (categorizedEntityClass == null) {
             return mainDs.getMetaClass();
         } else {
             return categorizedEntityClass;
         }
-    }
-
-    protected CategoryAttributeValue getValue(CategoryAttribute attribute, Collection<CategoryAttributeValue> entityValues) {
-        for (CategoryAttributeValue attrValue : entityValues) {
-            if (attrValue.getCategoryAttribute().equals(attribute))
-                return attrValue;
-        }
-        return null;
-    }
-
-    protected Object parseValue(CategoryAttribute attribute, CategoryAttributeValue attrValue) {
-        PropertyType dataType = attribute.getDataType();
-
-        if (BooleanUtils.isTrue(attribute.getIsEntity())) {
-            if (attrValue != null) {
-                UUID entityId = attrValue.getEntityValue();
-                return parseEntity(attribute.getEntityClass(), entityId);
-            } else {
-                UUID entityId = attribute.getDefaultEntityId();
-                return parseEntity(attribute.getEntityClass(), entityId);
-            }
-        } else {
-            switch (dataType) {
-                case STRING:
-                case ENUMERATION:
-                    return attrValue != null ? attrValue.getStringValue() : attribute.getDefaultString();
-                case INTEGER:
-                    return attrValue != null ? attrValue.getIntValue() : attribute.getDefaultInt();
-                case DOUBLE:
-                    return attrValue != null ? attrValue.getDoubleValue() : attribute.getDefaultDouble();
-                case BOOLEAN:
-                    return attrValue != null ? attrValue.getBooleanValue() : attribute.getDefaultBoolean();
-                case DATE:
-                    return attrValue != null ? attrValue.getDateValue() : attribute.getDefaultDate();
-            }
-
-        }
-        return attrValue.getStringValue();
-    }
-
-    protected Entity parseEntity(String entityType, UUID uuid) {
-        Entity entity;
-        try {
-            Class clazz = Class.forName(entityType);
-            LoadContext entitiesContext = new LoadContext(clazz);
-            entitiesContext.setSoftDeletion(false);
-            String entityClassName = metadata.getSession().getClassNN(clazz).getName();
-            LoadContext.Query query = entitiesContext.setQueryString("select a from " + entityClassName + " a where a.id =:e");
-            query.setParameter("e", uuid);
-            entitiesContext.setView("_local");
-            entity = dataSupplier.load(entitiesContext);
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("can't parse entity " + entityType + " " + uuid, e);
-        }
-        return entity;
     }
 
     @Override
@@ -249,24 +97,7 @@ public class RuntimePropsDatasourceImpl
 
     @Override
     public void commit() {
-        if (!allowCommit)
-            return;
-
-        if (Datasource.CommitMode.DATASTORE.equals(getCommitMode())) {
-            Set<Entity> commitInstances = new HashSet<>();
-            Set<Entity> deleteInstances = new HashSet<>();
-
-            commitInstances.addAll(itemToCreate);
-            commitInstances.addAll(itemToUpdate);
-            deleteInstances.addAll(itemToDelete);
-
-            CommitContext cc = new CommitContext(commitInstances, deleteInstances);
-
-            Set<Entity> entities = getDataSupplier().commit(cc);
-            committed(entities);
-        } else {
-            throw new UnsupportedOperationException();
-        }
+        //just do nothing
     }
 
     @Override
@@ -306,7 +137,7 @@ public class RuntimePropsDatasourceImpl
 
     @Override
     public void refresh() {
-        initMetaClass();
+        initMetaClass(mainDs.getItem());
     }
 
     @Override
@@ -345,44 +176,12 @@ public class RuntimePropsDatasourceImpl
         }
 
         for (Entity entity : entities) {
-            if (entity instanceof CategoryAttributeValue) {
-                CategoryAttributeValue attributeValue = (CategoryAttributeValue) entity;
-                item.updateAttributeValue(attributeValue);
-                Entity mainItem = mainDs.getItem();
-                if (mainItem instanceof BaseGenericIdEntity) {
-                    BaseGenericIdEntity baseGenericIdEntity = (BaseGenericIdEntity) mainItem;
-                    if (baseGenericIdEntity.getDynamicAttributes() == null) {
-                        baseGenericIdEntity.setDynamicAttributes(new HashMap<>());
-                    }
-
-                    baseGenericIdEntity.getDynamicAttributes().put(attributeValue.getCode(), attributeValue);
-                }
+            if (entity.equals(mainDs.getItem())) {
+                initMetaClass(entity);
             }
         }
         modified = false;
         clearCommitLists();
-    }
-
-    protected void setMainDs(String name) {
-        mainDs = dsContext.get(name);
-        if (mainDs == null) {
-            throw new DevelopmentException("runtimePropsDatasource initialization error: mainDs '" + name + "' does not exists");
-        }
-
-        //noinspection unchecked
-        mainDs.addListener(
-                new DsListenerAdapter() {
-                    @Override
-                    public void stateChanged(Datasource ds, State prevState, State state) {
-                        if (State.VALID.equals(state)) {
-                            if (!State.VALID.equals(prevState))
-                                initMetaClass();
-                            else
-                                valid();
-                        }
-                    }
-                }
-        );
     }
 
     @Override
@@ -406,5 +205,81 @@ public class RuntimePropsDatasourceImpl
         }
 
         return null;
+    }
+
+    protected void setMainDs(String name) {
+        mainDs = dsContext.get(name);
+        if (mainDs == null) {
+            throw new DevelopmentException("runtimePropsDatasource initialization error: mainDs '" + name + "' does not exists");
+        }
+        mainDs.setLoadDynamicAttributes(true);
+
+        //noinspection unchecked
+        mainDs.addListener(
+                new DsListenerAdapter() {
+                    @Override
+                    public void stateChanged(Datasource ds, State prevState, State state) {
+                        if (State.VALID.equals(state)) {
+                            if (!State.VALID.equals(prevState))
+                                initMetaClass(mainDs.getItem());
+                            else
+                                valid();
+                        }
+                    }
+
+                    @Override
+                    public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                        if (property.equals("category")) {
+                            categoryChanged = true;
+                            initMetaClass(mainDs.getItem());
+                        }
+                    }
+
+                    @Override
+                    public void itemChanged(Datasource ds, @Nullable Entity prevItem, @Nullable Entity item) {
+                        initMetaClass(item);
+                    }
+                }
+        );
+    }
+
+    protected void initMetaClass(Entity entity) {
+        if (!(entity instanceof BaseGenericIdEntity)) {
+            throw new IllegalStateException("This datasource can contain only entity with subclass of BaseGenericIdEntity");
+        }
+
+        BaseGenericIdEntity baseGenericIdEntity = (BaseGenericIdEntity) entity;
+        if (PersistenceHelper.isNew(baseGenericIdEntity) && baseGenericIdEntity.getDynamicAttributes() == null) {
+            baseGenericIdEntity.setDynamicAttributes(new HashMap<String, CategoryAttributeValue>());
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, CategoryAttributeValue> dynamicAttributes = baseGenericIdEntity.getDynamicAttributes();
+        Preconditions.checkNotNullArgument(dynamicAttributes, "Dynamic attributes should be loaded explicitly");
+
+        if (baseGenericIdEntity instanceof Categorized) {
+            category = ((Categorized) baseGenericIdEntity).getCategory();
+        }
+        if (!initializedBefore && category == null) {
+            category = getDefaultCategory();
+            if (baseGenericIdEntity.getMetaClass().getProperty("category") != null) {
+                baseGenericIdEntity.setValue("category", category);
+            }
+        }
+
+        item = new DynamicAttributesEntity(baseGenericIdEntity);
+        DynamicAttributesGuiTools dynamicAttributesGuiTools = AppBeans.get(DynamicAttributesGuiTools.NAME);
+        dynamicAttributesGuiTools.initDefaultAttributeValues(baseGenericIdEntity);
+
+        view = new View(DynamicAttributesEntity.class);
+        Collection<MetaProperty> properties = metaClass.getProperties();
+        for (MetaProperty property : properties) {
+            view.addProperty(property.getName());
+        }
+
+        item.addListener(listener);
+        this.valid();
+        initializedBefore = true;
+        fireItemChanged(null);
     }
 }
