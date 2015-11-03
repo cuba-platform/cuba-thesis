@@ -21,10 +21,7 @@ import com.haulmont.cuba.gui.data.*;
 import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Specific datasource for dynamic attributes.
@@ -272,8 +269,7 @@ public class RuntimePropsDatasourceImpl
             view.addProperty(property.getName());
         }
 
-        item.addListener(listener);
-        this.valid();
+        valid();
         initializedBefore = true;
         fireItemChanged(null);
     }
