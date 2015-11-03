@@ -10,14 +10,21 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributes;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesMetaClass;
+import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesMetaProperty;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
 import com.haulmont.cuba.core.entity.*;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.DevelopmentException;
+import com.haulmont.cuba.core.global.PersistenceHelper;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.data.*;
 import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Specific datasource for dynamic attributes.
@@ -45,7 +52,6 @@ public class RuntimePropsDatasourceImpl
     protected Category category;
 
     protected final Collection<CategoryAttribute> attributes;
-    protected final View attributeValueView;
 
     public RuntimePropsDatasourceImpl(DsContext dsContext, DataSupplier dataSupplier, String id, String mainDsId, @Nullable MetaClass categorizedEntityClass) {
         this.categorizedEntityClass = categorizedEntityClass;
@@ -61,14 +67,6 @@ public class RuntimePropsDatasourceImpl
             MetaProperty metaProperty = DynamicAttributesUtils.getMetaPropertyPath(mainDs.getMetaClass(), attribute).getMetaProperty();
             this.metaClass.addProperty(metaProperty, attribute);
         }
-
-        ViewRepository viewRepository = AppBeans.get(ViewRepository.NAME);
-
-        View baseAttributeValueView = viewRepository.getView(CategoryAttributeValue.class, View.LOCAL);
-        View baseAttributeView = viewRepository.getView(CategoryAttribute.class, View.LOCAL);
-
-        attributeValueView = new View(baseAttributeValueView, null, false)
-                .addProperty("categoryAttribute", new View(baseAttributeView, null, false).addProperty("category"));
     }
 
     @Override
@@ -151,11 +149,6 @@ public class RuntimePropsDatasourceImpl
     }
 
     @Override
-    public View getAttributeValueView() {
-        return attributeValueView;
-    }
-
-    @Override
     public void initialized() {
         final State prev = state;
         state = State.INVALID;
@@ -190,8 +183,10 @@ public class RuntimePropsDatasourceImpl
     }
 
     @Override
-    public Collection<MetaProperty> getPropertiesFilteredByCategory() {
-        return metaClass.getPropertiesFilteredByCategory(category);
+    @SuppressWarnings("unchecked")
+    public Collection<DynamicAttributesMetaProperty> getPropertiesFilteredByCategory() {
+        Collection propertiesFilteredByCategory = metaClass.getPropertiesFilteredByCategory(category);
+        return (Collection<DynamicAttributesMetaProperty>) propertiesFilteredByCategory;
     }
 
     @Nullable
