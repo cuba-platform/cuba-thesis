@@ -36,6 +36,7 @@ public class RuntimePropsDatasourceImpl
 
     protected DsContext dsContext;
     protected DataSupplier dataSupplier;
+    protected DynamicAttributesGuiTools dynamicAttributesGuiTools;
     protected DynamicAttributesMetaClass metaClass;
     protected View view;
     protected Datasource mainDs;
@@ -55,11 +56,13 @@ public class RuntimePropsDatasourceImpl
         this.id = id;
         this.dsContext = dsContext;
         this.dataSupplier = dataSupplier;
+        this.dynamicAttributesGuiTools = AppBeans.get(DynamicAttributesGuiTools.NAME);
+
         this.metaClass = new DynamicAttributesMetaClass();
         this.setMainDs(mainDsId);
         this.setCommitMode(CommitMode.DATASTORE);
 
-        attributes = AppBeans.get(DynamicAttributes.class).getAttributesForMetaClass(resolveCategorizedEntityClass());
+        this.attributes = AppBeans.get(DynamicAttributes.NAME, DynamicAttributes.class).getAttributesForMetaClass(resolveCategorizedEntityClass());
         for (CategoryAttribute attribute : attributes) {
             MetaProperty metaProperty = DynamicAttributesUtils.getMetaPropertyPath(mainDs.getMetaClass(), attribute).getMetaProperty();
             this.metaClass.addProperty(metaProperty, attribute);
@@ -206,6 +209,8 @@ public class RuntimePropsDatasourceImpl
         }
         mainDs.setLoadDynamicAttributes(true);
 
+        dynamicAttributesGuiTools.listenDynamicAttributesChanges(mainDs);
+
         //noinspection unchecked
         mainDs.addListener(
                 new DsListenerAdapter() {
@@ -260,7 +265,6 @@ public class RuntimePropsDatasourceImpl
         }
 
         item = new DynamicAttributesEntity(baseGenericIdEntity);
-        DynamicAttributesGuiTools dynamicAttributesGuiTools = AppBeans.get(DynamicAttributesGuiTools.NAME);
         dynamicAttributesGuiTools.initDefaultAttributeValues(baseGenericIdEntity);
 
         view = new View(DynamicAttributesEntity.class);
