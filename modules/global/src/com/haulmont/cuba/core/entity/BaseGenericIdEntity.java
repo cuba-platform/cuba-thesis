@@ -10,6 +10,7 @@ import com.haulmont.chile.core.model.impl.AbstractInstance;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributes;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
 import com.haulmont.cuba.core.global.*;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.openjpa.enhance.PersistenceCapable;
 import org.apache.openjpa.kernel.DetachedStateManager;
 
@@ -119,33 +120,37 @@ public abstract class BaseGenericIdEntity<T> extends AbstractInstance implements
     public static boolean allowSetNotLoadedAttributes;
 
     @Override
-    public void setValue(String property, Object obj, boolean checkEquals) {
+    public void setValue(String property, Object newValue, boolean checkEquals) {
         if (DynamicAttributesUtils.isDynamicAttribute(property)) {
             Preconditions.checkState(dynamicAttributes != null, "Dynamic attributes should be loaded explicitly");
             String attributeCode = DynamicAttributesUtils.decodeAttributeCode(property);
             CategoryAttributeValue categoryAttributeValue = dynamicAttributes.get(attributeCode);
-            if (categoryAttributeValue != null) {
-                if (obj != null) {
-                    categoryAttributeValue.setValue(obj);
-                    categoryAttributeValue.setDeleteTs(null);
-                } else {
+            Object oldValue = categoryAttributeValue != null ? categoryAttributeValue.getValue() : null;
+
+            if (newValue == null) {
+                if (categoryAttributeValue != null) {
                     categoryAttributeValue.setValue(null);
                     categoryAttributeValue.setDeleteTs(AppBeans.get(TimeSource.class).currentTimestamp());
+                    propertyChanged(property, oldValue, null);
                 }
-            } else if (obj != null) {
-                categoryAttributeValue = new CategoryAttributeValue();
-                categoryAttributeValue.setValue(obj);
-                categoryAttributeValue.setEntityId(getUuid());
-                categoryAttributeValue.setCode(attributeCode);
-                DynamicAttributes dynamicAttributesBean = AppBeans.get(DynamicAttributes.NAME);
-                categoryAttributeValue.setCategoryAttribute(
-                        dynamicAttributesBean.getAttributeForMetaClass(getMetaClass(), attributeCode));
-                dynamicAttributes.put(attributeCode, categoryAttributeValue);
+            } else if (!ObjectUtils.equals(oldValue, newValue)) {
+                if (categoryAttributeValue != null) {
+                    categoryAttributeValue.setValue(newValue);
+                    categoryAttributeValue.setDeleteTs(null);
+                } else {
+                    categoryAttributeValue = new CategoryAttributeValue();
+                    categoryAttributeValue.setValue(newValue);
+                    categoryAttributeValue.setEntityId(getUuid());
+                    categoryAttributeValue.setCode(attributeCode);
+                    DynamicAttributes dynamicAttributesBean = AppBeans.get(DynamicAttributes.NAME);
+                    categoryAttributeValue.setCategoryAttribute(
+                            dynamicAttributesBean.getAttributeForMetaClass(getMetaClass(), attributeCode));
+                    dynamicAttributes.put(attributeCode, categoryAttributeValue);
+                }
+                propertyChanged(property, null, newValue);
             }
-
-            propertyChanged(property, null, obj);
         } else {
-            super.setValue(property, obj, checkEquals);
+            super.setValue(property, newValue, checkEquals);
         }
     }
 
@@ -154,7 +159,7 @@ public abstract class BaseGenericIdEntity<T> extends AbstractInstance implements
     public <T> T getValue(String property) {
         if (DynamicAttributesUtils.isDynamicAttribute(property)) {
             if (PersistenceHelper.isNew(this) && dynamicAttributes == null) {
-                    dynamicAttributes = new HashMap<>();
+                dynamicAttributes = new HashMap<>();
             }
 
             Preconditions.checkState(dynamicAttributes != null, "Dynamic attributes should be loaded explicitly");
