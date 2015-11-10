@@ -6,6 +6,7 @@ package com.haulmont.cuba.gui.data.impl;
 
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.gui.data.CollectionDatasourceListener;
 import com.haulmont.cuba.gui.data.GroupDatasource;
 import com.haulmont.cuba.gui.data.GroupInfo;
 
@@ -165,7 +166,7 @@ public class GroupDatasourceImpl<T extends Entity<K>, K>
             if (!getGroupProperties().isEmpty()) {
                 groupBy(getGroupProperties().toArray());
 
-                fireCollectionChanged(Operation.REFRESH, Collections.emptyList());
+                fireCollectionChanged(CollectionDatasourceListener.Operation.REFRESH, Collections.<Entity>emptyList());
             }
         }
     }
