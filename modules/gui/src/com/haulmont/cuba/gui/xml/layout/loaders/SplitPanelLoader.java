@@ -63,6 +63,11 @@ public class SplitPanelLoader extends ContainerLoader{
             component.setSplitPosition(Integer.parseInt(pos));
         }
 
+        String locked = element.attributeValue("locked");
+        if (!StringUtils.isEmpty(locked)) {
+            component.setLocked(Boolean.parseBoolean(locked));
+        }
+
         loadHeight(component, element, Component.AUTO_SIZE);
         loadWidth(component, element, Component.AUTO_SIZE);
         loadAlign(component, element);
