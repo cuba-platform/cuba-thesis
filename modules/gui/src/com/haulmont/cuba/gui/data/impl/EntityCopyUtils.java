@@ -79,6 +79,7 @@ public class EntityCopyUtils {
         }
         if (source instanceof BaseEntity && dest instanceof BaseEntity) {
             ((BaseEntity) dest).setDetached(((BaseEntity) source).isDetached());
+            ((BaseGenericIdEntity) dest).setDynamicAttributes(((BaseGenericIdEntity<?>) source).getDynamicAttributes());
         }
     }
 
