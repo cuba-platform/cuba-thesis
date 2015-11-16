@@ -127,12 +127,13 @@ public class EditorWindowDelegate extends WindowDelegate {
 
         DatasourceImplementation parentDs = (DatasourceImplementation) ((DatasourceImplementation) ds).getParent();
 
+        boolean useSecConstraints = !WindowParams.DISABLE_SECURITY_CONSTRAINTS.getBool(window.getContext());
         if (parentDs != null) {
             if (!PersistenceHelper.isNew(item)
                     && !parentDs.getItemsToCreate().contains(item) && !parentDs.getItemsToUpdate().contains(item)
                     && parentDs instanceof CollectionDatasource
                     && ((CollectionDatasource) parentDs).containsItem(item)) {
-                item = dataservice.reload(item, ds.getView(), ds.getMetaClass());
+                item = dataservice.reload(item, ds.getView(), ds.getMetaClass(), useSecConstraints, ds.getLoadDynamicAttributes());
                 if (parentDs instanceof CollectionPropertyDatasourceImpl) {
                     ((CollectionPropertyDatasourceImpl) parentDs).replaceItem(item);
                 } else {
@@ -140,9 +141,7 @@ public class EditorWindowDelegate extends WindowDelegate {
                 }
             }
             item = EntityCopyUtils.copyCompositions(item);
-
         } else if (!PersistenceHelper.isNew(item)) {
-            boolean useSecConstraints = !WindowParams.DISABLE_SECURITY_CONSTRAINTS.getBool(window.getContext());
             item = dataservice.reload(item, ds.getView(), ds.getMetaClass(), useSecConstraints, ds.getLoadDynamicAttributes());
         }
 
