@@ -82,6 +82,11 @@ public class FilterSelectWindow extends AbstractWindow {
             public void actionPerform(Component component) {
                 select();
             }
+
+            @Override
+            public String getCaption() {
+                return getMessage("FilterSelect.selectByDblClk");
+            }
         });
 
         FilterHelper filterHelper = AppBeans.get(FilterHelper.class);
