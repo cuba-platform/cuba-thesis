@@ -200,24 +200,21 @@ public class EditorWindowDelegate extends WindowDelegate {
      * nested items previously deleted by the user.
      */
     protected void handlePreviouslyDeletedCompositionItems(Entity entity, final DatasourceImplementation parentDs) {
-        metadata.getTools().traverseAttributes(entity, new EntityAttributeVisitor() {
-            @Override
-            public void visit(Entity entity, MetaProperty property) {
-                if (property.getType() == MetaProperty.Type.COMPOSITION) {
-                    for (Datasource datasource : parentDs.getDsContext().getAll()) {
-                        if (datasource instanceof NestedDatasource
-                                && ((NestedDatasource) datasource).getMaster().equals(parentDs)) {
-                            Object value = entity.getValue(property.getName());
-                            if (value instanceof Collection) {
-                                Collection collection = (Collection) value;
-                                //noinspection unchecked
-                                collection.removeAll(((DatasourceImplementation) datasource).getItemsToDelete());
-                            }
+        for (MetaProperty property : metadata.getClassNN(entity.getClass()).getProperties()) {
+            if (property.getType() == MetaProperty.Type.COMPOSITION) {
+                for (Datasource datasource : parentDs.getDsContext().getAll()) {
+                    if (datasource instanceof NestedDatasource
+                            && ((NestedDatasource) datasource).getMaster().equals(parentDs)) {
+                        Object value = entity.getValue(property.getName());
+                        if (value instanceof Collection) {
+                            Collection collection = (Collection) value;
+                            //noinspection unchecked
+                            collection.removeAll(((DatasourceImplementation) datasource).getItemsToDelete());
                         }
                     }
                 }
             }
-        });
+        }
     }
 
     public void setParentDs(Datasource parentDs) {
