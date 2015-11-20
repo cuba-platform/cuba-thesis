@@ -20,6 +20,7 @@ import org.apache.commons.lang.ObjectUtils;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -176,8 +177,14 @@ public class PropertyDatasourceImpl<T extends Entity>
                 // in this datasource, so we need to delete them
                 for (Iterator it = ((DatasourceImplementation) parentCollectionDs).getItemsToCreate().iterator(); it.hasNext(); ) {
                     Object item = it.next();
-                    if (!itemToCreate.contains(item))
-                        it.remove();
+                    if (!itemToCreate.contains(item)) {
+                        MetaProperty inverseProp = metaProperty.getInverse();
+                        // delete only if they have the same master item
+                        if (inverseProp != null
+                                && Objects.equals(((Instance) item).getValue(inverseProp.getName()), masterDs.getItem())) {
+                            it.remove();
+                        }
+                    }
                 }
 
             } /* else {

@@ -7,6 +7,7 @@ package com.haulmont.cuba.gui.components;
 
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.app.LockService;
@@ -16,10 +17,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowParams;
-import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.data.DataSupplier;
-import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.DsContext;
+import com.haulmont.cuba.gui.data.*;
 import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.EntityCopyUtils;
@@ -27,6 +25,7 @@ import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.security.entity.EntityOp;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -141,6 +140,7 @@ public class EditorWindowDelegate extends WindowDelegate {
                 }
             }
             item = EntityCopyUtils.copyCompositions(item);
+            handlePreviouslyDeletedCompositionItems(item, parentDs);
         } else if (!PersistenceHelper.isNew(item)) {
             item = dataservice.reload(item, ds.getView(), ds.getMetaClass(), useSecConstraints, ds.getLoadDynamicAttributes());
         }
@@ -192,6 +192,32 @@ public class EditorWindowDelegate extends WindowDelegate {
                 readOnly = true;
             }
         }
+    }
+
+    /**
+     * This method is required for multi-level composition, when a user deletes records from nested editors, saves them
+     * and then reopens. When an editor is opened, we reload the item from the database, hence we need to remove
+     * nested items previously deleted by the user.
+     */
+    protected void handlePreviouslyDeletedCompositionItems(Entity entity, final DatasourceImplementation parentDs) {
+        metadata.getTools().traverseAttributes(entity, new EntityAttributeVisitor() {
+            @Override
+            public void visit(Entity entity, MetaProperty property) {
+                if (property.getType() == MetaProperty.Type.COMPOSITION) {
+                    for (Datasource datasource : parentDs.getDsContext().getAll()) {
+                        if (datasource instanceof NestedDatasource
+                                && ((NestedDatasource) datasource).getMaster().equals(parentDs)) {
+                            Object value = entity.getValue(property.getName());
+                            if (value instanceof Collection) {
+                                Collection collection = (Collection) value;
+                                //noinspection unchecked
+                                collection.removeAll(((DatasourceImplementation) datasource).getItemsToDelete());
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public void setParentDs(Datasource parentDs) {
