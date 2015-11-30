@@ -1446,6 +1446,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
                             layout.addComponent(vComponent);
                             vComponent = layout;
                         }
+
+                        vComponent.setParent(WebAbstractTable.this.component);
+
                         return vComponent;
                     }
                 }
