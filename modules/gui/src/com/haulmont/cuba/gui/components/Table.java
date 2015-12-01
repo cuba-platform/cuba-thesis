@@ -130,6 +130,12 @@ public interface Table
     RowsCount getRowsCount();
     void setRowsCount(RowsCount rowsCount);
 
+    void setColumnSortAllowed(String columnId, boolean allowed);
+    boolean getColumnSortAllowed(String columnId);
+
+    void setColumnSortAllowed(Column column, boolean allowed);
+    boolean getColumnSortAllowed(Column column);
+
     /**
      * Use {@link #isMultiLineCells()}
      */
@@ -414,6 +420,7 @@ public interface Table
         protected Formatter formatter;
         protected Integer width;
         protected boolean collapsed;
+        protected boolean sortAllowed = true;
         protected AggregationInfo aggregation;
         protected boolean calculatable;
         protected Integer maxTextLength;
@@ -533,6 +540,17 @@ public interface Table
             this.aggregation = aggregation;
             if (owner != null) {
                 owner.addAggregationProperty(this, aggregation.getType());
+            }
+        }
+
+        public boolean isSortAllowed() {
+            return sortAllowed;
+        }
+
+        public void setSortAllowed(boolean allowed) {
+            this.sortAllowed = allowed;
+            if (owner != null) {
+                owner.setColumnSortAllowed(this, allowed);
             }
         }
 

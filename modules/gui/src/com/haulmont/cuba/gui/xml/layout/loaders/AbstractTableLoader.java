@@ -308,6 +308,11 @@ public abstract class AbstractTableLoader extends ActionsHolderLoader {
             column.setEditable(Boolean.valueOf(editable));
         }
 
+        String sortAllowed = element.attributeValue("sortAllowed");
+        if (StringUtils.isNotEmpty(sortAllowed)) {
+            column.setSortAllowed(Boolean.valueOf(sortAllowed));
+        }
+
         String collapsed = element.attributeValue("collapsed");
         if (collapsed == null) {
             // todo artamonov remove in 5.3
