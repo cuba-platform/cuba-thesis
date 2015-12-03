@@ -559,11 +559,23 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
             nonSortableProperties = new HashSet<>();
         }
         if (sortable) {
-            nonSortableProperties.remove(columnId);
+            if (nonSortableProperties.remove(columnId)) {
+                markAsDirty();
+            }
         } else {
-            nonSortableProperties.add(columnId);
+            if (nonSortableProperties.add(columnId)) {
+                markAsDirty();
+            }
         }
-        markAsDirty();
+    }
+
+    @Override
+    public Collection<?> getSortableContainerPropertyIds() {
+        Collection<?> ids = super.getSortableContainerPropertyIds();
+        if (nonSortableProperties != null) {
+            ids.removeAll(nonSortableProperties);
+        }
+        return ids;
     }
 
     @Override
@@ -572,7 +584,6 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
 
         updateClickableColumnKeys();
         updateColumnDescriptions();
-        updateSortableColumnKeys();
     }
 
     protected void updateClickableColumnKeys() {
@@ -600,17 +611,6 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
         popupComponent.setParent(this);
     }
 
-    protected void updateSortableColumnKeys() {
-        if (nonSortableProperties != null) {
-            String[] sortDisallowedColumnKeys = new String[nonSortableProperties.size()];
-            int i = 0;
-            for (Object columnId : nonSortableProperties) {
-                sortDisallowedColumnKeys[i] = columnIdMap.key(columnId);
-                i++;
-            }
-            getState().nonSortableColumnKeys = sortDisallowedColumnKeys;
-        }
-    }
     @Override
     public boolean getCustomPopupAutoClose() {
         return getState(false).customPopupAutoClose;
