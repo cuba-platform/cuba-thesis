@@ -197,6 +197,10 @@ public class FileDownloadController {
     }
 
     protected String getContentType(FileDescriptor fd) {
+        if (StringUtils.isEmpty(fd.getExtension())) {
+            return FileTypesHelper.DEFAULT_MIME_TYPE;
+        }
+
         return FileTypesHelper.getMIMEType("." + fd.getExtension().toLowerCase());
     }
 
