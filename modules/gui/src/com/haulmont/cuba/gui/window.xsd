@@ -929,7 +929,7 @@
         <xs:attribute name="maxTextLength" type="xs:integer"/>
         <xs:attribute name="calculatable" type="xs:boolean"/>
         <xs:attribute name="align" type="columnAlignment"/>
-        <xs:attribute name="sortAllowed" type="xs:boolean"/>
+        <xs:attribute name="sortable" type="xs:boolean"/>
 
         <!-- Show entity reference as clickable link -->
         <xs:attribute name="link" type="xs:boolean"/>

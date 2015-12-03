@@ -308,9 +308,9 @@ public abstract class AbstractTableLoader extends ActionsHolderLoader {
             column.setEditable(Boolean.valueOf(editable));
         }
 
-        String sortAllowed = element.attributeValue("sortAllowed");
-        if (StringUtils.isNotEmpty(sortAllowed)) {
-            column.setSortAllowed(Boolean.valueOf(sortAllowed));
+        String sortable = element.attributeValue("sortable");
+        if (StringUtils.isNotEmpty(sortable)) {
+            column.setSortable(Boolean.valueOf(sortable));
         }
 
         String collapsed = element.attributeValue("collapsed");
