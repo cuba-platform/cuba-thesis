@@ -187,9 +187,12 @@ public class Param {
             String[] parts = text.split(",");
             List list = new ArrayList(parts.length);
             for (String part : parts) {
-                list.add(parseSingleValue(part));
+                Object v = parseSingleValue(part);
+                if (v != null) {
+                    list.add(v);
+                }
             }
-            value = list;
+            value = list.isEmpty() ? null : list;
         } else {
             value = parseSingleValue(text);
         }
