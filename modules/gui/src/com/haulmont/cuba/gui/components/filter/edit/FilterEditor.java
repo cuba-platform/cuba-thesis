@@ -14,10 +14,7 @@ import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.filter.AddConditionHelper;
-import com.haulmont.cuba.gui.components.filter.ConditionsTree;
-import com.haulmont.cuba.gui.components.filter.FilterHelper;
-import com.haulmont.cuba.gui.components.filter.GroupType;
+import com.haulmont.cuba.gui.components.filter.*;
 import com.haulmont.cuba.gui.components.filter.condition.*;
 import com.haulmont.cuba.gui.components.filter.descriptor.GroupConditionDescriptor;
 import com.haulmont.cuba.gui.data.Datasource;
@@ -139,7 +136,9 @@ public class FilterEditor extends AbstractWindow {
         refreshConditionsDs();
         conditionsTree.expandTree();
 
-        filterName.setValue(filterEntity.getName());
+        if (!messages.getMessage(FilterDelegateImpl.class, "Filter.adHocFilter").equals(filterEntity.getName())) {
+            filterName.setValue(filterEntity.getName());
+        }
         availableForAllCb.setValue(filterEntity.getUser() == null);
         defaultCb.setValue(filterEntity.getIsDefault());
         applyDefaultCb.setValue(filterEntity.getApplyDefault());

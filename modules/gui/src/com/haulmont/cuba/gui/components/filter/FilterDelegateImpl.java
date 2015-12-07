@@ -2025,6 +2025,9 @@ public class FilterDelegateImpl implements FilterDelegate {
                 public void windowClosed(String actionId) {
                     if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                         conditions = window.getConditions();
+                        filterEntity.setXml(FilterParser.getXml(conditions, Param.ValueProperty.DEFAULT_VALUE));
+                        saveFilterEntity();
+                        initAdHocFilter();
                         initFilterSelectComponents();
                         updateWindowCaption();
                         fillConditionsLayout(ConditionsFocusType.FIRST);
