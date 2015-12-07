@@ -184,15 +184,23 @@ public class Param {
         }
 
         if (inExpr) {
-            String[] parts = text.split(",");
-            List list = new ArrayList(parts.length);
-            for (String part : parts) {
-                Object v = parseSingleValue(part);
-                if (v != null) {
-                    list.add(v);
+            if (StringUtils.isBlank(text)) {
+                value = new ArrayList<>();
+            } else {
+                String[] parts = text.split(",");
+                List list = new ArrayList(parts.length);
+                if (type == Type.ENTITY) {
+                    list = loadEntityList(parts);
+                } else {
+                    for (String part : parts) {
+                        Object value = parseSingleValue(part);
+                        if (value != null) {
+                            list.add(value);
+                        }
+                    }
                 }
+                value = list.isEmpty() ? null : list;
             }
-            value = list.isEmpty() ? null : list;
         } else {
             value = parseSingleValue(text);
         }
@@ -240,6 +248,17 @@ public class Param {
                 throw new IllegalStateException("Param type unknown");
         }
         return value;
+    }
+
+    protected List<Entity> loadEntityList(String[] ids) {
+        Metadata metadata = AppBeans.get(Metadata.class);
+        MetaClass metaClass = metadata.getSession().getClass(javaClass);
+        LoadContext ctx = new LoadContext(javaClass);
+        LoadContext.Query query = ctx.setQueryString("select e from " + metaClass.getName() + " e where e.id in (:ids)");
+        query.setParameter("ids", Arrays.asList(ids));
+        DataManager dataManager = AppBeans.get(DataManager.class);
+        List result = dataManager.loadList(ctx);
+        return result;
     }
 
     protected Object loadEntity(String id) {
