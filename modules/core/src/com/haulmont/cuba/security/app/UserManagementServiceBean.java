@@ -349,68 +349,71 @@ public class UserManagementServiceBean implements UserManagementService {
                 messageTools.getDefaultLocale().getLanguage() : user.getLanguage();
 
         Template bodyTemplate;
-        if (userLocaleIsUnknown)
+        if (userLocaleIsUnknown) {
             bodyTemplate = bodyDefaultTemplate;
-        else {
-            if (localizedBodyTemplates.containsKey(locale))
+        } else {
+            if (localizedBodyTemplates.containsKey(locale)) {
                 bodyTemplate = localizedBodyTemplates.get(locale);
-            else {
-                String baseName = FilenameUtils.getBaseName(resetPasswordBodyTemplate);
-                String localizedTemplate = baseName + "_" + locale;
-                String templateString = resources.getResourceAsString(localizedTemplate);
+            } else {
+                String templateString = getLocalizedTemplateContent(resetPasswordBodyTemplate, locale);
                 if (templateString == null) {
                     log.warn("Reset passwords: Not found email body template for locale: '" + locale + "'");
                     bodyTemplate = bodyDefaultTemplate;
                 } else {
-                    try {
-                        bodyTemplate = templateEngine.createTemplate(templateString);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    bodyTemplate = getTemplate(templateEngine, templateString);
                 }
                 localizedBodyTemplates.put(locale, bodyTemplate);
             }
         }
 
         Template subjectTemplate;
-        if (userLocaleIsUnknown)
+        if (userLocaleIsUnknown) {
             subjectTemplate = subjectDefaultTemplate;
-        else {
-            if (localizedSubjectTemplates.containsKey(locale))
+        } else {
+            if (localizedSubjectTemplates.containsKey(locale)) {
                 subjectTemplate = localizedSubjectTemplates.get(locale);
-            else {
-                String baseName = FilenameUtils.getBaseName(resetPasswordSubjectTemplate);
-                String localizedTemplate = baseName + "_" + locale;
-                String templateString = resources.getResourceAsString(localizedTemplate);
+            } else {
+                String templateString = getLocalizedTemplateContent(resetPasswordSubjectTemplate, locale);
                 if (templateString == null) {
                     log.warn("Reset passwords: Not found email subject template for locale '" + locale + "'");
                     subjectTemplate = subjectDefaultTemplate;
-                    localizedSubjectTemplates.put(locale, subjectDefaultTemplate);
                 } else {
-                    try {
-                        subjectTemplate = templateEngine.createTemplate(templateString);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    localizedSubjectTemplates.put(locale, subjectTemplate);
+                    subjectTemplate = getTemplate(templateEngine, templateString);
                 }
+                localizedSubjectTemplates.put(locale, subjectTemplate);
             }
         }
 
         return new EmailTemplate(subjectTemplate, bodyTemplate);
     }
 
-    protected Template loadDefaultTemplate(String templatePath, SimpleTemplateEngine templateEngine) {
-        Template template;
-        String defaultTemplateContent = resources.getResourceAsString(templatePath);
-        if (defaultTemplateContent == null)
-            throw new IllegalStateException("Not found default email template for reset passwords operation");
+    private String getLocalizedTemplateContent(String defaultTemplateName, String locale) {
+        String localizedTemplate = FilenameUtils.getFullPath(defaultTemplateName)
+                + FilenameUtils.getBaseName(defaultTemplateName) +
+                "_" + locale +
+                "." + FilenameUtils.getExtension(defaultTemplateName);
 
+        return resources.getResourceAsString(localizedTemplate);
+    }
+
+    protected Template getTemplate(SimpleTemplateEngine templateEngine, String templateString) {
+        Template bodyTemplate;
         try {
-            template = templateEngine.createTemplate(defaultTemplateContent);
+            bodyTemplate = templateEngine.createTemplate(templateString);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to compile Groovy template", e);
         }
+        return bodyTemplate;
+    }
+
+    protected Template loadDefaultTemplate(String templatePath, SimpleTemplateEngine templateEngine) {
+        String defaultTemplateContent = resources.getResourceAsString(templatePath);
+        if (defaultTemplateContent == null) {
+            throw new IllegalStateException("Not found default email template for reset passwords operation");
+        }
+
+        //noinspection UnnecessaryLocalVariable
+        Template template = getTemplate(templateEngine, defaultTemplateContent);
         return template;
     }
 
