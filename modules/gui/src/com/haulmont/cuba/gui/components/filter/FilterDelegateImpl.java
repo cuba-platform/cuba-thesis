@@ -420,7 +420,15 @@ public class FilterDelegateImpl implements FilterDelegate {
         if (defaultFilter == null) {
             defaultFilter = adHocFilter;
         }
-        setFilterEntity(defaultFilter);
+
+        try {
+            setFilterEntity(defaultFilter);
+        } catch (Exception e) {
+            log.error("Exception on loading default filter '" + defaultFilter.getName() + "'", e);
+            windowManager.showNotification(formatMessage("Filter.errorLoadingDefaultFilter", defaultFilter.getName()), IFrame.NotificationType.ERROR);
+            defaultFilter = adHocFilter;
+            setFilterEntity(adHocFilter);
+        }
 
         if (defaultFilter != adHocFilter) {
             Window window = ComponentsHelper.getWindow(filter);
