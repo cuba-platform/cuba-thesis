@@ -12,11 +12,17 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.desktop.sys.DesktopToolTipManager;
+import com.haulmont.cuba.desktop.sys.layout.BoxLayoutAdapter;
+import com.haulmont.cuba.desktop.sys.layout.MigBoxLayoutAdapter;
+import com.haulmont.cuba.desktop.sys.layout.MigLayoutHelper;
+import com.haulmont.cuba.desktop.sys.vcl.ExtFlowLayout;
 import com.haulmont.cuba.gui.DialogParams;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowParams;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -24,56 +30,61 @@ import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueChangingListener;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
+import net.miginfocom.layout.CC;
+import net.miginfocom.swing.MigLayout;
 
 import javax.annotation.Nullable;
-import javax.swing.BoxLayout;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author artamonov
  * @version $Id$
  */
-public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.TokenListImpl> implements TokenList {
+public class DesktopTokenList extends DesktopAbstractField<JPanel> implements TokenList {
 
-    private TokenStyleGenerator tokenStyleGenerator;
+    protected TokenStyleGenerator tokenStyleGenerator;
 
-    private CollectionDatasource datasource;
+    protected CollectionDatasource datasource;
 
-    private String captionProperty;
+    protected String captionProperty;
 
-    private CaptionMode captionMode;
+    protected CaptionMode captionMode;
 
-    private Position position = Position.TOP;
+    protected Position position = Position.TOP;
 
-    private ItemChangeHandler itemChangeHandler;
+    protected ItemChangeHandler itemChangeHandler;
 
-    private ItemClickListener itemClickListener;
+    protected ItemClickListener itemClickListener;
 
-    private boolean inline;
+    protected boolean inline;
 
-    private DesktopButton addButton;
+    protected TokenListImpl rootPanel;
 
-    private DesktopLookupPickerField lookupPickerField;
+    protected DesktopButton addButton;
 
-    private String lookupScreen;
+    protected DesktopLookupPickerField lookupPickerField;
 
-    private WindowManager.OpenType lookupOpenMode = WindowManager.OpenType.THIS_TAB;
+    protected String lookupScreen;
 
-    private Map<String, Object> lookupScreenParams;
+    protected WindowManager.OpenType lookupOpenMode = WindowManager.OpenType.THIS_TAB;
 
-    private DialogParams lookupScreenDialogParams;
+    protected Map<String, Object> lookupScreenParams;
 
-    private boolean lookup = false;
+    protected DialogParams lookupScreenDialogParams;
 
-    private boolean editable = true;
+    protected boolean lookup = false;
 
-    private boolean simple = false;
+    protected boolean editable = true;
 
-    private boolean multiselect;
+    protected boolean simple = false;
 
-    private PickerField.LookupAction lookupAction;
+    protected boolean multiselect;
+
+    protected PickerField.LookupAction lookupAction;
 
     protected final ValueListener lookupSelectListener = new ValueListener() {
         @Override
@@ -85,8 +96,11 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     };
 
     public DesktopTokenList() {
-        impl = new TokenListImpl();
+        rootPanel = new TokenListImpl();
+
+        impl = rootPanel.getImpl();
         addButton = new DesktopButton();
+
         Messages messages = AppBeans.get(Messages.NAME);
         addButton.setCaption(messages.getMessage(TokenList.class, "actions.Add"));
 
@@ -94,7 +108,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
         lookupPickerField.addListener(lookupSelectListener);
 
         setMultiSelect(false);
-        setWidth("100%");
+        setWidth(Component.AUTO_SIZE);
+        setHeight(Component.AUTO_SIZE);
     }
 
     @Override
@@ -134,6 +149,7 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
 
     @Override
     public void setDatasource(Datasource datasource, String property) {
+        throw new UnsupportedOperationException("TokenList does not support datasource with property");
     }
 
     @SuppressWarnings("unchecked")
@@ -155,8 +171,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
                         lookupAction.setLookupScreenDialogParams(lookupScreenDialogParams);
                     }
                 }
-                impl.refreshComponent();
-                impl.refreshClickListeners(itemClickListener);
+                rootPanel.refreshComponent();
+                rootPanel.refreshClickListeners(itemClickListener);
             }
         });
     }
@@ -243,7 +259,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
             }
         }
         this.lookup = lookup;
-        impl.refreshComponent();
+
+        rootPanel.refreshComponent();
     }
 
     @Override
@@ -296,8 +313,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     public void setSimple(boolean simple) {
         this.simple = simple;
         this.addButton.setVisible(simple);
-        this.impl.editor = null;
-        this.impl.refreshComponent();
+        this.rootPanel.editor = null;
+        this.rootPanel.refreshComponent();
     }
 
     @Override
@@ -308,8 +325,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     @Override
     public void setPosition(Position position) {
         this.position = position;
-        this.impl.editor = null;
-        this.impl.refreshComponent();
+        this.rootPanel.editor = null;
+        this.rootPanel.refreshComponent();
     }
 
     @Override
@@ -330,8 +347,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     @Override
     public void setInline(boolean inline) {
         this.inline = inline;
-        this.impl.editor = null;
-        this.impl.refreshComponent();
+        this.rootPanel.editor = null;
+        this.rootPanel.refreshComponent();
     }
 
     @Override
@@ -372,7 +389,7 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     @Override
     public void setItemClickListener(ItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
-        this.impl.refreshClickListeners(itemClickListener);
+        this.rootPanel.refreshClickListeners(itemClickListener);
     }
 
     @Override
@@ -387,12 +404,12 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
 
     @Override
     public String getCaption() {
-        return impl.getCaption();
+        return rootPanel.getCaption();
     }
 
     @Override
     public void setCaption(String caption) {
-        impl.setCaption(caption);
+        rootPanel.setCaption(caption);
     }
 
     @Override
@@ -410,10 +427,11 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     @SuppressWarnings("unchecked")
     public <T> T getValue() {
         if (datasource != null) {
-            List<Object> items = new ArrayList<Object>(datasource.getItems());
+            List<Object> items = new ArrayList<>(datasource.getItems());
             return (T) items;
-        } else
+        } else {
             return (T) Collections.emptyList();
+        }
     }
 
     @Override
@@ -450,7 +468,7 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     public void setEditable(boolean editable) {
         this.editable = editable;
 
-        impl.refreshComponent();
+        rootPanel.refreshComponent();
     }
 
     @Override
@@ -494,10 +512,13 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
 
         public TokenListLabel() {
             label = new DesktopLabel();
+            label.setHeight("24px");
             composition = new DesktopHBox();
+
             composition.setSpacing(true);
             composition.add(label);
             removeButton = new DesktopButton();
+            removeButton.getImpl().setPreferredSize(new Dimension(0, 24));
             removeButton.setAction(new AbstractAction("actions.Remove") {
                 @Override
                 public String getCaption() {
@@ -518,8 +539,12 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
             button.setBorder(new EmptyBorder(0, 3, 0, 3));
             button.setFocusPainted(false);
             button.setBorderPainted(false);
+            button.setOpaque(false);
+            button.setContentAreaFilled(false);
+            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             openButton = new DesktopButton();
+            openButton.getImpl().setPreferredSize(new Dimension(0, 24));
             openButton.setAction(new AbstractAction("actions.Open") {
                 @Override
                 public void actionPerform(Component component) {
@@ -539,6 +564,9 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
             button.setBorder(new EmptyBorder(0, 3, 0, 3));
             button.setFocusPainted(false);
             button.setBorderPainted(false);
+            button.setOpaque(false);
+            button.setContentAreaFilled(false);
+            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             impl = label.getComponent();
         }
@@ -657,13 +685,15 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
 
             WindowManager wm = DesktopComponentsHelper.getTopLevelFrame(DesktopTokenList.this).getWindowManager();
             if (lookupOpenMode == WindowManager.OpenType.DIALOG) {
-                wm.getDialogParams().setResizable(true);
+                DialogParams dialogParams = wm.getDialogParams();
+
+                dialogParams.setResizable(true);
                 if (lookupScreenDialogParams != null) {
-                    wm.getDialogParams().setWidth(lookupScreenDialogParams.getWidth());
-                    wm.getDialogParams().setHeight(lookupScreenDialogParams.getHeight());
+                    dialogParams.setWidth(lookupScreenDialogParams.getWidth());
+                    dialogParams.setHeight(lookupScreenDialogParams.getHeight());
                 } else {
-                    wm.getDialogParams().setWidth(800);
-                    wm.getDialogParams().setHeight(600);
+                    dialogParams.setWidth(800);
+                    dialogParams.setHeight(600);
                 }
             }
 
@@ -687,18 +717,49 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
 
     @Override
     public void setHeight(String height) {
+        float oldHeight = getHeight();
+
         super.setHeight(height);
-        if (height.endsWith("px")) {
-            impl.addScroll();
+
+        rootPanel.setHeight(height);
+
+        if ((getHeight() > 0 && oldHeight < 0)
+                || (getHeight() < 0 && oldHeight > 0)) {
+            rootPanel.refreshComponent();
         }
     }
 
-    public class TokenListImpl extends JPanel {
+    @Override
+    public void setWidth(String width) {
+        float oldWidth = getWidth();
 
-        private DesktopVBox root;
+        super.setWidth(width);
 
+        rootPanel.setWidth(width);
+
+        if ((getWidth() > 0 && oldWidth < 0)
+                || (getWidth() < 0 && oldWidth > 0)) {
+            rootPanel.refreshComponent();
+        }
+    }
+
+    @Override
+    public void setParent(Component parent) {
+        super.setParent(parent);
+
+        rootPanel.setParent(parent);
+    }
+
+    @Override
+    public void setContainer(DesktopContainer container) {
+        super.setContainer(container);
+
+        rootPanel.setContainer(container);
+    }
+
+    public class TokenListImpl extends DesktopVBox {
         private DesktopScrollBoxLayout scrollContainer;
-        private DesktopVBox tokensContainer;
+        private JPanel tokensContainer;
 
         private DesktopHBox editor;
 
@@ -708,34 +769,11 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
         private Map<TokenListLabel, Instance> componentItems = new HashMap<>();
 
         private TokenListImpl() {
-            BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
-            setLayout(layout);
-
-            root = new DesktopVBox();
-            root.setSpacing(true);
-            root.setExpanded(true);
+            setSpacing(true);
+            setExpanded(true);
 
             scrollContainer = new DesktopScrollBoxLayout();
-            scrollContainer.setWidth("100%");
-            scrollContainer.setHeight("100%");
-
-            scrollContainer.setScrollBarPolicy(ScrollBoxLayout.ScrollBarPolicy.BOTH);
-
-            tokensContainer = new DesktopVBox();
-            tokensContainer.setWidth("-1px");
-            //scrollContainer.add(tokensContainer);
-
-            root.add(tokensContainer);
-
-            this.add(root.getComposition());
-        }
-
-        public void addScroll() {
-            root.remove(scrollContainer);
-            root.remove(tokensContainer);
-            scrollContainer.remove(tokensContainer);
-            scrollContainer.add(tokensContainer);
-            root.add(scrollContainer);
+            tokensContainer = new JPanel();
         }
 
         protected void initField() {
@@ -783,10 +821,8 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
         }
 
         public void refreshComponent() {
-            // todo inline mode
-
             if (editor != null) {
-                root.remove(editor);
+                remove(editor);
             }
 
             if (editor == null) {
@@ -794,23 +830,63 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
             }
 
             if (isEditable()) {
-                java.awt.Container rootComposition = root.getComposition();
                 if (position == Position.TOP) {
-                    rootComposition.add(editor.getComposition(), 0);
+                    add(editor, 0);
                 } else {
-                    rootComposition.add(editor.getComposition());
+                    add(editor);
                 }
             }
 
-            for (Component ownComponent : new ArrayList<>(tokensContainer.getOwnComponents()))
-                tokensContainer.remove(ownComponent);
+            if (inline) {
+                tokensContainer.setLayout(new ExtFlowLayout());
+            } else {
+                BoxLayoutAdapter tcLayoutAdapter = MigBoxLayoutAdapter.create(tokensContainer);
+                tcLayoutAdapter.setFlowDirection(BoxLayoutAdapter.FlowDirection.Y);
+            }
+
+            CC tokensContainerCC = new CC();
+            if ((getHeight() < 0 || getWidth() < 0) && !inline) {
+                MigLayoutHelper.applyWidth(tokensContainerCC, -1, UNITS_PIXELS, false);
+            } else {
+                MigLayoutHelper.applyWidth(tokensContainerCC, 100, UNITS_PERCENTAGE, false);
+            }
+
+            MigLayoutHelper.applyHeight(tokensContainerCC, -1, UNITS_PIXELS, false);
+
+            tokensContainer.removeAll();
+
+            remove(scrollContainer);
+            scrollContainer.removeAll();
+            impl.remove(tokensContainer);
+
+            if (getHeight() < 0 || getWidth() < 0) {
+                impl.add(tokensContainer, tokensContainerCC);
+            } else {
+                DesktopVBox scrollWrap = new DesktopVBox();
+                scrollWrap.setHeight(AUTO_SIZE);
+                scrollWrap.getImpl().add(tokensContainer, tokensContainerCC);
+
+                scrollContainer.setWidth("100%");
+                scrollContainer.setHeight("100%");
+
+                if (inline) {
+                    scrollContainer.setScrollBarPolicy(ScrollBoxLayout.ScrollBarPolicy.VERTICAL);
+                } else {
+                    scrollContainer.setScrollBarPolicy(ScrollBoxLayout.ScrollBarPolicy.BOTH);
+                }
+
+                scrollContainer.remove(scrollWrap);
+                scrollContainer.add(scrollWrap);
+
+                add(scrollContainer);
+            }
 
             if (datasource != null) {
                 List<Instance> usedItems = new ArrayList<>();
 
                 // New tokens
-                for (final Object itemId : datasource.getItemIds()) {
-                    final Instance item = datasource.getItem(itemId);
+                for (Object itemId : datasource.getItemIds()) {
+                    Instance item = datasource.getItem(itemId);
                     TokenListLabel f = itemComponents.get(item);
                     if (f == null) {
                         f = createToken();
@@ -819,9 +895,19 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
                     }
                     f.setEditable(isEditable());
                     f.setValue(instanceCaption(item));
-                    f.setHeight("24px");
+
                     setTokenStyle(f, itemId);
-                    tokensContainer.add(f);
+
+                    if (tokensContainer.getLayout() instanceof MigLayout) {
+                        CC tokenCC = new CC();
+                        MigLayoutHelper.applyWidth(tokenCC, -1, UNITS_PIXELS, false);
+                        MigLayoutHelper.applyHeight(tokenCC, -1, UNITS_PIXELS, false);
+
+                        tokensContainer.add(f.getComposition(), tokenCC);
+                    } else {
+                        tokensContainer.add(f.getComposition());
+                    }
+
                     usedItems.add(item);
                 }
 
@@ -833,6 +919,12 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
                     }
                 }
             }
+
+            tokensContainer.revalidate();
+            tokensContainer.repaint();
+
+            requestRepaint();
+            requestContainerUpdate();
         }
 
         public void refreshClickListeners(ItemClickListener listener) {
@@ -841,22 +933,23 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
                     Instance item = datasource.getItem(id);
                     final TokenListLabel label = itemComponents.get(item);
                     if (label != null) {
-                        if (listener == null)
+                        if (listener == null) {
                             label.setClickListener(null);
-                        else
+                        } else {
                             label.setClickListener(new ClickListener() {
                                 @Override
                                 public void onClick(TokenListLabel source) {
                                     doClick(label);
                                 }
                             });
+                        }
                     }
                 }
             }
         }
 
         protected TokenListLabel createToken() {
-            final TokenListLabel label = new TokenListLabel();
+            TokenListLabel label = new TokenListLabel();
             label.setWidth(Component.AUTO_SIZE);
             label.addListener(new RemoveTokenListener() {
                 @Override
@@ -893,7 +986,7 @@ public class DesktopTokenList extends DesktopAbstractField<DesktopTokenList.Toke
     }
 
     protected void addValueFromLookupPickerField() {
-        final Entity newItem = lookupPickerField.getValue();
+        Entity newItem = lookupPickerField.getValue();
         if (newItem == null) return;
         if (itemChangeHandler != null) {
             itemChangeHandler.addItem(newItem);

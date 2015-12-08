@@ -5,6 +5,8 @@
 package com.haulmont.cuba.web.gui.components;
 
 import com.haulmont.chile.core.model.Instance;
+import com.haulmont.chile.core.model.MetaProperty;
+import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
@@ -16,6 +18,7 @@ import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueChangingListener;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
@@ -195,6 +198,21 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
     @Override
     public void setOptionsDatasource(CollectionDatasource datasource) {
         lookupPickerField.setOptionsDatasource(datasource);
+    }
+
+    @Override
+    public void setDatasource(Datasource datasource, String property) {
+        throw new UnsupportedOperationException("TokenList does not support datasource with property");
+    }
+
+    @Override
+    public MetaProperty getMetaProperty() {
+        return null;
+    }
+
+    @Override
+    public MetaPropertyPath getMetaPropertyPath() {
+        return null;
     }
 
     @Override
@@ -391,16 +409,6 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
         this.inline = inline;
 
         component.refreshComponent();
-    }
-
-    @Override
-    public String getCaption() {
-        return component.getCaption();
-    }
-
-    @Override
-    public void setCaption(String caption) {
-        component.setCaption(caption);
     }
 
     @Override
