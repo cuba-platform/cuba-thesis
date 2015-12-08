@@ -1286,7 +1286,8 @@ public class FilterDelegateImpl implements FilterDelegate {
     @Override
     public void setUseMaxResults(boolean useMaxResults) {
         this.useMaxResults = useMaxResults;
-        maxResultsLayout.setVisible(isMaxResultsLayoutVisible());
+        if (maxResultsLayout != null)
+            maxResultsLayout.setVisible(isMaxResultsLayoutVisible());
     }
 
     protected boolean isMaxResultsLayoutVisible() {
