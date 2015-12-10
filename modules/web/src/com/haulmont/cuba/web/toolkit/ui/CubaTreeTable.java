@@ -662,7 +662,7 @@ public class CubaTreeTable extends com.vaadin.ui.TreeTable implements TreeTableC
 
     @Override
     public Collection<?> getSortableContainerPropertyIds() {
-        Collection<?> ids = super.getSortableContainerPropertyIds();
+        Collection<?> ids = new ArrayList<>(super.getSortableContainerPropertyIds());
         if (nonSortableProperties != null) {
             ids.removeAll(nonSortableProperties);
         }

@@ -571,7 +571,7 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
 
     @Override
     public Collection<?> getSortableContainerPropertyIds() {
-        Collection<?> ids = super.getSortableContainerPropertyIds();
+        Collection<?> ids = new ArrayList<>(super.getSortableContainerPropertyIds());
         if (nonSortableProperties != null) {
             ids.removeAll(nonSortableProperties);
         }
