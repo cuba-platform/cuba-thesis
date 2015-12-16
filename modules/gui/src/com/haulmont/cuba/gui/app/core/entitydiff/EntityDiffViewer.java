@@ -55,6 +55,7 @@ public class EntityDiffViewer extends AbstractFrame {
         super.init(params);
 
         diffTable.setStyleProvider(new DiffStyleProvider());
+        diffTable.setIconProvider(new DiffIconProvider());
 
         diffDs.addListener(new DsListenerAdapter<EntityPropertyDiff>() {
             @Override
