@@ -54,6 +54,8 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
 
     protected WebButton addButton;
 
+    protected WebButton clearButton;
+
     protected WebLookupPickerField lookupPickerField;
 
     protected String lookupScreen;
@@ -64,6 +66,8 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
     protected TokenStyleGenerator tokenStyleGenerator;
 
     protected boolean lookup = false;
+
+    protected boolean clearEnabled = true;
 
     protected boolean editable = true;
 
@@ -85,6 +89,9 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
         addButton = new WebButton();
         Messages messages = AppBeans.get(Messages.NAME);
         addButton.setCaption(messages.getMessage(TokenList.class, "actions.Add"));
+
+        clearButton = new WebButton();
+        clearButton.setCaption(messages.getMessage(TokenList.class, "actions.Clear"));
 
         lookupPickerField = new WebLookupPickerField();
         lookupPickerField.addListener(lookupSelectListener);
@@ -271,6 +278,18 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
     }
 
     @Override
+    public boolean isClearEnabled() {
+        return clearEnabled;
+    }
+
+    @Override
+    public void setClearEnabled(boolean clearEnabled) {
+        clearButton.setVisible(clearEnabled);
+        this.clearEnabled = clearEnabled;
+        component.refreshComponent();
+    }
+
+    @Override
     public boolean isLookup() {
         return lookup;
     }
@@ -364,6 +383,26 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
     @Override
     public void setAddButtonIcon(String icon) {
         addButton.setIcon(icon);
+    }
+
+    @Override
+    public String getClearButtonCaption() {
+        return clearButton.getCaption();
+    }
+
+    @Override
+    public void setClearButtonCaption(String caption) {
+        clearButton.setCaption(caption);
+    }
+
+    @Override
+    public String getClearButtonIcon() {
+        return clearButton.getIcon();
+    }
+
+    @Override
+    public void setClearButtonIcon(String icon) {
+        clearButton.setIcon(icon);
     }
 
     @Override
@@ -592,6 +631,18 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
                 });
             }
             layout.addComponent(wrappedButton);
+
+            clearButton.setVisible(clearEnabled);
+            clearButton.setStyleName("clear-btn");
+
+            Button wrappedClearButton = WebComponentsHelper.unwrap(clearButton);
+            wrappedClearButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    datasource.clear();
+                }
+            });
+            layout.addComponent(wrappedClearButton);
 
             editor = layout;
         }

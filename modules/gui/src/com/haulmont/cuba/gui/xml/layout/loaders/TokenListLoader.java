@@ -122,6 +122,11 @@ public class TokenListLoader extends AbstractFieldLoader {
             component.setSimple(false);
         }
 
+        String clearEnabled = element.attributeValue("clearEnabled");
+        if (StringUtils.isNotEmpty(clearEnabled)) {
+            component.setClearEnabled(BooleanUtils.toBoolean(clearEnabled));
+        }
+
         assignFrame(component);
     }
 

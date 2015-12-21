@@ -66,6 +66,8 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
 
     protected DesktopButton addButton;
 
+    protected DesktopButton clearButton;
+
     protected DesktopLookupPickerField lookupPickerField;
 
     protected String lookupScreen;
@@ -77,6 +79,8 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
     protected DialogParams lookupScreenDialogParams;
 
     protected boolean lookup = false;
+
+    protected boolean clearEnabled = true;
 
     protected boolean editable = true;
 
@@ -103,6 +107,9 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
 
         Messages messages = AppBeans.get(Messages.NAME);
         addButton.setCaption(messages.getMessage(TokenList.class, "actions.Add"));
+
+        clearButton = new DesktopButton();
+        clearButton.setCaption(messages.getMessage(TokenList.class, "actions.Clear"));
 
         lookupPickerField = new DesktopLookupPickerField();
         lookupPickerField.addListener(lookupSelectListener);
@@ -238,6 +245,18 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
     }
 
     @Override
+    public boolean isClearEnabled() {
+        return clearEnabled;
+    }
+
+    @Override
+    public void setClearEnabled(boolean clearEnabled) {
+        clearButton.setVisible(clearEnabled);
+        this.clearEnabled = clearEnabled;
+        rootPanel.refreshComponent();
+    }
+
+    @Override
     public boolean isLookup() {
         return lookup;
     }
@@ -369,6 +388,26 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
     @Override
     public void setAddButtonIcon(String icon) {
         addButton.setIcon(icon);
+    }
+
+    @Override
+    public String getClearButtonCaption() {
+        return clearButton.getCaption();
+    }
+
+    @Override
+    public void setClearButtonCaption(String caption) {
+        clearButton.setCaption(caption);
+    }
+
+    @Override
+    public String getClearButtonIcon() {
+        return clearButton.getIcon();
+    }
+
+    @Override
+    public void setClearButtonIcon(String icon) {
+        clearButton.setIcon(icon);
     }
 
     @Override
@@ -715,6 +754,22 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
         }
     }
 
+    public class ClearAction extends AbstractAction {
+        public ClearAction() {
+            super("actions.Clear");
+        }
+
+        @Override
+        public String getCaption() {
+            return clearButton.getCaption();
+        }
+
+        @Override
+        public void actionPerform(Component component) {
+            datasource.clear();
+        }
+    }
+
     @Override
     public void setHeight(String height) {
         float oldHeight = getHeight();
@@ -799,6 +854,14 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
                 ((Container) addButton.getParent()).remove(addButton);
             }
             hBox.add(addButton);
+
+            clearButton.setAction(new ClearAction());
+            clearButton.setVisible(clearEnabled);
+            clearButton.setStyleName("clear-btn");
+            if (clearButton.getParent() instanceof Container) {
+                ((Container) clearButton.getParent()).remove(clearButton);
+            }
+            hBox.add(clearButton);
 
             editor = hBox;
         }
