@@ -299,7 +299,7 @@ public class WebDateField extends WebAbstractField<CubaDateFieldWrapper> impleme
 
     @Override
     public void setEnabled(boolean enabled) {
-        component.setEnabled(true);
+        component.setEnabled(enabled);
     }
 
     @Override
