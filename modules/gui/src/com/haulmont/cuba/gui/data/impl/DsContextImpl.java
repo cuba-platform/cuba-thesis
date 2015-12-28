@@ -9,7 +9,10 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.impl.AbstractInstance;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.CommitContext;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.FrameContext;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.IFrame;
@@ -260,7 +263,40 @@ public class DsContextImpl implements DsContextImplementation {
         for (Entity entity : context.getCommitInstances()) {
             for (Entity otherEntity : context.getCommitInstances()) {
                 if (!entity.equals(otherEntity)) {
-                    metadata.getTools().traverseAttributes(otherEntity, new ReferenceRepairingAttributeVisitor(entity));
+                    repairReferences(otherEntity, entity);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void repairReferences(Entity entity, Entity contextEntity) {
+        MetaClass metaClass = metadata.getClassNN(entity.getClass());
+        MetaClass contextEntityMetaClass = metadata.getClassNN(contextEntity.getClass());
+
+        for (MetaProperty property : metaClass.getProperties()) {
+            if (!property.getRange().isClass() || !property.getRange().asClass().equals(contextEntityMetaClass))
+                continue;
+
+            Object value = entity.getValue(property.getName());
+            if (value != null) {
+                if (property.getRange().getCardinality().isMany()) {
+                    Collection collection = (Collection) value;
+                    for (Object item : new ArrayList(collection)) {
+                        if (contextEntity.equals(item) && contextEntity != item) {
+                            if (collection instanceof List) {
+                                List list = (List) collection;
+                                list.set(list.indexOf(item), contextEntity);
+                            } else {
+                                collection.remove(item);
+                                collection.add(contextEntity);
+                            }
+                        }
+                    }
+                } else {
+                    if (contextEntity.equals(value) && contextEntity != value) {
+                        entity.setValue(property.getName(), contextEntity);
+                    }
                 }
             }
         }
@@ -489,41 +525,5 @@ public class DsContextImpl implements DsContextImplementation {
     @Override
     public List<DsContext> getChildren() {
         return children;
-    }
-
-    protected static class ReferenceRepairingAttributeVisitor implements EntityAttributeVisitor {
-        protected Entity contextEntity;
-
-        public ReferenceRepairingAttributeVisitor(Entity contextEntity) {
-            this.contextEntity = contextEntity;
-        }
-
-        @Override
-        public void visit(Entity entity, MetaProperty property) {
-            if (!property.getRange().isClass() || !property.getRange().asClass().equals(contextEntity.getMetaClass()))
-                return;
-
-            Object value = entity.getValue(property.getName());
-            if (value != null) {
-                if (property.getRange().getCardinality().isMany()) {
-                    Collection collection = (Collection) value;
-                    for (Object item : new ArrayList<>(collection)) {
-                        if (contextEntity.equals(item) && contextEntity != item) {
-                            if (collection instanceof List) {
-                                List list = (List) collection;
-                                list.set(list.indexOf(item), contextEntity);
-                            } else {
-                                collection.remove(item);
-                                collection.add(contextEntity);
-                            }
-                        }
-                    }
-                } else {
-                    if (contextEntity.equals(value) && contextEntity != value) {
-                        entity.setValue(property.getName(), contextEntity);
-                    }
-                }
-            }
-        }
     }
 }
