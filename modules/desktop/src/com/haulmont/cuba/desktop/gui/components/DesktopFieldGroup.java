@@ -980,6 +980,20 @@ public class DesktopFieldGroup extends DesktopAbstractComponent<JPanel> implemen
         return getClass().getSimpleName();
     }
 
+    public void updateCaptionVisibility(DesktopAbstractComponent child) {
+        FieldConfig field = null;
+        for (Map.Entry<FieldConfig, Component> entry : fieldComponents.entrySet()) {
+            if (entry.getValue() == child) {
+                field = entry.getKey();
+                break;
+            }
+        }
+
+        if (fieldLabels.containsKey(field)) {
+            fieldLabels.get(field).setVisible(child.isComponentVisible());
+        }
+    }
+
     protected class FieldFactory extends AbstractFieldFactory {
 
         @Override

@@ -169,6 +169,10 @@ public abstract class DesktopAbstractComponent<C extends JComponent>
         return enabled && parentEnabled;
     }
 
+    public boolean isComponentVisible() {
+        return getComposition().isVisible();
+    }
+
     @Override
     public boolean isVisible() {
         return DesktopComponentsHelper.isRecursivelyVisible(getComposition());
@@ -180,6 +184,11 @@ public abstract class DesktopAbstractComponent<C extends JComponent>
             this.visible = visible;
 
             getComposition().setVisible(visible);
+
+            if (parent instanceof DesktopFieldGroup) {
+                ((DesktopFieldGroup) parent).updateCaptionVisibility(this);
+            }
+
             requestContainerUpdate();
         }
     }
