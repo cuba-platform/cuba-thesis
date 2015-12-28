@@ -56,6 +56,11 @@ public class UniqueNumbers implements UniqueNumbersAPI {
     @Override
     public long getNextNumber(String domain) {
         String seqName = getSequenceName(domain);
+        return getNextNumberBySequenceName(seqName);
+    }
+
+    @Override
+    public long getNextNumberBySequenceName(String seqName) {
         String sqlScript = sequenceSupport.getNextValueSql(seqName);
 
         try {
@@ -123,7 +128,7 @@ public class UniqueNumbers implements UniqueNumbersAPI {
         }
     }
 
-    public long getResult(String seqName, String sqlScript) {
+    protected long getResult(String seqName, String sqlScript) {
         Transaction tx = persistence.getTransaction();
         try {
             checkSequenceExists(seqName);
