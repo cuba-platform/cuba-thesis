@@ -4,6 +4,7 @@
  */
 package com.haulmont.cuba.gui.data.impl;
 
+import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.common.ValueListener;
 import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.MetaClass;
@@ -165,6 +166,8 @@ public abstract class AbstractDatasource<T extends Entity> implements Datasource
 
     @Override
     public void addListener(DatasourceListener<T> listener) {
+        Preconditions.checkNotNullArgument(listener, "listener cannot be null");
+
         if (!weakListeners.isEmpty()) {
             for (WeakDatasourceListener weakListener : new ArrayList<>(weakListeners)) {
                 if (!weakListener.isAlive()) {
