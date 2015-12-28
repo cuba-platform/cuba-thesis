@@ -602,16 +602,25 @@ public class CubaGroupTableWidget extends CubaScrollTableWidget {
                         }
                         setRowFocus(this);
 
-                        if (!isSingleSelectMode()) {
-                            deselectAll();
-                            sendSelectedRows(false);
+                        if ((event.getCtrlKey() || event.getMetaKey())
+                                && !event.getAltKey() && !event.getShiftKey()) {
+                            handleRowCtrlClick(event);
+                        } else {
+                            if (!isSingleSelectMode()) {
+                                deselectAll();
+                                sendSelectedRows(false);
+                            }
+                            handleRowClick(event);
                         }
-
-                        handleRowClick(event);
                         break;
                     default:
                         break;
                 }
+            }
+
+            protected void handleRowCtrlClick(Event event) {
+                client.updateVariable(paintableId, "expandAllInGroup", getGroupKey(), true);
+                DOM.eventCancelBubble(event, true);
             }
 
             protected void handleRowClick(Event event) {
