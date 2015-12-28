@@ -155,28 +155,19 @@ public class UniqueNumbers implements UniqueNumbersAPI {
             try {
                 PreparedStatement statement = connection.prepareStatement(sql);
                 try {
-                    statement.execute();
-                    if (isSelectSql(sql) || isInsertSql(sql)) {
+                    if (statement.execute()) {
                         ResultSet rs = statement.getResultSet();
-                        if (rs != null && rs.next())
+                        if (rs.next())
                             value = rs.getLong(1);
                     }
                 } finally {
                     DbUtils.closeQuietly(statement);
                 }
             } catch (SQLException e) {
-                throw new IllegalStateException(String.format("Error in sql while getting next number"), e);
+                throw new IllegalStateException("Error executing SQL for getting next number", e);
             }
         }
         return value;
-    }
-
-    protected boolean isSelectSql(String sql) {
-        return sql.trim().toLowerCase().startsWith("select");
-    }
-
-    protected boolean isInsertSql(String sql) {
-        return sql.trim().toLowerCase().startsWith("insert");
     }
 
     protected void checkSequenceExists(String seqName) {
