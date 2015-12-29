@@ -127,6 +127,21 @@ public class TokenListLoader extends AbstractFieldLoader {
             component.setClearEnabled(BooleanUtils.toBoolean(clearEnabled));
         }
 
+        Element clearButtonElement = element.element("clearButton");
+        if (clearButtonElement != null) {
+            String caption = clearButtonElement.attributeValue("caption");
+            if (caption != null) {
+                if (!StringUtils.isEmpty(caption))
+                    caption = loadResourceString(caption);
+                component.setClearButtonCaption(caption);
+            }
+
+            String icon = clearButtonElement.attributeValue("icon");
+            if (!StringUtils.isEmpty(icon)) {
+                component.setClearButtonIcon(loadResourceString(icon));
+            }
+        }
+
         assignFrame(component);
     }
 
