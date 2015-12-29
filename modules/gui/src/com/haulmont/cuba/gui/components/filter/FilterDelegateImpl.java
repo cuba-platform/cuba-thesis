@@ -500,10 +500,10 @@ public class FilterDelegateImpl implements FilterDelegate {
 
         setConditionsLayoutVisible(true);
 
-        if (!filterEntity.equals(adHocFilter) && (BooleanUtils.isTrue(filterEntity.getApplyDefault()) ||
-                BooleanUtils.isTrue(filterEntity.getIsSet()) ||
-                !getResultingManualApplyRequired()))
+        if (BooleanUtils.isTrue(filterEntity.getIsSet())
+                || (filterEntity.getFolder() != null && BooleanUtils.isNotFalse(filterEntity.getApplyDefault()))) {
             apply(true);
+        }
 
         for (Filter.FilterEntityChangeListener listener : filterEntityChangeListeners) {
             listener.filterEntityChanged(filterEntity);
