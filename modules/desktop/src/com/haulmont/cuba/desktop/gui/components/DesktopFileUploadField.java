@@ -225,4 +225,15 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
         else
             impl.setIcon(null);
     }
+
+    @Override
+    public String getAccept() {
+        // do nothing
+        return null;
+    }
+
+    @Override
+    public void setAccept(String accept) {
+        // do nothing
+    }
 }

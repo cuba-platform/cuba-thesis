@@ -30,7 +30,8 @@ import java.util.Map;
  */
 @JavaScript(value = "resources/swfobject/swfobject-2.2.js")
 @Deprecated
-public class CubaMultiUpload extends AbstractComponent implements LegacyComponent {
+public class CubaMultiUpload extends AbstractComponent
+        implements LegacyComponent, UploadComponent {
 
     private List<UploadListener> uploadListeners = new ArrayList<>();
 
@@ -274,6 +275,19 @@ public class CubaMultiUpload extends AbstractComponent implements LegacyComponen
 
     public String getFileTypesDescription() {
         return getState(false).fileTypesDescription;
+    }
+
+    @Override
+    public String getAccept() {
+        return getFileTypesMask();
+    }
+
+    /**
+     * @param accept file types, semicolon separated
+     */
+    @Override
+    public void setAccept(String accept) {
+        setFileTypesMask(accept);
     }
 
     public void setFileTypesDescription(String fileTypesDescription) {

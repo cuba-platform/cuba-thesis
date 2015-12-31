@@ -7,6 +7,7 @@ package com.haulmont.cuba.gui.xml.layout.loaders;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.FileUploadField;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
 /**
@@ -43,6 +44,15 @@ public class FileUploadFieldLoader extends ComponentLoader {
         loadCaption(component, element);
         loadDescription(component, element);
 
+        loadAccept(component, element);
+
         assignFrame(component);
+    }
+
+    protected void loadAccept(FileUploadField uploadField, Element element) {
+        String accept = element.attributeValue("accept");
+        if (StringUtils.isNotEmpty(accept)) {
+            uploadField.setAccept(accept);
+        }
     }
 }

@@ -80,4 +80,7 @@ public interface FileUploadField extends Component, Component.HasCaption, Compon
 
     void addListener(Listener listener);
     void removeListener(Listener listener);
+
+    String getAccept();
+    void setAccept(String accept);
 }

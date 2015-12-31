@@ -69,4 +69,7 @@ public interface FileMultiUploadField extends Component, Component.HasCaption, C
      * Clear uploads list
      */
     void clearUploads();
+
+    String getAccept();
+    void setAccept(String accept);
 }

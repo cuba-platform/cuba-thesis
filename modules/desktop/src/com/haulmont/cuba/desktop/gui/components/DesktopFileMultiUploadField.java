@@ -201,4 +201,15 @@ public class DesktopFileMultiUploadField extends DesktopAbstractComponent<JButto
         else
             impl.setIcon(null);
     }
+
+    @Override
+    public String getAccept() {
+        // do nothing
+        return null;
+    }
+
+    @Override
+    public void setAccept(String accept) {
+        // do nothing
+    }
 }

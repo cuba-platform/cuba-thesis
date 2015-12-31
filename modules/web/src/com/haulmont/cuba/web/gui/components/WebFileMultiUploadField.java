@@ -17,12 +17,13 @@ import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.WebConfig;
 import com.haulmont.cuba.web.WebWindowManager;
+import com.haulmont.cuba.web.toolkit.FileUploadTypesHelper;
 import com.haulmont.cuba.web.toolkit.VersionedThemeResource;
 import com.haulmont.cuba.web.toolkit.ui.CubaFileUpload;
 import com.haulmont.cuba.web.toolkit.ui.CubaMultiUpload;
+import com.haulmont.cuba.web.toolkit.ui.UploadComponent;
 import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.ui.AbstractComponent;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +37,7 @@ import java.util.*;
  * @author artamonov
  * @version $Id$
  */
-public class WebFileMultiUploadField extends WebAbstractComponent<AbstractComponent> implements FileMultiUploadField {
+public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponent> implements FileMultiUploadField {
 
     private static final int BYTES_IN_MEGABYTE = 1048576;
 
@@ -49,6 +50,7 @@ public class WebFileMultiUploadField extends WebAbstractComponent<AbstractCompon
 
     protected UUID tempFileId;
     protected String icon;
+    protected String accept;
 
     public WebFileMultiUploadField() {
         fileUploading = AppBeans.get(FileUploadingAPI.NAME);
@@ -429,6 +431,21 @@ public class WebFileMultiUploadField extends WebAbstractComponent<AbstractCompon
             } else {
                 component.setIcon(null);
             }
+        }
+    }
+
+    @Override
+    public String getAccept() {
+        return accept;
+    }
+
+    @Override
+    public void setAccept(String accept) {
+        if (!StringUtils.equals(accept, getAccept())) {
+            this.accept = accept;
+            component.setAccept(component instanceof CubaMultiUpload
+                    ? FileUploadTypesHelper.convertSeparator(accept, ";")
+                    : FileUploadTypesHelper.convertToMIME(accept));
         }
     }
 }
