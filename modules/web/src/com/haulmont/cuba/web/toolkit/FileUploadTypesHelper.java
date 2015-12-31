@@ -35,7 +35,7 @@ public final class FileUploadTypesHelper {
         for (int i = 0; i < types.length; i++) {
             types[i] = FileTypesHelper.getMIMEType(types[i]);
         }
-        return String.join(separator, types);
+        return StringUtils.join(types, separator);
     }
 
     public static String convertSeparator(String types, String separator) {
