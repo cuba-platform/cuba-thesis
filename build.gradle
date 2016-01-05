@@ -7,7 +7,7 @@ allprojects {
     ext.artifactGroup = 'com.haulmont.cuba'
     ext.artifactVersion = cubaVersion.replace('-SNAPSHOT', '')
     ext.isSnapshot = cubaVersion.endsWith('-SNAPSHOT')
-    ext.vcs = 'svn'
+    ext.vcs = 'Git'
     //ext.tomcatDir = rootDir.absolutePath + '/../tomcat'
 }
 
