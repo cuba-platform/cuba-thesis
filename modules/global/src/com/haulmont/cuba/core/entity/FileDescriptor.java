@@ -8,7 +8,6 @@ import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.UuidProvider;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -86,11 +85,14 @@ public class FileDescriptor extends StandardEntity {
      * Used by the framework to transfer file between application tiers.
      */
     public String toUrlParam() {
-        return new StrBuilder()
+        StringBuilder strBuilder = new StringBuilder()
                 .append(id).append(",")
                 .append(extension).append(",")
-                .append(createDate.getTime())
-                .toString();
+                .append(createDate.getTime());
+        if (size != null) {
+            strBuilder.append(",").append(size);
+        }
+        return strBuilder.toString();
     }
 
     /**
@@ -98,13 +100,16 @@ public class FileDescriptor extends StandardEntity {
      */
     public static FileDescriptor fromUrlParam(String urlParam) {
         String[] parts = urlParam.split(",");
-        if (parts.length != 3) {
+        if (parts.length != 3 && parts.length != 4) {
             throw new IllegalArgumentException("Invalid FileDescriptor format");
         }
         FileDescriptor fd = new FileDescriptor();
         fd.setId(UuidProvider.fromString(parts[0]));
         fd.setExtension(parts[1]);
         fd.setCreateDate(new Date(Long.parseLong(parts[2])));
+        if (parts.length == 4) {
+            fd.setSize(Long.parseLong(parts[3]));
+        }
         return fd;
     }
 }
