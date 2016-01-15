@@ -14,11 +14,9 @@ import com.haulmont.cuba.core.entity.CategoryAttribute;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.MetadataTools;
+import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Field;
-import com.haulmont.cuba.gui.components.FieldGroup;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
@@ -178,8 +176,10 @@ public class FieldGroupLoader extends AbstractFieldLoader {
         if (ds != null && AppBeans.get(MetadataTools.NAME, MetadataTools.class).isPersistent(ds.getMetaClass())) {
             DynamicAttributesGuiTools dynamicAttributesGuiTools =
                     AppBeans.get(DynamicAttributesGuiTools.NAME, DynamicAttributesGuiTools.class);
+            Window window = ComponentsHelper.getWindow(fieldGroup);
+            String theScreenId = window != null ? window.getId() : context.getFullFrameId();
             Set<CategoryAttribute> attributesToShow =
-                    dynamicAttributesGuiTools.getAttributesToShowOnTheScreen(ds.getMetaClass(), context.getFullFrameId(), fieldGroup.getId());
+                    dynamicAttributesGuiTools.getAttributesToShowOnTheScreen(ds.getMetaClass(), theScreenId, fieldGroup.getId());
             if (CollectionUtils.isNotEmpty(attributesToShow)) {
                 ds.setLoadDynamicAttributes(true);
                 for (CategoryAttribute attribute : attributesToShow) {
