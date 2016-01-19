@@ -20,7 +20,7 @@ import com.haulmont.cuba.web.WebConfig;
 import com.haulmont.cuba.web.toolkit.ui.CubaTimer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import com.vaadin.server.VaadinSession;
 import javax.annotation.ManagedBean;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -169,6 +169,7 @@ public class WebBackgroundWorker implements BackgroundWorker {
     */
     private class WebTaskExecutor<T, V> extends Thread implements TaskExecutor<T, V> {
 
+        private VaadinSession session;
         private App app;
 
         private BackgroundTask<T, V> runnableTask;
@@ -201,6 +202,7 @@ public class WebBackgroundWorker implements BackgroundWorker {
             this.runnableTask = runnableTask;
             this.webTimerListener = webTimerListener;
             this.app = app;
+            this.session = app.getAppUI().getSession();
 
             //noinspection unchecked
             this.params = runnableTask.getParams();
@@ -282,13 +284,18 @@ public class WebBackgroundWorker implements BackgroundWorker {
                 // Interrupt
                 interrupt();
 
-                // Remove task from execution
-                app.removeBackgroundTask(this);
+                session.accessSynchronously(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Remove task from execution
+                        app.removeBackgroundTask(WebTaskExecutor.this);
 
-                this.canceled = true;
-                this.closed = true;
+                        WebTaskExecutor.this.canceled = true;
+                        WebTaskExecutor.this.closed = true;
 
-                stopTimer();
+                        stopTimer();
+                    }
+                });
 
                 canceled = true;
             }
