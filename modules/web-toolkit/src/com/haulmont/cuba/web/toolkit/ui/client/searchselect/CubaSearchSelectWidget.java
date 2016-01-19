@@ -71,7 +71,6 @@ public class CubaSearchSelectWidget extends VFilterSelect {
 
                                 MenuItem selectedItem = suggestionPopup.menu.getSelectedItem();
                                 suggestionPopup.menu.setKeyboardSelectedItem(selectedItem);
-                                suggestionPopup.menu.getElement().focus();
 
                                 tb.setText(selectedItem.getText());
 
