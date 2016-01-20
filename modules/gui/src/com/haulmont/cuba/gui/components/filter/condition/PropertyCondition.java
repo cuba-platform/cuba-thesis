@@ -100,6 +100,11 @@ public class PropertyCondition extends AbstractCondition {
                 sb.append(")");
             }
 
+            if (operator == Op.ENDS_WITH || operator == Op.STARTS_WITH
+                    || operator == Op.CONTAINS || operator == Op.DOES_NOT_CONTAIN) {
+                sb.append(" ESCAPE '").append(ESCAPE_CHARACTER).append("' ");
+            }
+
             if (operator == Op.NOT_IN) {
                 sb.append(") or (").append(entityAlias).append(".").append(name).append(" is null)) ");
             }
