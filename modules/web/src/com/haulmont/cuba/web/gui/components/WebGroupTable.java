@@ -743,8 +743,16 @@ public class WebGroupTable extends WebAbstractTable<CubaGroupTable> implements G
                 String captionProperty = column.getXmlDescriptor().attributeValue("captionProperty");
                 if (column.getFormatter() != null) {
                     return column.getFormatter().format(value);
-                } else if (!StringUtils.isEmpty(captionProperty) && propertyPath.getRange().isClass()) {
-                    return String.valueOf(((Instance) value).getValue(captionProperty));
+                } else if (StringUtils.isNotEmpty(captionProperty)) {
+                    Collection<?> children = component.getGroupItemIds(groupId);
+                    if (children.isEmpty()) {
+                        return null;
+                    }
+
+                    Object itemId = children.iterator().next();
+                    Instance item = ((ItemWrapper) component.getItem(itemId)).getItem();
+                    final Object captionValue = item.getValueEx(captionProperty);
+                    return captionValue != null ? String.valueOf(captionValue) : null;
                 }
             }
 
