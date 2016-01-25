@@ -179,10 +179,16 @@ public class FileUploadController {
             return null;
         }
 
+        String size = request.getParameter("size");
+
         FileDescriptor fd = new FileDescriptor();
         fd.setName(name);
         fd.setExtension(ext);
         fd.setCreateDate(timeSource.currentTimestamp());
+        if (size != null) {
+            fd.setSize(Long.parseLong(size));
+        }
+
         return fd;
     }
 }
