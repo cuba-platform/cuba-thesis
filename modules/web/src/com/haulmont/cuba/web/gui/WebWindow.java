@@ -54,7 +54,6 @@ import static com.haulmont.cuba.web.gui.components.WebComponentsHelper.convertAl
 
 /**
  * @author krivopustov
- * @version $Id$
  */
 public class WebWindow implements Window, Component.Wrapper,
                                   Component.HasXmlDescriptor, WrappedWindow, Component.Disposable,
@@ -843,6 +842,19 @@ public class WebWindow implements Window, Component.Wrapper,
     @Override
     public void expand(Component component) {
         expand(component, "", "");
+    }
+
+    @Override
+    public void resetExpanded() {
+        if (getContainer() instanceof AbstractOrderedLayout) {
+            AbstractOrderedLayout container = (AbstractOrderedLayout) getContainer();
+
+            for (com.vaadin.ui.Component child : container) {
+                container.setExpandRatio(child, 0.0f);
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override

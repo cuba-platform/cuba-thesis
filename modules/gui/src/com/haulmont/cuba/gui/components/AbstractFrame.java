@@ -25,7 +25,6 @@ import java.util.Map;
  * Base class for frame controllers.
  *
  * @author abramov
- * @version $Id$
  */
 public class AbstractFrame implements IFrame, Component.Wrapper, Component.OrderedContainer {
 
@@ -215,6 +214,11 @@ public class AbstractFrame implements IFrame, Component.Wrapper, Component.Order
     @Override
     public void expand(Component component) {
         frame.expand(component);
+    }
+
+    @Override
+    public void resetExpanded() {
+        frame.resetExpanded();
     }
 
     @Override

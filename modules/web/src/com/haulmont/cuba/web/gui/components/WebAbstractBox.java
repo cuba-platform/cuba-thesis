@@ -19,7 +19,6 @@ import static com.haulmont.cuba.web.gui.components.WebComponentsHelper.convertAl
 
 /**
  * @author abramov
- * @version $Id$
  */
 public abstract class WebAbstractBox extends WebAbstractComponent<AbstractOrderedLayout> implements BoxLayout {
 
@@ -168,6 +167,13 @@ public abstract class WebAbstractBox extends WebAbstractComponent<AbstractOrdere
     @Override
     public void expand(Component component) {
         expand(component, "", "");
+    }
+
+    @Override
+    public void resetExpanded() {
+        for (com.vaadin.ui.Component child : component) {
+            component.setExpandRatio(child, 0.0f);
+        }
     }
 
     @Override

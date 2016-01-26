@@ -57,7 +57,6 @@ import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
 
 /**
  * @author krivopustov
- * @version $Id$
  */
 public class DesktopWindow implements Window, Component.Disposable,
         Component.Wrapper, Component.HasXmlDescriptor, Component.SecuredActionsHolder, WrappedWindow, DesktopContainer {
@@ -633,6 +632,12 @@ public class DesktopWindow implements Window, Component.Disposable,
     @Override
     public void expand(Component component) {
         expand(component, "", "");
+    }
+
+    @Override
+    public void resetExpanded() {
+        layoutAdapter.resetExpanded();
+        expandedComponent = null;
     }
 
     @Override

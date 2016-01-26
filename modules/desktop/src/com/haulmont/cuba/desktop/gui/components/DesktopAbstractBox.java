@@ -21,7 +21,6 @@ import java.util.*;
 
 /**
  * @author krivopustov
- * @version $Id$
  */
 public abstract class DesktopAbstractBox
         extends DesktopAbstractComponent<JPanel>
@@ -277,7 +276,6 @@ public abstract class DesktopAbstractBox
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Component> T getOwnComponent(String id) {
         return (T) componentByIds.get(id);
@@ -339,6 +337,14 @@ public abstract class DesktopAbstractBox
     @Override
     public void expand(Component component) {
         expand(component, "", "");
+    }
+
+    @Override
+    public void resetExpanded() {
+        expandedComponent = null;
+        layoutAdapter.resetExpanded();
+
+        requestRepaint();
     }
 
     @Override
