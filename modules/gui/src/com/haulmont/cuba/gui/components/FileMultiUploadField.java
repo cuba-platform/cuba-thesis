@@ -70,6 +70,15 @@ public interface FileMultiUploadField extends Component, Component.HasCaption, C
      */
     void clearUploads();
 
+    /**
+     * Returns comma separated types of files.
+     * @return comma separated types of files
+     */
     String getAccept();
+
+    /**
+     * Sets the types of files that the server accepts (that can be submitted through a file upload).
+     * @param accept comma separated types of files; possible options to specify the file types are {@code *.png, .png}
+     */
     void setAccept(String accept);
 }
