@@ -54,9 +54,22 @@ public class ParamWrapper implements Component.HasValue {
                 } else if (Op.ENDS_WITH.equals(op)) {
                     value = wrapValueForLike(escapeValueForLike(value), true, false);
                 }
+            } else if (condition instanceof CustomCondition) {
+                String where = ((CustomCondition) condition).getWhere();
+                Op op = condition.getOperator();
+                Matcher matcher = LIKE_PATTERN.matcher(where);
+                if (matcher.find()) {
+                    if (Op.STARTS_WITH.equals(op)) {
+                        value = wrapValueForLike(escapeValueForLike(value.toString()), false, true);
+                    } else if (Op.ENDS_WITH.equals(op)) {
+                        value = wrapValueForLike(escapeValueForLike(value.toString()), true, false);
+                    } else {
+                        value = wrapValueForLike(escapeValueForLike(value.toString()));
+                    }
+                }
+            } else if (value instanceof EnumClass) {
+                value = ((EnumClass) value).getId();
             }
-        } else if (value instanceof EnumClass) {
-            value = ((EnumClass) value).getId();
         }
         return (T) value;
     }
