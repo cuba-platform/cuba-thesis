@@ -77,8 +77,9 @@ public interface FileMultiUploadField extends Component, Component.HasCaption, C
     String getAccept();
 
     /**
-     * Sets the mask for files to filter them in the file selection dialog.
-     * @param accept comma separated types of files; possible options to specify the file types are {@code *.png, .png}
+     * Sets the mask for files to filter them in the file selection dialog.<br/>
+     * Example: <pre>{@code fileUpload.setAccept(".png,.jpeg")}</pre>
+     * @param accept comma separated types of files
      */
     void setAccept(String accept);
 }
