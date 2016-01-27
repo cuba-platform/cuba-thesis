@@ -373,7 +373,7 @@ public class CubaFileUpload extends AbstractComponent
      * Interrupts the upload currently being received. The interruption will be done by the receiving thread so this
      * method will return immediately and the actual interrupt will happen a bit later.
      */
-    protected void interruptUpload() {
+    public void interruptUpload() {
         if (isUploading) {
             interrupted = true;
         }
