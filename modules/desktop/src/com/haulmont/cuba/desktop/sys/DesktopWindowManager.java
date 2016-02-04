@@ -1258,7 +1258,16 @@ public class DesktopWindowManager extends WindowManager {
                 button.setIcon(App.getInstance().getResources().getIcon(icon));
             }
 
-            button.addActionListener(new DialogActionHandler(dialog, action));
+            final DialogActionHandler dialogActionHandler = new DialogActionHandler(dialog, action);
+            button.addActionListener(dialogActionHandler);
+            if (actions.length == 1) {
+                dialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        dialogActionHandler.onClose();
+                    }
+                });
+            }
 
             button.setPreferredSize(new Dimension(button.getPreferredSize().width, DesktopComponentsHelper.BUTTON_HEIGHT));
             button.setMaximumSize(new Dimension(Integer.MAX_VALUE, DesktopComponentsHelper.BUTTON_HEIGHT));
@@ -1329,10 +1338,7 @@ public class DesktopWindowManager extends WindowManager {
         }
         dialog.setModal(false);
 
-        if (actions.length == 1) {
-            final Action action = actions[0];
-            dialog.addWindowListener(new DialogActionHandler(dialog, action));
-        } else if (actions.length > 1) {
+        if (actions.length > 1) {
             dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         }
 
@@ -1416,7 +1422,7 @@ public class DesktopWindowManager extends WindowManager {
      */
     protected class DialogActionHandler extends WindowAdapter implements ActionListener {
 
-        protected final Action action;
+        protected Action action;
 
         protected final DialogWindow dialog;
 
@@ -1425,6 +1431,7 @@ public class DesktopWindowManager extends WindowManager {
         public DialogActionHandler(DialogWindow dialog, Action action) {
             this.action = action;
             this.dialog = dialog;
+            this.dialog.addWindowListener(this);
 
             DialogWindow lastDialogWindow = getLastDialogWindow();
             if (lastDialogWindow != null) {
@@ -1434,7 +1441,7 @@ public class DesktopWindowManager extends WindowManager {
             }
         }
 
-        protected void onClose() {
+        public void onClose() {
             if (lastFocusedComponent != null
                     && lastFocusedComponent.isEnabled()
                     && lastFocusedComponent.isVisible()
@@ -1451,6 +1458,7 @@ public class DesktopWindowManager extends WindowManager {
             action.actionPerform(null);
             dialog.setVisible(false);
             cleanupAfterModalDialogClosed(null);
+            dialog.dispose();
         }
 
         @Override
@@ -1459,8 +1467,8 @@ public class DesktopWindowManager extends WindowManager {
         }
 
         @Override
-        public void windowClosing(WindowEvent e) {
-            onClose();
+        public void windowClosed(WindowEvent e) {
+            action = null;
         }
     }
 
