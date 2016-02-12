@@ -9,6 +9,7 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.*;
 import com.haulmont.cuba.gui.components.mainwindow.AppWorkArea;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
@@ -489,5 +490,17 @@ public abstract class ComponentsHelper {
             }
         }
         return -1;
+    }
+
+    public static int findActionById(List<Action> actionList, String actionId) {
+        int oldIndex = -1;
+        for (int i = 0; i < actionList.size(); i++) {
+            Action a = actionList.get(i);
+            if (ObjectUtils.equals(a.getId(), actionId)) {
+                oldIndex = i;
+                break;
+            }
+        }
+        return oldIndex;
     }
 }

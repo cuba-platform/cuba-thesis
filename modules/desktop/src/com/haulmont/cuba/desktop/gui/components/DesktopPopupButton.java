@@ -8,10 +8,10 @@ package com.haulmont.cuba.desktop.gui.components;
 import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.DesktopResources;
 import com.haulmont.cuba.desktop.sys.DesktopToolTipManager;
-import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.*;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
@@ -22,15 +22,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
-import static java.awt.Component.*;
+import static java.awt.Component.CENTER_ALIGNMENT;
 
 /**
  * @author krivopustov
- * @version $Id$
  */
 public class DesktopPopupButton extends DesktopAbstractActionsHolderComponent<JButton> implements PopupButton {
 
@@ -216,8 +214,8 @@ public class DesktopPopupButton extends DesktopAbstractActionsHolderComponent<JB
     }
 
     @Override
-    public void addAction(Action action) {
-        super.addAction(action);
+    public void addAction(Action action, int index) {
+        super.addAction(action, index);
         action.addOwner(new ButtonStub(action));
     }
 
