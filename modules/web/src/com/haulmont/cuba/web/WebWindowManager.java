@@ -1091,6 +1091,7 @@ public class WebWindowManager extends WindowManager {
         HorizontalLayout buttonsContainer = new HorizontalLayout();
         buttonsContainer.setSpacing(true);
 
+        boolean hasPrimaryAction = false;
         for (final Action action : actions) {
             final Button button = WebComponentsHelper.createButton();
             button.setCaption(action.getCaption());
@@ -1124,6 +1125,8 @@ public class WebWindowManager extends WindowManager {
             if (action instanceof AbstractAction && ((AbstractAction)action).isPrimary()) {
                 button.addStyleName("cuba-primary-action");
                 button.focus();
+
+                hasPrimaryAction = true;
             }
 
             if (ui.isTestMode()) {
@@ -1133,7 +1136,7 @@ public class WebWindowManager extends WindowManager {
 
             buttonsContainer.addComponent(button);
         }
-        if (buttonsContainer.getComponentCount() == 1) {
+        if (!hasPrimaryAction && buttonsContainer.getComponentCount() > 0) {
             ((Button) buttonsContainer.getComponent(0)).focus();
         }
 
