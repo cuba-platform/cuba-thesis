@@ -38,6 +38,8 @@ import java.util.UUID;
  */
 public class SpecificPermissionsFrame extends AbstractFrame {
 
+    protected static final String CATEGORY_PREFIX = "category:";
+
     public interface Companion {
         void initPermissionColoredColumns(TreeTable specificPermissionsTree);
     }
@@ -87,11 +89,11 @@ public class SpecificPermissionsFrame extends AbstractFrame {
             @Override
             public void itemChanged(Datasource<BasicPermissionTarget> ds,
                                     BasicPermissionTarget prevItem, BasicPermissionTarget item) {
-                if (!selectedPermissionPanel.isVisible() && (item != null)) {
-                    selectedPermissionPanel.setVisible(!item.getId().startsWith("category:"));
-                }
-                if (selectedPermissionPanel.isVisible() && (item == null))
+                if (item != null) {
+                    selectedPermissionPanel.setVisible(!item.getId().startsWith(CATEGORY_PREFIX));
+                } else {
                     selectedPermissionPanel.setVisible(false);
+                }
 
                 updateCheckBoxes(item);
             }

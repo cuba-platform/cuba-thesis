@@ -31,10 +31,10 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
+import static com.haulmont.cuba.gui.ComponentsHelper.findActionById;
 
 /**
  * @author abramov
- * @version $Id$
  */
 public class WebPickerField extends WebAbstractField<CubaPickerField>
         implements PickerField, Component.SecuredActionsHolder {
@@ -220,25 +220,28 @@ public class WebPickerField extends WebAbstractField<CubaPickerField>
 
     @Override
     public void addAction(Action action) {
+        int index = findActionById(actions, action.getId());
+        if (index < 0) {
+            index = actions.size();
+        }
+
+        addAction(action, index);
+    }
+
+    @Override
+    public void addAction(Action action, int index) {
         checkNotNullArgument(action, "action must be non null");
 
-        Action oldAction = getAction(action.getId());
-
-        // get button for old action
-        Button oldButton = null;
-        if (oldAction != null && oldAction.getOwner() != null && oldAction.getOwner() instanceof WebButton) {
-            WebButton oldActionButton = (WebButton) oldAction.getOwner();
-            oldButton = oldActionButton.getComponent();
+        int oldIndex = findActionById(actions, action.getId());
+        if (oldIndex >= 0) {
+            removeAction(actions.get(oldIndex));
+            if (index > oldIndex) {
+                index--;
+            }
         }
 
-        if (oldAction == null) {
-            actions.add(action);
-            actionHandler.addAction(action);
-        } else {
-            actions.add(actions.indexOf(oldAction), action);
-            actions.remove(oldAction);
-            actionHandler.removeAction(oldAction);
-        }
+        actions.add(index, action);
+        actionHandler.addAction(action, index);
 
         PickerButton pButton = new PickerButton();
         pButton.setAction(action);
@@ -246,11 +249,7 @@ public class WebPickerField extends WebAbstractField<CubaPickerField>
         Button vButton = pButton.getComponent();
         vButton.setCaption("");
 
-        if (oldButton == null) {
-            component.addButton(vButton);
-        } else {
-            component.replaceButton(oldButton, vButton);
-        }
+        component.addButton(vButton, index);
 
         // apply Editable after action owner is set
         if (action instanceof StandardAction) {

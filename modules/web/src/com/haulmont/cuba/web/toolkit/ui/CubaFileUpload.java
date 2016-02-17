@@ -5,8 +5,9 @@
 
 package com.haulmont.cuba.web.toolkit.ui;
 
+import com.haulmont.cuba.web.toolkit.ui.client.fileupload.CubaFileUploadClientRpc;
 import com.haulmont.cuba.web.toolkit.ui.client.fileupload.CubaFileUploadServerRpc;
-import com.haulmont.cuba.web.toolkit.ui.client.jqueryfileupload.CubaFileUploadState;
+import com.haulmont.cuba.web.toolkit.ui.client.fileupload.CubaFileUploadState;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.*;
 import com.vaadin.ui.AbstractComponent;
@@ -58,6 +59,8 @@ public class CubaFileUpload extends AbstractComponent
             @Override
             public void fileUploaded(String fileName) {
                 fireUploadSuccess(fileName, mimeTypes.get(fileName), contentLength);
+
+                getRpcProxy(CubaFileUploadClientRpc.class).continueUploading();
             }
 
             @Override
