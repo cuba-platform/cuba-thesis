@@ -30,7 +30,6 @@ import java.util.Locale;
 
 /**
  * @author abramov
- * @version $Id$
  */
 public abstract class ComponentLoader implements com.haulmont.cuba.gui.xml.layout.ComponentLoader {
 
@@ -438,6 +437,13 @@ public abstract class ComponentLoader implements com.haulmont.cuba.gui.xml.layou
                     shortcut,
                     actionsHolder
             );
+        }
+    }
+
+    protected void loadInputPrompt(Component.HasInputPrompt component, Element element) {
+        String inputPrompt = element.attributeValue("inputPrompt");
+        if (StringUtils.isNotBlank(inputPrompt)) {
+            component.setInputPrompt(loadResourceString(inputPrompt));
         }
     }
 }

@@ -18,7 +18,6 @@ import org.dom4j.Element;
 
 /**
  * @author abramov
- * @version $Id$
  */
 public class TextFieldLoader extends AbstractTextFieldLoader {
 
@@ -52,9 +51,6 @@ public class TextFieldLoader extends AbstractTextFieldLoader {
 
         component.setFormatter(loadFormatter(element));
 
-        String inputPrompt = element.attributeValue("inputPrompt");
-        if (StringUtils.isNotBlank(inputPrompt)) {
-            component.setInputPrompt(loadResourceString(inputPrompt));
-        }
+        loadInputPrompt(component, element);
     }
 }

@@ -19,7 +19,6 @@ import java.util.Map;
 
 /**
  * @author abramov
- * @version $Id$
  */
 public class LookupFieldLoader extends AbstractFieldLoader {
 
@@ -47,6 +46,7 @@ public class LookupFieldLoader extends AbstractFieldLoader {
 
         loadFilterMode(component, element);
         loadNewOptionHandler(component, element);
+        loadInputPrompt(component, element);
 
         String inputPrompt = element.attributeValue("inputPrompt");
         if (StringUtils.isNotBlank(inputPrompt)) {

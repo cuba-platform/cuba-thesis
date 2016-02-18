@@ -19,7 +19,6 @@ import java.util.List;
 
 /**
  * @author subbotin
- * @version $Id$
  */
 public class WebResizableTextArea
         extends
@@ -154,5 +153,15 @@ public class WebResizableTextArea
     @Override
     public void setCursorPosition(int position) {
         component.setCursorPosition(position);
+    }
+
+    @Override
+    public String getInputPrompt() {
+        return component.getInputPrompt();
+    }
+
+    @Override
+    public void setInputPrompt(String inputPrompt) {
+        component.setInputPrompt(inputPrompt);
     }
 }

@@ -8,6 +8,7 @@ package com.haulmont.cuba.desktop.gui.components;
 import com.haulmont.cuba.desktop.sys.vcl.Flushable;
 import com.haulmont.cuba.gui.components.TextArea;
 import org.apache.commons.lang.StringUtils;
+import org.jdesktop.swingx.prompt.PromptSupport;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,12 +21,13 @@ import static javax.swing.KeyStroke.getKeyStroke;
 
 /**
  * @author artamonov
- * @version $Id$
  */
 public class DesktopTextArea extends DesktopAbstractTextField<JTextArea> implements TextArea {
 
     protected JComponent composition;
     protected int rows;
+
+    protected String inputPrompt;
 
     public DesktopTextArea() {
         setRows(5);
@@ -186,6 +188,22 @@ public class DesktopTextArea extends DesktopAbstractTextField<JTextArea> impleme
     public void setCursorPosition(int position) {
         impl.setSelectionStart(position);
         impl.setSelectionEnd(position);
+    }
+
+    @Override
+    public String getInputPrompt() {
+        return inputPrompt;
+    }
+
+    @Override
+    public void setInputPrompt(String inputPrompt) {
+        this.inputPrompt = inputPrompt;
+
+        if (StringUtils.isNotBlank(inputPrompt)) {
+            PromptSupport.setPrompt(inputPrompt, impl);
+        } else {
+            PromptSupport.setPrompt(null, impl);
+        }
     }
 
     protected class TextAreaFlushableField extends JTextArea implements Flushable {

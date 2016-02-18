@@ -14,7 +14,6 @@ import org.dom4j.Element;
 
 /**
  * @author abramov
- * @version $Id$
  */
 public class TextAreaLoader extends AbstractTextFieldLoader {
 
@@ -30,6 +29,7 @@ public class TextAreaLoader extends AbstractTextFieldLoader {
 
         loadMaxLength(element, component);
         loadTrimming(element, component);
+        loadInputPrompt(component, element);
 
         final String cols = element.attributeValue("cols");
         if (StringUtils.isNotEmpty(cols)) {
