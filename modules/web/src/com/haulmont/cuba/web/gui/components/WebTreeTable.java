@@ -21,7 +21,6 @@ import com.haulmont.cuba.web.toolkit.data.TreeTableContainer;
 import com.haulmont.cuba.web.toolkit.ui.CubaTreeTable;
 import com.vaadin.data.Item;
 import com.vaadin.server.Resource;
-import org.apache.commons.lang.ObjectUtils;
 
 import java.util.*;
 
@@ -81,7 +80,7 @@ public class WebTreeTable extends WebAbstractTable<CubaTreeTable> implements Tre
 
     @Override
     public void expandAll() {
-        component.expandAll();
+        component.expandAllItems();
     }
 
     @Override
