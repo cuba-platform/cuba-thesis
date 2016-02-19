@@ -103,7 +103,7 @@ public class WebSearchField extends WebLookupField implements SearchField {
         });
     }
 
-    private CubaSearchSelect getSearchComponent() {
+    protected CubaSearchSelect getSearchComponent() {
         return (CubaSearchSelect) component;
     }
 

@@ -221,15 +221,7 @@ public class CubaSearchSelectWidget extends VFilterSelect {
         if (enabled && !readonly) {
             switch (event.getNativeKeyCode()) {
                 case KeyCodes.KEY_ENTER:
-                    String tbText = tb.getText() == null ? "" : tb.getText();
-                    String currentText = currentSuggestion == null ? "" : currentSuggestion.getReplacementString();
-                    if (!this.preventFilterAfterSelect && !tbText.equals(currentText))
-                        filterOptions(currentPage);
-                    else {
-                        if (!event.isAnyModifierKeyDown())
-                            event.stopPropagation();
-                    }
-                    this.preventFilterAfterSelect = false;
+                    onEnterKeyUp(event);
                     break;
                 case KeyCodes.KEY_TAB:
                 case KeyCodes.KEY_SHIFT:
@@ -248,5 +240,17 @@ public class CubaSearchSelectWidget extends VFilterSelect {
 
             updateEditState();
         }
+    }
+    
+    protected void onEnterKeyUp(KeyUpEvent event) {
+        String tbText = tb.getText() == null ? "" : tb.getText();
+        String currentText = currentSuggestion == null ? "" : currentSuggestion.getReplacementString();
+        if (!this.preventFilterAfterSelect && !tbText.equals(currentText))
+            filterOptions(currentPage);
+        else {
+            if (!event.isAnyModifierKeyDown())
+                event.stopPropagation();
+        }
+        this.preventFilterAfterSelect = false;
     }
 }
