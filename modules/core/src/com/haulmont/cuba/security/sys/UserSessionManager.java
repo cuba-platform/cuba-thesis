@@ -115,8 +115,10 @@ public class UserSessionManager {
             for (Permission permission : role.getPermissions()) {
                 PermissionType type = permission.getType();
                 if (type != null && permission.getValue() != null) {
-                    session.addPermission(type,
-                            permission.getTarget(), convertToExtendedEntityTarget(permission), permission.getValue());
+                    try {
+                        session.addPermission(type,
+                                permission.getTarget(), convertToExtendedEntityTarget(permission), permission.getValue());
+                    } catch (Exception ignored) {}
                 }
             }
         }
