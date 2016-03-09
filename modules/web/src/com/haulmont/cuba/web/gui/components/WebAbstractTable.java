@@ -248,7 +248,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         if (printable != null) {
             return printable;
         } else {
-            com.vaadin.ui.Table.ColumnGenerator vColumnGenerator = component.getColumnGenerator(columnId);
+            com.vaadin.ui.Table.ColumnGenerator vColumnGenerator = component.getColumnGenerator(getColumn(columnId).getId());
             if (vColumnGenerator instanceof CustomColumnGenerator) {
                 ColumnGenerator columnGenerator = ((CustomColumnGenerator) vColumnGenerator).getColumnGenerator();
                 if (columnGenerator instanceof Printable)
@@ -1836,7 +1836,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             }
 
             WindowManager.OpenType screenOpenType = WindowManager.OpenType.THIS_TAB;
-            if (column.getXmlDescriptor()!= null) {
+            if (column.getXmlDescriptor() != null) {
                 String openTypeAttribute = column.getXmlDescriptor().attributeValue("linkScreenOpenType");
                 if (StringUtils.isNotEmpty(openTypeAttribute)) {
                     screenOpenType = WindowManager.OpenType.valueOf(openTypeAttribute);
