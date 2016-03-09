@@ -25,6 +25,7 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.dom4j.Element;
 
 import javax.annotation.Nullable;
 import javax.persistence.TemporalType;
@@ -310,7 +311,13 @@ public class ExcelExporter {
                 if (printable != null) {
                     cellValue = printable.getValue((Entity) instance);
                 } else {
-                    cellValue = InstanceUtils.getValueEx(instance, ((MetaPropertyPath) column.getId()).getPath());
+                    Element xmlDescriptor = column.getXmlDescriptor();
+                    if (xmlDescriptor != null && StringUtils.isNotEmpty(xmlDescriptor.attributeValue("captionProperty"))) {
+                        String captionProperty = xmlDescriptor.attributeValue("captionProperty");
+                        cellValue = InstanceUtils.getValueEx(instance, captionProperty);
+                    } else {
+                        cellValue = InstanceUtils.getValueEx(instance, ((MetaPropertyPath) column.getId()).getPath());
+                    }
                     if (column.getFormatter() != null)
                         cellValue = column.getFormatter().format(cellValue);
                     TemporalType tt = (TemporalType) ((MetaPropertyPath) column.getId()).getMetaProperty().getAnnotations().get("temporal");
