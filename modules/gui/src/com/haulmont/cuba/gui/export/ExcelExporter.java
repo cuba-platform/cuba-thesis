@@ -1,6 +1,18 @@
 /*
- * Copyright (c) 2008-2013 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package com.haulmont.cuba.gui.export;
 
@@ -40,9 +52,6 @@ import java.util.List;
  * Use this class to export {@link com.haulmont.cuba.gui.components.Table} into Excel format
  * and show using {@link ExportDisplay}.
  * <br>Just create an instance of this class and invoke one of <code>exportTable</code> methods.
- *
- * @author krivopustov
- * @version $Id$
  */
 public class ExcelExporter {
     protected static final int COL_WIDTH_MAGIC = 48;
@@ -270,7 +279,23 @@ public class ExcelExporter {
             val = messages.getMessage(getClass(), "excelExporter.empty");
         }
 
-        formatValueCell(cell, val, groupNumber++, rowNumber, 0, true);
+        MetaPropertyPath propertyPath = (MetaPropertyPath) groupInfo.getProperty();
+        Table.Column column = table.getColumn(propertyPath.toString());
+        Element xmlDescriptor = column.getXmlDescriptor();
+        if (xmlDescriptor != null && StringUtils.isNotEmpty(xmlDescriptor.attributeValue("captionProperty")) && val instanceof Instance) {
+            String captionProperty = xmlDescriptor.attributeValue("captionProperty");
+            Collection children = ((GroupDatasource) table.getDatasource()).getGroupItemIds(groupInfo);
+            if (children.isEmpty()) {
+                return rowNumber;
+            }
+
+            Object itemId = children.iterator().next();
+            Instance item = table.getDatasource().getItem(itemId);
+            Object captionValue = item.getValueEx(captionProperty);
+            formatValueCell(cell, captionValue, groupNumber++, rowNumber, 0, true);
+        } else {
+            formatValueCell(cell, val, groupNumber++, rowNumber, 0, true);
+        }
 
         int oldRowNumber = rowNumber;
         List<GroupInfo> children = ds.getChildren(groupInfo);
@@ -297,7 +322,7 @@ public class ExcelExporter {
 
         int level = 0;
         if (table instanceof TreeTable) {
-            level = ((TreeTable)table).getLevel(itemId);
+            level = ((TreeTable) table).getLevel(itemId);
         }
         for (int c = startColumn; c < columns.size(); c++) {
             HSSFCell cell = row.createCell(c);
@@ -409,7 +434,7 @@ public class ExcelExporter {
             if (sizers[sizersIndex].isNotificationRequired(notificationReqiured)) {
                 sizers[sizersIndex].notifyCellValue(message, stdFont);
             }
-        } else if (cellValue instanceof Entity){
+        } else if (cellValue instanceof Entity) {
             Entity entityVal = (Entity) cellValue;
             String instanceName = entityVal.getInstanceName();
             String str = sizersIndex == 0 ? createSpaceString(level) + instanceName : instanceName;
@@ -417,7 +442,7 @@ public class ExcelExporter {
             if (sizers[sizersIndex].isNotificationRequired(notificationReqiured)) {
                 sizers[sizersIndex].notifyCellValue(str, stdFont);
             }
-        } else if (cellValue instanceof Collection){
+        } else if (cellValue instanceof Collection) {
             String str = "";
             cell.setCellValue(new HSSFRichTextString(str));
             if (sizers[sizersIndex].isNotificationRequired(notificationReqiured)) {
