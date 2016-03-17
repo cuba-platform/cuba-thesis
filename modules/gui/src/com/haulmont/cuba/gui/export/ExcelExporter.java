@@ -1,18 +1,6 @@
 /*
- * Copyright (c) 2008-2016 Haulmont.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Copyright (c) 2008-2013 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
  */
 package com.haulmont.cuba.gui.export;
 
@@ -52,6 +40,9 @@ import java.util.List;
  * Use this class to export {@link com.haulmont.cuba.gui.components.Table} into Excel format
  * and show using {@link ExportDisplay}.
  * <br>Just create an instance of this class and invoke one of <code>exportTable</code> methods.
+ *
+ * @author krivopustov
+ * @version $Id$
  */
 public class ExcelExporter {
     protected static final int COL_WIDTH_MAGIC = 48;
