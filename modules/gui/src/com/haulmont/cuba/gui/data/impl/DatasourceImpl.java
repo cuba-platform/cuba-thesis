@@ -92,7 +92,13 @@ public class DatasourceImpl<T extends Entity>
             if (parentDs instanceof CollectionDatasource) {
                 CollectionDatasource ds = (CollectionDatasource) parentDs;
                 if (ds.containsItem(item.getId())) {
-                    ds.modifyItem(item);
+                    if (parentDs instanceof CollectionDatasourceImpl) {
+                        Entity itemFromParentDs = ((CollectionDatasourceImpl) parentDs).getItem(this.item.getId());
+                        EntityCopyUtils.copyCompositionsBack(item, itemFromParentDs);
+                        ds.modifyItem(itemFromParentDs);
+                    } else {
+                        ds.modifyItem(item);
+                    }
                 } else {
                     ds.addItem(item);
                     ds.setItem(item); // This is necessary for nested property datasources to work correctly
