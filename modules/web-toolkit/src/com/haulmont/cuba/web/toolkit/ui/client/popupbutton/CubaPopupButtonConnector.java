@@ -74,6 +74,7 @@ public class CubaPopupButtonConnector extends PopupButtonConnector {
                         && !nativeEvent.getShiftKey()
                         && !nativeEvent.getMetaKey()) {
                     event.cancel();
+                    event.getNativeEvent().stopPropagation();
                     event.getNativeEvent().preventDefault();
                     Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
                         @Override
