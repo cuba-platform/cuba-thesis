@@ -35,6 +35,7 @@ public class CubaGroupBoxWidget extends VPanel implements HasEnabled {
 
     public Element captionStartDeco = DOM.createDiv();
     public Element captionEndDeco = DOM.createDiv();
+    public Element captionTextNode;
 
     public CubaGroupBoxWidget(String primaryStyleName) {
         setStylePrimaryName(primaryStyleName);
@@ -61,7 +62,7 @@ public class CubaGroupBoxWidget extends VPanel implements HasEnabled {
 
         captionNode.insertFirst(expander);
 
-        Element captionTextNode = (Element) captionNode.getChild(1);
+        captionTextNode = (Element) captionNode.getChild(1);
         captionTextNode.setClassName(primaryStyleName + "-caption-text");
 
         DOM.sinkEvents(expander, Event.ONCLICK);
