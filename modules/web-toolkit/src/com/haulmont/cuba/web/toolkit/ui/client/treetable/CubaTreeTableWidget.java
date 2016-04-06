@@ -709,7 +709,7 @@ public class CubaTreeTableWidget extends VTreeTable implements ShortcutActionHan
             }
         }
 
-        customContextMenuPopup = Tools.createCubaContextMenu();
+        customContextMenuPopup = Tools.createCubaTableContextMenu();
         customContextMenuPopup.setOwner(this);
         customContextMenuPopup.setWidget(customContextMenu);
 

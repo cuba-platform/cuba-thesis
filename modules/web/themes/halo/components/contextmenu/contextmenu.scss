@@ -5,8 +5,8 @@
 
 // Version: $Id$
 
-@mixin halo-cuba-contextmenu($primary-stylename: cuba-context-menu) {
-  .#{$primary-stylename}-container {
+@mixin halo-cuba-contextmenu($primary-stylename: cuba-context-menu-container) {
+  .#{$primary-stylename} {
     @include valo-selection-overlay-style;
 
     .v-button {
@@ -25,8 +25,13 @@
       text-align: left;
     }
 
-    .v-button:hover {
+    .cuba-context-menu-button-selected {
       @include valo-selection-item-selected-style;
+    }
+
+    .cuba-context-menu-button-selected.v-disabled {
+       color: inherit;
+       background: transparent;
     }
 
     .v-ie9 & {
@@ -39,12 +44,6 @@
       .v-button.ie9-hover:hover {
         @include valo-selection-item-selected-style;
       }
-    }
-
-    .v-button.v-disabled:hover {
-      background: transparent;
-      color: inherit;
-      text-shadow: none;
     }
   }
 }

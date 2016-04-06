@@ -24,7 +24,7 @@ import org.vaadin.hene.popupbutton.widgetset.client.ui.VPopupButton;
  */
 public class CubaPopupButtonWidget extends VPopupButton {
 
-    public static final String SELECTED_ITEM_STYLE = "v-selected";
+    public static final String SELECTED_ITEM_STYLE = "cuba-context-menu-button-selected";
 
     protected boolean customLayout = false;
 

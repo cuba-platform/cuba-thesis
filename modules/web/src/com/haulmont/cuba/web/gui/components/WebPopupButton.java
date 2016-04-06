@@ -28,6 +28,8 @@ import static com.haulmont.cuba.gui.ComponentsHelper.findActionById;
 public class WebPopupButton extends WebAbstractComponent<CubaPopupButton>
         implements PopupButton, Component.SecuredActionsHolder {
 
+    private final static String CONTEXT_MENU_BUTTON = "cuba-context-menu-button";
+
     protected Component popupComponent;
     protected com.vaadin.ui.Component vPopupComponent;
     protected String icon;
@@ -190,7 +192,7 @@ public class WebPopupButton extends WebAbstractComponent<CubaPopupButton>
         Button vButton = (Button) button.getComposition();
         vButton.setImmediate(true);
         vButton.setSizeFull();
-        vButton.setStyleName(BaseTheme.BUTTON_LINK);
+        vButton.setStyleName(CONTEXT_MENU_BUTTON);
 
         if (AppUI.getCurrent().isTestMode()) {
             String debugId = getDebugId();
