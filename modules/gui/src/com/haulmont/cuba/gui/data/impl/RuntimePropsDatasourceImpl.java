@@ -266,7 +266,7 @@ public class RuntimePropsDatasourceImpl
         }
 
         item = new DynamicAttributesEntity(baseGenericIdEntity, attributes);
-        dynamicAttributesGuiTools.initDefaultAttributeValues(baseGenericIdEntity);
+        dynamicAttributesGuiTools.initDefaultAttributeValues(baseGenericIdEntity, resolveCategorizedEntityClass());
 
         view = new View(DynamicAttributesEntity.class);
         Collection<MetaProperty> properties = metaClass.getProperties();

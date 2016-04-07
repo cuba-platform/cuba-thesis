@@ -5,6 +5,7 @@
 
 package com.haulmont.cuba.gui.dynamicattributes;
 
+import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributes;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
@@ -73,9 +74,10 @@ public class DynamicAttributesGuiTools {
         return categoryAttributes;
     }
 
-    public void initDefaultAttributeValues(BaseGenericIdEntity item) {
+    public void initDefaultAttributeValues(BaseGenericIdEntity item, MetaClass metaClass) {
+        Preconditions.checkNotNullArgument(metaClass, "metaClass is null");
         Collection<CategoryAttribute> attributes =
-                dynamicAttributes.getAttributesForMetaClass(item.getMetaClass());
+                dynamicAttributes.getAttributesForMetaClass(metaClass);
         if (item.getDynamicAttributes() == null) {
             item.setDynamicAttributes(new HashMap<>());
         }
@@ -107,7 +109,7 @@ public class DynamicAttributesGuiTools {
             @Override
             public void valueChanged(Entity source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 if ("category".equals(property)) {
-                    initDefaultAttributeValues((BaseGenericIdEntity) source);
+                    initDefaultAttributeValues((BaseGenericIdEntity) source, source.getMetaClass());
                 }
             }
         });
