@@ -74,9 +74,6 @@ public class DynamicAttributesGuiTools {
         return categoryAttributes;
     }
 
-
-
-
     public void initDefaultAttributeValues(BaseGenericIdEntity item, MetaClass metaClass) {
         Preconditions.checkNotNullArgument(metaClass, "metaClass is null");
         Collection<CategoryAttribute> attributes =
@@ -112,8 +109,7 @@ public class DynamicAttributesGuiTools {
             @Override
             public void valueChanged(Entity source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 if ("category".equals(property)) {
-                    BaseGenericIdEntity entity = (BaseGenericIdEntity) source;
-                    initDefaultAttributeValues(entity, entity.getMetaClass());
+                    initDefaultAttributeValues((BaseGenericIdEntity) source, source.getMetaClass());
                 }
             }
         });
