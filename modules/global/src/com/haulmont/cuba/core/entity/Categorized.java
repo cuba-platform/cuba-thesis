@@ -5,6 +5,8 @@
 
 package com.haulmont.cuba.core.entity;
 
+import com.haulmont.chile.core.model.MetaClass;
+
 /**
  * Interface to be implemented by entities which can be separated by categories and hence have several sets of
  * dynamic attributes.
@@ -18,4 +20,6 @@ public interface Categorized {
     Category getCategory();
 
     void setCategory(Category category);
+
+    MetaClass getCategorizedMetaClass();
 }

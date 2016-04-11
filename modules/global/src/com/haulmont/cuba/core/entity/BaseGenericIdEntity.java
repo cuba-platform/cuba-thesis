@@ -143,8 +143,12 @@ public abstract class BaseGenericIdEntity<T> extends AbstractInstance implements
                     categoryAttributeValue.setEntityId(getUuid());
                     categoryAttributeValue.setCode(attributeCode);
                     DynamicAttributes dynamicAttributesBean = AppBeans.get(DynamicAttributes.NAME);
+                    MetaClass metaClass = getMetaClass();
+                    if (this instanceof Categorized) {
+                        metaClass = ((Categorized)this).getCategorizedMetaClass();
+                    }
                     categoryAttributeValue.setCategoryAttribute(
-                            dynamicAttributesBean.getAttributeForMetaClass(getMetaClass(), attributeCode));
+                            dynamicAttributesBean.getAttributeForMetaClass(metaClass, attributeCode));
                     dynamicAttributes.put(attributeCode, categoryAttributeValue);
                 }
                 propertyChanged(property, null, newValue);

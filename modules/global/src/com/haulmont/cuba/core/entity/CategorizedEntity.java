@@ -4,6 +4,7 @@
  */
 package com.haulmont.cuba.core.entity;
 
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.annotation.OnDeleteInverse;
 import com.haulmont.cuba.core.global.DeletePolicy;
 
@@ -37,5 +38,10 @@ public abstract class CategorizedEntity extends BaseUuidEntity implements Catego
     @Override
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    @Override
+    public MetaClass getCategorizedMetaClass() {
+        return getMetaClass();
     }
 }
