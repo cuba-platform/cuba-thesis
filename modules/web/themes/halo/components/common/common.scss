@@ -15,6 +15,11 @@
     .cuba-tooltip-button {
       display: none;
     }
+  } @else {
+    .cuba-tooltip-button::before {
+      font-family: FontAwesome;
+      content: "\f059";
+    }
   }
 
   .v-widget {
