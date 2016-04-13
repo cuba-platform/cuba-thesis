@@ -252,6 +252,7 @@ public class WebBackgroundWorker implements BackgroundWorker {
             } finally {
                 // Set null security permissions
                 securityContext = null;
+                AppContext.setSecurityContext(null);
                 // Save result
                 this.result = result;
                 // Is done
@@ -284,7 +285,7 @@ public class WebBackgroundWorker implements BackgroundWorker {
                 // Interrupt
                 interrupt();
 
-                session.accessSynchronously(new Runnable() {
+                Runnable removeTaskRunnable = new Runnable() {
                     @Override
                     public void run() {
                         // Remove task from execution
@@ -295,7 +296,15 @@ public class WebBackgroundWorker implements BackgroundWorker {
 
                         stopTimer();
                     }
-                });
+                };
+
+                if (VaadinSession.getCurrent() != session) {
+                    // access to vaadin session asynchronously
+                    // to prevent deadlock with com.haulmont.cuba.gui.executors.impl.TasksWatchDog
+                    session.access(removeTaskRunnable);
+                } else {
+                    removeTaskRunnable.run();
+                }
 
                 canceled = true;
             }
