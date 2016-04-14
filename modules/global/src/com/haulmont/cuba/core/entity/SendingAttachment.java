@@ -11,8 +11,6 @@ import javax.persistence.*;
 import javax.persistence.Entity;
 
 /**
- * <p>$Id$</p>
- *
  * @author ovchinnikov
  */
 @Entity(name = "sys$SendingAttachment")
@@ -22,7 +20,7 @@ public class SendingAttachment extends StandardEntity {
     private static final long serialVersionUID = -8253918579521701435L;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "MESSAGE_ID")
+    @JoinColumn(name = "MESSAGE_ID")
     protected SendingMessage message;
 
     /**
