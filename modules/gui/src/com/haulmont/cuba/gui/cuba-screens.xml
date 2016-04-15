@@ -181,4 +181,7 @@
     <screen id="filterSelect"
             template="/com/haulmont/cuba/gui/components/filter/filterselect/filter-select.xml"/>
 
+    <screen id="commonLookup"
+            template="com/haulmont/cuba/gui/commonlookup/common-lookup.xml"/>
+
 </screen-config>

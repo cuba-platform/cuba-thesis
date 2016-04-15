@@ -1,6 +1,18 @@
 /*
- * Copyright (c) 2008-2014 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 package com.haulmont.cuba.gui.components;
@@ -23,6 +35,7 @@ import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
+import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
@@ -273,8 +286,13 @@ public abstract class AbstractFieldFactory implements FieldFactory {
 
             PickerField pickerField;
             if (optionsDatasource == null) {
-                pickerField = componentsFactory.createComponent(PickerField.NAME);
-                pickerField.addLookupAction();
+                pickerField = componentsFactory.createComponent(PickerField.class);
+                if (DynamicAttributesUtils.isDynamicAttribute(mpp.getMetaProperty())) {
+                    DynamicAttributesGuiTools dynamicAttributesGuiTools = AppBeans.get(DynamicAttributesGuiTools.NAME);
+                    dynamicAttributesGuiTools.addEntityLookupAction(pickerField, (DynamicAttributesMetaProperty) mpp.getMetaProperty());
+                } else {
+                    pickerField.addLookupAction();
+                }
                 pickerField.addClearAction();
             } else {
                 LookupPickerField lookupPickerField = componentsFactory.createComponent(LookupPickerField.NAME);

@@ -31,6 +31,7 @@ import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.data.RuntimePropsDatasource;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
+import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import org.apache.commons.lang.StringUtils;
 
@@ -53,7 +54,6 @@ public class RuntimePropertiesFrame extends AbstractWindow {
 
     public static final String NAME = "runtimeProperties";
     public static final String DEFAULT_FIELD_WIDTH = "100%";
-    private final DynamicAttributes dynamicAttributes = AppBeans.get(DynamicAttributes.NAME);
 
     protected RuntimePropsDatasource rds;
 
@@ -69,6 +69,12 @@ public class RuntimePropertiesFrame extends AbstractWindow {
 
     @Inject
     protected ComponentsFactory componentsFactory;
+
+    @Inject
+    protected DynamicAttributes dynamicAttributes;
+
+    @Inject
+    protected DynamicAttributesGuiTools dynamicAttributesGuiTools;
 
     @WindowParam
     protected String rows;
@@ -233,21 +239,12 @@ public class RuntimePropertiesFrame extends AbstractWindow {
 
                             ((LookupPickerField) pickerField).setOptionsDatasource(optionsDs);
                         } else {
-                            pickerField = componentsFactory.createComponent(PickerField.NAME);
-                            pickerField.addLookupAction();
+                            pickerField = componentsFactory.createComponent(PickerField.class);
+                            dynamicAttributesGuiTools.addEntityLookupAction(pickerField, metaProperty);
                         }
                         pickerField.setMetaClass(ds.getMetaClass());
                         pickerField.setFrame(RuntimePropertiesFrame.this);
                         pickerField.setDatasource(ds, propertyId);
-                        LookupAction lookupAction = (LookupAction) pickerField.getAction(LookupAction.NAME);
-                        if (lookupAction != null) {
-                            String screen = metaProperty.getAttribute().getScreen();
-                            if (StringUtils.isBlank(screen)) {
-                                WindowConfig windowConfig = AppBeans.get(WindowConfig.NAME);
-                                screen = windowConfig.getBrowseScreenId(pickerField.getMetaClass());
-                            }
-                            lookupAction.setLookupScreen(screen);
-                        }
                         pickerField.addOpenAction();
                         pickerField.setWidth(fieldWidth);
                         return pickerField;
