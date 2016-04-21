@@ -415,7 +415,7 @@ public class DataManagerBean implements DataManager {
                 if (property.getRange().isClass()
                         && !metadata.getTools().isEmbedded(property)
                         && !property.getRange().getCardinality().isMany()
-                        && metadata.getTools().isPersistent(property)) {
+                        && !property.isReadOnly()) {
 
                     Entity refEntity = entity.getValue(property.getName());
                     if (refEntity == null || refEntity.getId() == null)
