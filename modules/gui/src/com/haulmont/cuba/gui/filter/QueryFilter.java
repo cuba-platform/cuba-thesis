@@ -71,7 +71,14 @@ public class QueryFilter {
                     for (ParameterInfo param : params) {
                         try {
                             param.setJavaClass(Class.forName(javaClass.getValue()));
-                            param.setConditionName(conditionElement.attributeValue("name"));
+
+                            String conditionName;
+                            if (conditionElement.attributeValue("locCaption") == null) {
+                                conditionName = conditionElement.attributeValue("name");
+                            } else {
+                                conditionName = conditionElement.attributeValue("locCaption");
+                            }
+                            param.setConditionName(conditionName);
                         } catch (ClassNotFoundException e) {
                             //do not fail
                         }
