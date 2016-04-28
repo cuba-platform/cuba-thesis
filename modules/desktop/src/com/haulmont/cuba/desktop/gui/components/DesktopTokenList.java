@@ -522,6 +522,10 @@ public class DesktopTokenList extends DesktopAbstractField<JPanel> implements To
         if (addButton != null) {
             addButton.setParentEnabled(isEnabledWithParent());
         }
+
+        if (clearButton != null) {
+            clearButton.setParentEnabled(isEnabledWithParent());
+        }
     }
 
     protected String instanceCaption(Instance instance) {
