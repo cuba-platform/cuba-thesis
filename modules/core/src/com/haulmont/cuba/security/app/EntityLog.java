@@ -300,7 +300,7 @@ public class EntityLog implements EntityLogAPI {
             }
             Date ts = timeSource.currentTimestamp();
             EntityManager em = persistence.getEntityManager();
-            Set<String> dirty = persistence.getTools().getDirtyFields(entity);
+            Set<String> dirty = getDirtyFields(entity);
 
             Properties properties = new Properties();
             for (String attr : attributes) {
@@ -323,6 +323,10 @@ public class EntityLog implements EntityLogAPI {
         } catch (Exception e) {
             log.warn("Unable to log entity " + entity + ", id=" + entity.getId(), e);
         }
+    }
+
+    protected Set<String> getDirtyFields(BaseEntity entity) {
+        return persistence.getTools().getDirtyFields(entity);
     }
 
     private String getChanges(Properties properties) throws IOException {
