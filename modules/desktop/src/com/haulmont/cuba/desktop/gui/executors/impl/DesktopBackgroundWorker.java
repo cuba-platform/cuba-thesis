@@ -115,6 +115,7 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
                     });
                 }
             } catch (Exception ex) {
+                log.error("", ex);
                 if (!(ex instanceof InterruptedException) && !isCancelled())
                     taskException = ex;
             } finally {
@@ -135,8 +136,10 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
 
         @Override
         protected final void done() {
-            if (isClosed)
+            if (isClosed) {
+                log.trace("Done statement is not processed because it is already closed");
                 return;
+            }
 
             if (!isInterrupted) {
                 try {
@@ -160,6 +163,8 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
 
                     isClosed = true;
                 }
+            } else {
+                log.trace("Done statement is not processed because task is interrupted");
             }
         }
 
@@ -178,9 +183,16 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
             if (!isDone() && !isCancelled()) {
                 log.debug("Cancel task. User: " + userId);
                 isClosed = cancel(true);
+                if (isClosed) {
+                    log.trace("Task was cancelled. User: " + userId);
+                } else {
+                    log.trace("Cancellation of task isn't processed. User: " + userId);
+                }
                 return isClosed;
-            } else
+            } else {
+                log.trace("Cancellation of task isn't processed because it's already done or cancelled. User: " + userId);
                 return false;
+            }
         }
 
         @Override
@@ -190,6 +202,7 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
                 result = get();
                 this.done();
             } catch (InterruptedException | ExecutionException e) {
+                log.error("", e);
                 return null;
             }
             return result;
