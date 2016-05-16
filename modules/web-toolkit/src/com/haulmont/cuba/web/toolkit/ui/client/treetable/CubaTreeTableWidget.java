@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.*;
 import com.haulmont.cuba.web.toolkit.ui.client.Tools;
 import com.haulmont.cuba.web.toolkit.ui.client.aggregation.AggregatableTable;
 import com.haulmont.cuba.web.toolkit.ui.client.aggregation.TableAggregationRow;
+import com.haulmont.cuba.web.toolkit.ui.client.profiler.ScreenClientProfiler;
 import com.haulmont.cuba.web.toolkit.ui.client.table.TableCellClickListener;
 import com.vaadin.client.*;
 import com.vaadin.client.ui.*;
@@ -61,12 +62,20 @@ public class CubaTreeTableWidget extends VTreeTable implements ShortcutActionHan
     protected boolean customPopupAutoClose = false;
     protected int lastClickClientX;
     protected int lastClickClientY;
+    protected String profilerMarker;
 
     protected CubaTreeTableWidget() {
         // handle shortcuts
         DOM.sinkEvents(getElement(), Event.ONKEYDOWN);
 
         hideColumnControlAfterClick = false;
+        rowRequestHandler = new RowRequestHandler() {
+            @Override
+            protected void updateVariables() {
+                client.updateVariable(paintableId, "profilerMarker", profilerMarker, false);
+                profilerMarker = null;
+            }
+        };
     }
 
     @Override
@@ -698,6 +707,12 @@ public class CubaTreeTableWidget extends VTreeTable implements ShortcutActionHan
                     container.addClassName(WIDGET_CELL_CLASSNAME);
                 }
             }
+        }
+
+        @Override
+        public void renderInitialRows(UIDL rowData, int firstIndex, int rows) {
+            profilerMarker = ScreenClientProfiler.getInstance().getProfilerMarker();
+            super.renderInitialRows(rowData, firstIndex, rows);
         }
     }
 

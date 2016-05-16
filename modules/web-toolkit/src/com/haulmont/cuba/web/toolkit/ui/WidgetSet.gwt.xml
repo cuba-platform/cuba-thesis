@@ -24,6 +24,10 @@
         <when-type-is class="com.vaadin.client.ui.ui.UIConnector"/>
     </replace-with>
 
+    <replace-with class="com.haulmont.cuba.web.toolkit.ui.client.CubaApplicationConnection">
+        <when-type-is class="com.vaadin.client.ApplicationConnection"/>
+    </replace-with>
+
     <!-- Text selection enable functions deffered binding -->
 
     <define-property name="ie11orHigher" values="no,yes"/>

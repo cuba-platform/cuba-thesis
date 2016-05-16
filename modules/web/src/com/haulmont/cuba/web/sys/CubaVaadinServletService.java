@@ -10,14 +10,13 @@ import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.web.App;
+import com.haulmont.cuba.web.ScreenProfiler;
 import com.haulmont.cuba.web.WebConfig;
 import com.haulmont.cuba.web.auth.RequestContext;
 import com.haulmont.cuba.web.toolkit.ui.CubaFileUpload;
 import com.vaadin.server.*;
-import com.vaadin.server.communication.FileUploadHandler;
-import com.vaadin.server.communication.HeartbeatHandler;
-import com.vaadin.server.communication.PublishedFileHandler;
-import com.vaadin.server.communication.ServletBootstrapHandler;
+import com.vaadin.server.communication.*;
+import com.vaadin.ui.UI;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -31,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -157,6 +157,8 @@ public class CubaVaadinServletService extends VaadinServletService {
                 // add support for jquery file upload
                 cubaRequestHandlers.add(handler);
                 cubaRequestHandlers.add(new CubaFileUploadHandler());
+            } else if (handler instanceof UidlRequestHandler) {
+                cubaRequestHandlers.add(new CubaUidlRequestHandler());
             } else {
                 cubaRequestHandlers.add(handler);
             }
@@ -211,6 +213,30 @@ public class CubaVaadinServletService extends VaadinServletService {
             writer.close();
         }
     }
+
+
+    // Add ability to profiling screens
+    protected static class CubaUidlRequestHandler extends UidlRequestHandler {
+        @Override
+        protected UidlWriter createUidlWriter() {
+            return new UidlWriter() {
+                @Override
+                protected void writePerformanceData(UI ui, Writer writer) throws IOException {
+                    super.writePerformanceData(ui, writer);
+                    ScreenProfiler profiler = AppBeans.get(ScreenProfiler.NAME);
+                    String profilerMarker = profiler.getCurrentProfilerMarker(ui);
+                    if (profilerMarker != null) {
+                        profiler.setCurrentProfilerMarker(ui, null);
+                        long lastRequestTimestamp = ui.getSession().getLastRequestTimestamp();
+                        writer.write(String.format(", \"profilerMarker\": \"%s\", \"profilerEventTs\": \"%s\", \"profilerServerTime\": %s",
+                                profilerMarker, lastRequestTimestamp, System.currentTimeMillis() - lastRequestTimestamp));
+                    }
+                }
+            };
+        }
+    }
+
+
 
     // Add ability to redirect to base application URL if we have unparsable path tail
     protected static class CubaApplicationBootstrapHandler extends ServletBootstrapHandler {

@@ -6,6 +6,7 @@
 package com.haulmont.cuba.web.toolkit.ui;
 
 import com.google.common.collect.Iterables;
+import com.haulmont.cuba.web.AppUI;
 import com.haulmont.cuba.web.gui.components.presentations.TablePresentations;
 import com.haulmont.cuba.web.gui.data.PropertyValueStringify;
 import com.haulmont.cuba.web.toolkit.ShortcutActionManager;
@@ -25,6 +26,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Layout;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -205,6 +207,12 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
 
         if (shortcutActionManager != null) {
             shortcutActionManager.handleActions(variables, this);
+        }
+
+        String profilerMarker = (String) variables.get("profilerMarker");
+        if (StringUtils.isNotEmpty(profilerMarker)) {
+            AppUI ui = AppUI.getCurrent();
+            ui.setProfilerMarker(profilerMarker);
         }
     }
 

@@ -61,6 +61,8 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
 
     protected CubaTimer workerTimer;
 
+    protected ScreenClientProfilerAgent clientProfiler;
+
     protected WebConfig webConfig;
 
     protected Window.MainWindow mainWindow;
@@ -189,6 +191,9 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
 
         fileDownloader = new CubaFileDownloader();
         fileDownloader.extend(this);
+
+        clientProfiler = new ScreenClientProfilerAgent();
+        clientProfiler.extend(this);
 
         if (webConfig.getAllowHandleBrowserHistoryBack()) {
             historyControl = new CubaHistoryControl();

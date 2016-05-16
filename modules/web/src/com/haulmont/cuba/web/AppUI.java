@@ -22,6 +22,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -49,6 +51,10 @@ public class AppUI extends UI implements ErrorHandler {
     protected TestIdManager testIdManager = new TestIdManager();
 
     protected boolean testMode = false;
+
+    protected String profilerMarker;
+
+    protected Map<String, String> profiledScreens;
 
     public AppUI() {
         if (log.isTraceEnabled()) {
@@ -291,5 +297,30 @@ public class AppUI extends UI implements ErrorHandler {
      */
     public void discardAccumulatedEvents() {
         getRpcProxy(AppUIClientRpc.class).discardAccumulatedEvents();
+    }
+
+    public String getProfilerMarker() {
+        return profilerMarker;
+    }
+
+    public void setProfilerMarker(String profilerMarker) {
+        this.profilerMarker = profilerMarker;
+    }
+
+    public void setProfiledScreen(String profilerMarker, String screen) {
+        if (profiledScreens == null) {
+            profiledScreens = new HashMap<>();
+        }
+        profiledScreens.put(profilerMarker, screen);
+    }
+
+    public String getProfiledScreen(String profilerMarker) {
+        return profiledScreens.get(profilerMarker);
+    }
+
+    public void clearProfiledScreens(List<String> profilerMarkers) {
+        for (String profilerMarker : profilerMarkers) {
+            profiledScreens.remove(profilerMarker);
+        }
     }
 }

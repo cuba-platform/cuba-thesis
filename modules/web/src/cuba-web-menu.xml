@@ -24,6 +24,7 @@
         <item id="jmxConsole"/>
         <item id="serverLog"/>
         <item id="performanceStatistics"/>
+        <item id="screenProfiler"/>
     </menu>
 
     <menu id="help">

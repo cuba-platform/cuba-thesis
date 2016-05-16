@@ -6,6 +6,7 @@ package com.haulmont.cuba.web;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.client.ClientConfig;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.*;
 import com.haulmont.cuba.gui.app.core.dev.LayoutAnalyzer;
@@ -19,6 +20,7 @@ import com.haulmont.cuba.gui.components.mainwindow.AppWorkArea;
 import com.haulmont.cuba.gui.components.mainwindow.FoldersPane;
 import com.haulmont.cuba.gui.components.mainwindow.UserIndicator;
 import com.haulmont.cuba.gui.config.WindowInfo;
+import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.theme.ThemeConstantsManager;
 import com.haulmont.cuba.gui.xml.layout.LayoutLoaderConfig;
@@ -73,6 +75,8 @@ public class WebWindowManager extends WindowManager {
     protected final WebConfig webConfig;
     protected final ClientConfig clientConfig;
 
+    protected ScreenProfiler screenProfiler;
+
     protected final Map<ComponentContainer, WindowBreadCrumbs> tabs = new HashMap<>();
     protected final Map<WindowBreadCrumbs, Stack<Map.Entry<Window, Integer>>> stacks = new HashMap<>();
     protected final Map<Window, WindowOpenMode> windowOpenMode = new LinkedHashMap<>();
@@ -89,6 +93,7 @@ public class WebWindowManager extends WindowManager {
         Configuration configuration = AppBeans.get(Configuration.NAME);
         webConfig = configuration.getConfig(WebConfig.class);
         clientConfig = configuration.getConfig(ClientConfig.class);
+        screenProfiler = AppBeans.get(ScreenProfiler.NAME);
 
         screenHistorySupport = new ScreenHistorySupport();
     }
@@ -102,6 +107,35 @@ public class WebWindowManager extends WindowManager {
     @Override
     public Collection<Window> getOpenWindows() {
         return new ArrayList<>(windowOpenMode.keySet());
+    }
+
+    @Override
+    public <T extends Window> T openWindow(WindowInfo windowInfo, OpenType openType, Map<String, Object> params) {
+        T window = super.openWindow(windowInfo, openType, params);
+        if (window != null) {
+            screenProfiler.initProfilerMarkerForWindow(windowInfo.getId());
+        }
+        return window;
+    }
+
+    @Override
+    public <T extends Window> T openLookup(WindowInfo windowInfo, Window.Lookup.Handler handler, OpenType openType, Map<String, Object> params) {
+        T window = super.openLookup(windowInfo, handler, openType, params);
+        if (window != null) {
+            screenProfiler.initProfilerMarkerForWindow(windowInfo.getId());
+        }
+        return window;
+    }
+
+    @Override
+    public <T extends Window> T openEditor(WindowInfo windowInfo, Entity item,
+                                    OpenType openType, Map<String, Object> params,
+                                    Datasource parentDs) {
+        T window = super.openEditor(windowInfo, item, openType, params, parentDs);
+        if (window != null) {
+            screenProfiler.initProfilerMarkerForWindow(windowInfo.getId());
+        }
+        return window;
     }
 
     @Override
