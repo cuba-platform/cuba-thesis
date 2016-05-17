@@ -115,7 +115,7 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
                     });
                 }
             } catch (Exception ex) {
-                log.error("", ex);
+                log.error("Exception occurred in background task", ex);
                 if (!(ex instanceof InterruptedException) && !isCancelled())
                     taskException = ex;
             } finally {
