@@ -77,7 +77,8 @@ public class QueryImpl<T> implements TypedQuery<T> {
                     log.trace("Transformed JPQL query: " + s);
                 }
                 if (resultClass != null) {
-                    query = (OpenJPAQuery) emDelegate.createQuery(s, resultClass);
+                    Class effectiveClass = metadata.getExtendedEntities().getEffectiveClass(resultClass);
+                    query = (OpenJPAQuery) emDelegate.createQuery(s, effectiveClass);
                 } else {
                     query = emDelegate.createQuery(s);
                 }
