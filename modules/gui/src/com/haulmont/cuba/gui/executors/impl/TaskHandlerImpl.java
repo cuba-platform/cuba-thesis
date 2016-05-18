@@ -128,10 +128,10 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
                 }
 
                 UUID userId = getUserSession().getId();
-                Frame ownerFrame = getTask().getOwnerFrame();
+                IFrame ownerFrame = getTask().getOwnerFrame();
                 String windowClass = ownerFrame.getClass().getCanonicalName();
 
-                log.trace("Task was cancelled. User: %s Frame: %s", userId.toString(), windowClass);
+                log.trace(String.format("Task was cancelled. User: %s Frame: %s", userId.toString(), windowClass));
             } else {
                 log.trace("Task wasn't cancelled. Execution is already cancelled");
             }
@@ -150,7 +150,7 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
 
                 String windowClass = ownerFrame.getClass().getCanonicalName();
 
-                log.trace("Resources were disposed. Frame: %s", windowClass);
+                log.trace("Resources were disposed. Frame: " + windowClass);
             } else {
                 log.trace("Empty ownerWindow. Resources were not disposed");
             }
@@ -200,10 +200,10 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
      * Cancel with timeout exceeded event
      */
     public final void timeoutExceeded() {
-        Frame ownerFrame = getTask().getOwnerFrame();
+        IFrame ownerFrame = getTask().getOwnerFrame();
         if (ownerFrame != null) {
             String windowClass = ownerFrame.getClass().getCanonicalName();
-            log.trace("Task timeout happened. Frame: %s", windowClass);
+            log.trace("Task timeout happened. Frame: " + windowClass);
         } else {
             log.trace("Task timeout happened");
         }
@@ -222,7 +222,7 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
 
         if (ownerFrame != null) {
             String windowClass = ownerFrame.getClass().getCanonicalName();
-            log.trace("Timeout was processed. Frame: %s", windowClass);
+            log.trace("Timeout was processed. Frame: " + windowClass);
         } else {
             log.trace("Timeout was processed");
         }
