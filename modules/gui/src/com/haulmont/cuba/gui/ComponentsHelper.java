@@ -145,11 +145,12 @@ public abstract class ComponentsHelper {
     private static <T extends com.haulmont.cuba.gui.components.Component> T getComponentByIteration(
             Component.Container container, String id) {
         for (com.haulmont.cuba.gui.components.Component component : container.getOwnComponents()) {
-            if (id.equals(component.getId()))
+            if (id.equals(component.getId())) {
                 return (T) component;
-            else {
-                if (component instanceof com.haulmont.cuba.gui.components.Component.Container) {
-                    return getComponentByIteration((com.haulmont.cuba.gui.components.Component.Container) component, id);
+            } else if (component instanceof com.haulmont.cuba.gui.components.Component.Container) {
+                Component innerComponent = getComponentByIteration((com.haulmont.cuba.gui.components.Component.Container) component, id);
+                if (innerComponent != null) {
+                    return (T) innerComponent;
                 }
             }
         }
