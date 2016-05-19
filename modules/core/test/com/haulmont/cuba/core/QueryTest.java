@@ -266,4 +266,20 @@ public class QueryTest extends CubaTestCase
             tx.end();
         }
     }
+
+    public void testPrimitiveResultClass() throws Exception {
+        Transaction tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+
+            String login = em.createQuery("select u.login from sec$User u where u.name = :name", String.class)
+                    .setParameter("name", "testUser")
+                    .getFirstResult();
+            assertEquals("testLogin", login);
+
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+    }
 }
