@@ -27,9 +27,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Desktop implementation of {@link BackgroundWorker}
- *
- * @author artamonov
- * @version $Id$
  */
 @ManagedBean(BackgroundWorker.NAME)
 public class DesktopBackgroundWorker implements BackgroundWorker {
@@ -71,29 +68,25 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
 
         private volatile boolean isClosed = false;
 
-        private volatile boolean isInterrupted = false;
-
         private Map<String, Object> params;
         private TaskHandlerImpl<T, V> taskHandler;
 
         private DesktopTaskExecutor(BackgroundTask<T, V> runnableTask) {
             this.runnableTask = runnableTask;
-            UserSessionSource sessionSource = AppBeans.get(UserSessionSource.NAME);
-            userId = sessionSource.getUserSession().getId();
 
-            //noinspection unchecked
-            this.params = runnableTask.getParams();
-            if (this.params != null)
-                this.params = Collections.unmodifiableMap(this.params);
-            else
-                this.params = Collections.emptyMap();
+            UserSessionSource sessionSource = AppBeans.get(UserSessionSource.NAME);
+            this.userId = sessionSource.getUserSession().getId();
+
+            this.params = runnableTask.getParams() != null ?
+                    Collections.unmodifiableMap(runnableTask.getParams()) :
+                    Collections.<String, Object>emptyMap();
         }
 
         @Override
         protected final V doInBackground() throws Exception {
             Thread.currentThread().setName("BackgroundTaskThread");
             try {
-                if (!isInterrupted) {
+                if (!Thread.currentThread().isInterrupted()) {
                     // do not run any activity if canceled before start
                     result = runnableTask.run(new TaskLifeCycle<T>() {
                         @SafeVarargs
@@ -104,7 +97,7 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
 
                         @Override
                         public boolean isInterrupted() {
-                            return DesktopTaskExecutor.this.isInterrupted;
+                            return Thread.currentThread().isInterrupted();
                         }
 
                         @Override
@@ -116,8 +109,9 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
                 }
             } catch (Exception ex) {
                 log.error("Exception occurred in background task", ex);
-                if (!(ex instanceof InterruptedException) && !isCancelled())
+                if (!(ex instanceof InterruptedException) && !isCancelled()) {
                     taskException = ex;
+                }
             } finally {
                 watchDog.removeTask(taskHandler);
             }
@@ -141,30 +135,30 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
                 return;
             }
 
-            if (!isInterrupted) {
-                try {
-                    if (this.taskException == null) {
-                        runnableTask.done(result);
-                        // Notify listeners
-                        for (BackgroundTask.ProgressListener<T, V> listener : runnableTask.getProgressListeners()) {
-                            listener.onDone(result);
-                        }
-                    } else {
-                        boolean handled = runnableTask.handleException(taskException);
-                        if (!handled) {
-                            log.error("Unhandled exception in background task", taskException);
-                        }
-                    }
-                } finally {
-                    if (finalizer != null) {
-                        finalizer.run();
-                        finalizer = null;
-                    }
+            if (log.isDebugEnabled()) {
+                log.debug("Done task. User: " + userId);
+            }
 
-                    isClosed = true;
+            try {
+                if (this.taskException == null) {
+                    runnableTask.done(result);
+                    // Notify listeners
+                    for (BackgroundTask.ProgressListener<T, V> listener : runnableTask.getProgressListeners()) {
+                        listener.onDone(result);
+                    }
+                } else {
+                    boolean handled = runnableTask.handleException(taskException);
+                    if (!handled) {
+                        log.error("Unhandled exception in background task", taskException);
+                    }
                 }
-            } else {
-                log.trace("Done statement is not processed because task is interrupted");
+            } finally {
+                if (finalizer != null) {
+                    finalizer.run();
+                    finalizer = null;
+                }
+
+                isClosed = true;
             }
         }
 
@@ -175,24 +169,28 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
 
         @Override
         public final boolean cancelExecution() {
-            if (isClosed)
+            if (isClosed) {
+                log.trace("Cancel will not be processed because it is already closed");
                 return false;
+            }
 
-            this.isInterrupted = true;
-
-            if (!isDone() && !isCancelled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("Cancel task. User: " + userId);
-                isClosed = cancel(true);
-                if (isClosed) {
+            }
+
+            boolean isCanceledNow = cancel(true);
+
+            if (log.isTraceEnabled()) {
+                if (isCanceledNow) {
                     log.trace("Task was cancelled. User: " + userId);
                 } else {
                     log.trace("Cancellation of task isn't processed. User: " + userId);
                 }
-                return isClosed;
-            } else {
-                log.trace("Cancellation of task isn't processed because it's already done or cancelled. User: " + userId);
-                return false;
             }
+
+            this.isClosed = isCanceledNow;
+
+            return isCanceledNow;
         }
 
         @Override
