@@ -155,4 +155,48 @@ public class PermissionTest extends CubaTestCase {
         permitted = userSession.isPermitted(PermissionType.ENTITY_ATTR, PERM_TARGET_ATTR, 2);
         assertFalse(permitted); // READ/WRITE access denied
     }
+
+    public void testNullPermissionsOnUser() throws LoginException {
+        LoginWorker lw = AppBeans.get(LoginWorker.NAME);
+
+        UserSession userSession = lw.login(USER_NAME, passwordEncryption.getPlainHash(USER_PASSW), Locale.getDefault());
+        assertNotNull(userSession);
+
+        //permission is empty on user
+        if (userSession.getUser().getUserRoles() != null) {
+            for (UserRole ur : userSession.getUser().getUserRoles()) {
+                if (ur.getRole() != null) {
+                    assertNull(ur.getRole().getPermissions());
+                }
+            }
+        }
+
+        User user = userSession.getUser();
+        Transaction tx = persistence.createTransaction();
+        try {
+            persistence.getEntityManager().merge(user);
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+
+        tx = persistence.createTransaction();
+        try {
+            user = persistence.getEntityManager().find(User.class, user.getId());
+            if (userSession.getUser().getUserRoles() != null) {
+                for (UserRole ur : user.getUserRoles()) {
+                    if (ur.getRole() != null) {
+                        Role role = ur.getRole();
+                        if ("testRole1".equals(role.getName()) || "testRole2".equals(role.getName())) {
+                            assertNotNull(role.getPermissions());
+                            assertEquals(1, role.getPermissions().size());
+                        }
+                    }
+                }
+            }
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+    }
 }

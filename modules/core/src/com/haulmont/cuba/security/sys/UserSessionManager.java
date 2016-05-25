@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.PersistenceHelper;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.core.global.UuidSource;
 import com.haulmont.cuba.security.app.UserSessionsAPI;
@@ -242,5 +243,26 @@ public class UserSessionManager {
             tx.end();
         }
         return result; 
+    }
+
+    /**
+     * INTERNAL
+     */
+    public void clearPermissionsOnUser(UserSession session) {
+        List<User> users = new ArrayList<>();
+        users.add(session.getUser());
+        if (session.getSubstitutedUser() != null) {
+            users.add(session.getSubstitutedUser());
+        }
+        for (User user : users) {
+            if (PersistenceHelper.isDetached(user) && user.getUserRoles() != null) {
+                for (UserRole userRole : user.getUserRoles()) {
+                    Role role = userRole.getRole();
+                    if (role != null && role.getPermissions() != null) {
+                        role.setPermissions(null);
+                    }
+                }
+            }
+        }
     }
 }
