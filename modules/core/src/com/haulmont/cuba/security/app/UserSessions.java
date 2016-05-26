@@ -62,11 +62,13 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
         final UserSession session;
         final long since;
         volatile long lastUsedTs; // set to 0 when propagating removal to cluster
+        volatile long lastSentTs;
 
         UserSessionInfo(UserSession session, long now) {
             this.session = session;
             this.since = now;
             this.lastUsedTs = now;
+            this.lastSentTs = now;
         }
 
         @Override
@@ -80,6 +82,8 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
     private Map<UUID, UserSessionInfo> cache = new ConcurrentHashMap<>();
 
     private volatile int expirationTimeout = 1800;
+
+    private volatile int sendTimeout = 10;
 
     private ClusterManagerAPI clusterManager;
 
@@ -130,6 +134,7 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
         globalConfig = configuration.getConfig(GlobalConfig.class);
         serverConfig = configuration.getConfig(ServerConfig.class);
         setExpirationTimeoutSec(serverConfig.getUserSessionExpirationTimeoutSec());
+        setSendTimeoutSec(serverConfig.getUserSessionSendTimeoutSec());
     }
 
     @Inject
@@ -420,9 +425,13 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
 
         UserSessionInfo usi = cache.get(id);
         if (usi != null) {
-            usi.lastUsedTs = timeSource.currentTimestamp().getTime();
+            long now = timeSource.currentTimeMillis();
+            usi.lastUsedTs = now;
             if (propagate && !usi.session.isSystem()) {
-                clusterManager.send(usi);
+                if (now > (usi.lastSentTs + sendTimeout * 1000)) {
+                    usi.lastSentTs = now;
+                    clusterManager.send(usi);
+                }
             }
             return usi.session;
         }
@@ -433,7 +442,9 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
     public void propagate(UUID id) {
         UserSessionInfo usi = cache.get(id);
         if (usi != null) {
-            usi.lastUsedTs = timeSource.currentTimestamp().getTime();
+            long now = timeSource.currentTimeMillis();
+            usi.lastUsedTs = now;
+            usi.lastSentTs = now;
             clusterManager.send(usi);
         }
     }
@@ -446,6 +457,16 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
     @Override
     public void setExpirationTimeoutSec(int value) {
         expirationTimeout = value;
+    }
+
+    @Override
+    public int getSendTimeoutSec() {
+        return sendTimeout;
+    }
+
+    @Override
+    public void setSendTimeoutSec(int timeout) {
+        this.sendTimeout = timeout;
     }
 
     @Override
