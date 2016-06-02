@@ -5,6 +5,7 @@
 package com.haulmont.cuba.gui.xml.layout.loaders;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
@@ -14,9 +15,11 @@ import com.haulmont.cuba.core.entity.CategoryAttribute;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.MetadataTools;
-import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
-import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.Field;
+import com.haulmont.cuba.gui.components.FieldGroup;
+import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
@@ -38,6 +41,8 @@ import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
  */
 public class FieldGroupLoader extends AbstractFieldLoader {
     protected DynamicAttributes dynamicAttributes = AppBeans.get(DynamicAttributes.NAME);
+    protected DynamicAttributesGuiTools dynamicAttributesGuiTools = AppBeans.get(DynamicAttributesGuiTools.NAME);
+    protected MetadataTools metadataTools = AppBeans.get(MetadataTools.NAME);
 
     public FieldGroupLoader(Context context, LayoutLoaderConfig config, ComponentsFactory factory) {
         super(context, config, factory);
@@ -59,11 +64,18 @@ public class FieldGroupLoader extends AbstractFieldLoader {
         assignFrame(component);
 
         loadVisible(component, element);
+        loadWidth(component, element);
 
         final Datasource ds = loadDatasource(element);
         if (element.elements("column").isEmpty()) {
             final List<FieldGroup.FieldConfig> rootFields = loadFields(component, element, ds);
-            for (final FieldGroup.FieldConfig field : rootFields) {
+            Iterable<FieldGroup.FieldConfig> dynamicAttributeFields = loadDynamicAttributeFields(ds, component);
+            for (FieldGroup.FieldConfig field : dynamicAttributeFields) {
+                if (component.getWidth() > 0 && field.getWidth() == null) {
+                    field.setWidth("100%");
+                }
+            }
+            for (final FieldGroup.FieldConfig field : Iterables.concat(rootFields, dynamicAttributeFields)) {
                 component.addField(field);
             }
         } else {
@@ -89,7 +101,10 @@ public class FieldGroupLoader extends AbstractFieldLoader {
 
                 String width = loadThemeString(columnElement.attributeValue("width"));
 
-                final List<FieldGroup.FieldConfig> columnFields = loadFields(component, columnElement, ds);
+                Iterable<FieldGroup.FieldConfig> columnFields = loadFields(component, columnElement, ds);
+                if (colIndex == 0) {
+                    columnFields = Iterables.concat(columnFields, loadDynamicAttributeFields(ds, component));
+                }
                 for (final FieldGroup.FieldConfig field : columnFields) {
                     component.addField(field, colIndex);
                     if (StringUtils.isNotEmpty(width) && field.getWidth() == null) {
@@ -113,8 +128,6 @@ public class FieldGroupLoader extends AbstractFieldLoader {
             }
         }
 
-        addDynamicAttributes(component, ds);
-
         component.setDatasource(ds);
 
         loadEditable(component, element);
@@ -125,7 +138,6 @@ public class FieldGroupLoader extends AbstractFieldLoader {
         loadCaption(component, element);
 
         loadHeight(component, element);
-        loadWidth(component, element);
         loadAlign(component, element);
 
         loadBorder(component, element);
@@ -134,8 +146,7 @@ public class FieldGroupLoader extends AbstractFieldLoader {
 
         loadFieldCaptionWidth(component, element);
 
-        final List<FieldGroup.FieldConfig> fields = component.getFields();
-        for (final FieldGroup.FieldConfig field : fields) {
+        for (final FieldGroup.FieldConfig field : component.getFields()) {
             if (!field.isCustom()) {
                 if (!DynamicAttributesUtils.isDynamicAttribute(field.getId())) {//the following does not make sense for dynamic attrs
                     loadValidators(component, field);
@@ -143,7 +154,6 @@ public class FieldGroupLoader extends AbstractFieldLoader {
                     loadEnable(component, field);
                     loadVisible(component, field);
                 }
-
                 loadEditable(component, field);
             }
         }
@@ -172,21 +182,16 @@ public class FieldGroupLoader extends AbstractFieldLoader {
         });
     }
 
-    protected void addDynamicAttributes(FieldGroup fieldGroup, Datasource ds) {
-        if (ds != null && AppBeans.get(MetadataTools.NAME, MetadataTools.class).isPersistent(ds.getMetaClass())) {
-            DynamicAttributesGuiTools dynamicAttributesGuiTools =
-                    AppBeans.get(DynamicAttributesGuiTools.NAME, DynamicAttributesGuiTools.class);
-            Context topContext = getContext();
-            while (topContext.getParent() != null) {
-                topContext = topContext.getParent();
-            }
-            Set<CategoryAttribute> attributesToShow = dynamicAttributesGuiTools
-                    .getAttributesToShowOnTheScreen(ds.getMetaClass(), topContext.getFullFrameId(), fieldGroup.getId());
-            if (CollectionUtils.isNotEmpty(attributesToShow)) {
+    protected List<FieldGroup.FieldConfig> loadDynamicAttributeFields(Datasource ds, FieldGroup fieldGroup) {
+        if (ds != null && metadataTools.isPersistent(ds.getMetaClass())) {
+            Set<CategoryAttribute> attributesToShow = dynamicAttributesGuiTools.getAttributesToShowOnTheScreen(ds.getMetaClass(),
+                    getFrameId(), fieldGroup.getId());
+            if (!attributesToShow.isEmpty()) {
+                List<FieldGroup.FieldConfig> fields = new ArrayList<>();
                 ds.setLoadDynamicAttributes(true);
                 for (CategoryAttribute attribute : attributesToShow) {
                     MetaPropertyPath metaPropertyPath = DynamicAttributesUtils.getMetaPropertyPath(ds.getMetaClass(), attribute);
-                    final FieldGroup.FieldConfig field = new FieldGroup.FieldConfig(
+                    FieldGroup.FieldConfig field = new FieldGroup.FieldConfig(
                             DynamicAttributesUtils.encodeAttributeCode(attribute.getCode()));
                     field.setMetaPropertyPath(metaPropertyPath);
                     field.setType(metaPropertyPath.getRangeJavaClass());
@@ -197,18 +202,13 @@ public class FieldGroupLoader extends AbstractFieldLoader {
                             messages.getMainMessagePack(),
                             "validation.required.defaultMsg",
                             attribute.getName()));
-
-                    if (fieldGroup.getWidth() > 0) {
-                        field.setWidth("100%");
-                    } else {
-                        field.setWidth(FieldGroup.DEFAULT_FIELD_WIDTH);
-                    }
-                    fieldGroup.addField(field);
+                    fields.add(field);
                 }
+                dynamicAttributesGuiTools.listenDynamicAttributesChanges(ds);
+                return fields;
             }
-
-            dynamicAttributesGuiTools.listenDynamicAttributesChanges(ds);
         }
+        return Collections.emptyList();
     }
 
     protected void loadFieldCaptionWidth(FieldGroup component, Element element) {
@@ -513,5 +513,13 @@ public class FieldGroupLoader extends AbstractFieldLoader {
         if (!StringUtils.isEmpty(captionAlignment)) {
             component.setCaptionAlignment(FieldGroup.FieldCaptionAlignment.valueOf(captionAlignment));
         }
+    }
+
+    protected String getFrameId() {
+        Context context = getContext();
+        while (context.getParent() != null) {
+            context = context.getParent();
+        }
+        return context.getFullFrameId();
     }
 }
