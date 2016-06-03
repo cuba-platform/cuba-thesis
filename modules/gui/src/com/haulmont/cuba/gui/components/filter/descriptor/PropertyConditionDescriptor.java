@@ -12,25 +12,19 @@ import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.gui.components.filter.Op;
 import com.haulmont.cuba.gui.components.filter.OpManager;
+import com.haulmont.cuba.gui.components.filter.condition.AbstractCondition;
 import com.haulmont.cuba.gui.components.filter.condition.FilterConditionUtils;
 import com.haulmont.cuba.gui.components.filter.condition.PropertyCondition;
-import com.haulmont.cuba.gui.components.filter.condition.AbstractCondition;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import org.dom4j.Element;
 
 import javax.annotation.Nullable;
-
 import java.util.EnumSet;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
-/**
- * @author devyatkin
- * @version $Id$
- */
 @MetaClass(name = "sec$PropertyConditionDescriptor")
 @SystemLevel
 public class PropertyConditionDescriptor extends AbstractConditionDescriptor {
@@ -99,9 +93,7 @@ public class PropertyConditionDescriptor extends AbstractConditionDescriptor {
     public String getTreeCaption() {
         MessageTools messageTools = AppBeans.get(MessageTools.class);
         MetaPropertyPath mpp = datasourceMetaClass.getPropertyPath(name);
-        MetadataTools metadataTools = AppBeans.get(MetadataTools.NAME);
-        com.haulmont.chile.core.model.MetaClass metaClass = metadataTools.getPropertyEnclosingMetaClass(mpp);
-        return mpp != null ? messageTools.getPropertyCaption(metaClass, mpp.getMetaProperty().getName()) : name;
+        return mpp != null ? messageTools.getPropertyCaption(datasourceMetaClass, name) : name;
     }
 
     @Nullable
