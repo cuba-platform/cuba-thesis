@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -212,11 +213,13 @@ public class DesktopBackgroundWorker implements BackgroundWorker {
             V result;
             try {
                 result = get();
-                this.done();
-            } catch (InterruptedException | ExecutionException e) {
-                log.error("Interrupted or execution exception in background task", e);
+            } catch (InterruptedException | ExecutionException | CancellationException e) {
+                log.error(e.getClass().getName() + "exception in background task", e);
                 return null;
             }
+
+            this.done();
+
             return result;
         }
 
