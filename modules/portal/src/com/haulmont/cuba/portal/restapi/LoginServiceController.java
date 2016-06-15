@@ -106,8 +106,16 @@ public class LoginServiceController {
             throw new IllegalStateException("Unsupported content type: " + contentType);
         }
 
+        LoginService loginService = AppBeans.get(LoginService.NAME);
         try {
-            LoginService loginService = AppBeans.get(LoginService.NAME);
+            if (loginService.isBruteForceProtectionEnabled()) {
+                if (loginService.loginAttemptsLeft(username, request.getRemoteAddr()) <= 0) {
+                    log.info(String.format("Blocked user login attempt: login=%s, ip=%s", username, request.getRemoteAddr()));
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+            }
+
             UserSession userSession = loginService.login(username, passwordEncryption.getPlainHash(password), locale);
 
             if (!userSession.isSpecificPermitted(Authentication.PERMISSION_NAME)) {
@@ -131,6 +139,9 @@ public class LoginServiceController {
 
             log.debug(String.format("User %s logged in with REST-API, session id: %s", username, userSession.getId()));
         } catch (LoginException e) {
+            if (loginService.isBruteForceProtectionEnabled()) {
+                loginService.registerUnsuccessfulLogin(username, request.getRemoteAddr());
+            }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
@@ -144,8 +155,15 @@ public class LoginServiceController {
 
         response.addHeader("Access-Control-Allow-Origin", "*");
         Locale locale = StringUtils.isBlank(localeStr) ? new Locale("en") : new Locale(localeStr);
+        LoginService loginService = AppBeans.get(LoginService.NAME);
         try {
-            LoginService loginService = AppBeans.get(LoginService.NAME);
+            if (loginService.isBruteForceProtectionEnabled()) {
+                if (loginService.loginAttemptsLeft(username, request.getRemoteAddr()) <= 0) {
+                    log.info(String.format("Blocked user login attempt: login=%s, ip=%s", username, request.getRemoteAddr()));
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+            }
 
             UserSession userSession = loginService.login(username, passwordEncryption.getPlainHash(password), locale);
 
@@ -170,6 +188,9 @@ public class LoginServiceController {
 
             log.debug(String.format("User %s logged in with REST-API, session id: %s", username, userSession.getId()));
         } catch (LoginException e) {
+            if (loginService.isBruteForceProtectionEnabled()) {
+                loginService.registerUnsuccessfulLogin(username, request.getRemoteAddr());
+            }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }

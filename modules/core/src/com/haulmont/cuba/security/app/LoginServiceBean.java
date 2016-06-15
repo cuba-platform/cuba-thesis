@@ -31,6 +31,9 @@ public class LoginServiceBean implements LoginService {
     @Inject
     protected LoginWorker loginWorker;
 
+    @Inject
+    protected BruteForceProtectionAPI bruteForceProtectionAPI;
+
     @Override
     public UserSession login(String login, String password, Locale locale) throws LoginException {
         try {
@@ -143,4 +146,25 @@ public class LoginServiceBean implements LoginService {
         // send text only to avoid ClassNotFoundException when the client has no dependency to some library
         return new LoginException(rootCause.toString());
     }
+
+    @Override
+    public boolean isBruteForceProtectionEnabled() {
+        return bruteForceProtectionAPI.isBruteForceProtectionEnabled();
+    }
+
+    @Override
+    public int getBruteForceBlockIntervalSec() {
+        return bruteForceProtectionAPI.getBruteForceBlockIntervalSec();
+    }
+
+    @Override
+    public int loginAttemptsLeft(String login, String ipAddress) {
+        return bruteForceProtectionAPI.loginAttemptsLeft(login, ipAddress);
+    }
+
+    @Override
+    public int registerUnsuccessfulLogin(String login, String ipAddress) {
+        return bruteForceProtectionAPI.registerUnsuccessfulLogin(login, ipAddress);
+    }
+
 }

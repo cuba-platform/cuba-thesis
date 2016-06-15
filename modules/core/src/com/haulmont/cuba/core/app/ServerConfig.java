@@ -169,4 +169,26 @@ public interface ServerConfig extends Config {
     @Property("cuba.prettyTimeProperties")
     @DefaultString("")
     String getPrettyTimeProperties();
+
+    /**
+     * Whether the brute-force protection on user login is enabled.
+     */
+    @Property("cuba.bruteForceProtection.enabled")
+    @DefaultBoolean(false)
+    boolean getBruteForceProtectionEnabled();
+
+    /**
+     * @return a maximum number of unsuccessful login attempts
+     */
+    @Property("cuba.bruteForceProtection.maxLoginAttemptsNumber")
+    @DefaultInt(5)
+    int getMaxLoginAttemptsNumber();
+
+    /**
+     * @return a time interval in seconds for which a user is blocked after a series of
+     * unsuccessful login attempts
+     */
+    @Property("cuba.bruteForceProtection.blockIntervalSec")
+    @DefaultInt(60)
+    int getBruteForceBlockIntervalSec();
 }

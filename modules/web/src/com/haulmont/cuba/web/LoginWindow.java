@@ -4,11 +4,13 @@
  */
 package com.haulmont.cuba.web;
 
+import com.google.common.base.Strings;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.TestIdManager;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.theme.ThemeConstantsRepository;
+import com.haulmont.cuba.security.app.LoginService;
 import com.haulmont.cuba.security.app.UserManagementService;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.global.LoginException;
@@ -79,6 +81,10 @@ public class LoginWindow extends UIView {
     protected Button okButton;
 
     protected Messages messages = AppBeans.get(Messages.NAME);
+
+    protected LoginService loginService = AppBeans.get(LoginService.class);
+
+    protected Boolean bruteForceProtectionEnabled;
 
     public LoginWindow(AppUI ui) {
         if (log.isTraceEnabled()) {
@@ -403,6 +409,9 @@ public class LoginWindow extends UIView {
             return;
         }
 
+
+        if (!bruteForceProtectionCheck(login, app.getClientAddress())) return;
+
         try {
             Locale locale = getUserLocale();
             app.setLocale(locale);
@@ -426,16 +435,63 @@ public class LoginWindow extends UIView {
             }
         } catch (LoginException e) {
             log.info("Login failed: " + e.toString());
-            showLoginException(e);
+            String message = StringUtils.abbreviate(e.getMessage(), 1000);
+            String bruteForceMsg = registerUnsuccessfulLoginAttempt(login, app.getClientAddress());
+            if (!Strings.isNullOrEmpty(bruteForceMsg)) message = bruteForceMsg;
+            showLoginException(message);
+            showLoginException(message);
         } catch (Exception e) {
             log.warn("Unable to login", e);
             showException(e);
         }
     }
 
-    protected void showLoginException(LoginException e){
+    protected boolean isBruteForceProtectionEnabled() {
+        if (bruteForceProtectionEnabled == null) {
+            bruteForceProtectionEnabled = loginService.isBruteForceProtectionEnabled();
+        }
+        return bruteForceProtectionEnabled;
+    }
+
+    protected boolean bruteForceProtectionCheck(String login, String ipAddress) {
+        if (isBruteForceProtectionEnabled()) {
+            if (loginService.loginAttemptsLeft(login, ipAddress) <= 0) {
+                String title = messages.getMainMessage("loginWindow.loginFailed", resolvedLocale);
+                String message = messages.formatMessage(messages.getMainMessagePack(),
+                        "loginWindow.loginAttemptsNumberExceeded",
+                        resolvedLocale,
+                        loginService.getBruteForceBlockIntervalSec());
+
+                new Notification(title, message, Type.ERROR_MESSAGE, true).show(ui.getPage());
+                log.info(String.format("Blocked user login attempt: login=%s, ip=%s", login, app.getClientAddress()));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Nullable
+    protected String registerUnsuccessfulLoginAttempt(String login, String ipAddress) {
+        String message = null;
+        if (isBruteForceProtectionEnabled()) {
+            int loginAttemptsLeft = loginService.registerUnsuccessfulLogin(login, ipAddress);
+            if (loginAttemptsLeft > 0) {
+                message = messages.formatMessage(messages.getMainMessagePack(),
+                        "loginWindow.loginFailedAttemptsLeft",
+                        resolvedLocale,
+                        loginAttemptsLeft);
+            } else {
+                message = messages.formatMessage(messages.getMainMessagePack(),
+                        "loginWindow.loginAttemptsNumberExceeded",
+                        resolvedLocale,
+                        loginService.getBruteForceBlockIntervalSec());
+            }
+        }
+        return message;
+    }
+
+    protected void showLoginException(String message){
         String title = messages.getMainMessage("loginWindow.loginFailed", resolvedLocale);
-        String message = StringUtils.abbreviate(e.getMessage(), 1000);
         new Notification(title, message, Type.ERROR_MESSAGE, true).show(ui.getPage());
 
         if (loginByRememberMe) {

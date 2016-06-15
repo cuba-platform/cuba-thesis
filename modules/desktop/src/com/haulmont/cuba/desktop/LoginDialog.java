@@ -5,23 +5,28 @@
 
 package com.haulmont.cuba.desktop;
 
+import com.google.common.base.Strings;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.desktop.gui.components.DesktopComponentsHelper;
 import com.haulmont.cuba.desktop.sys.LoginProperties;
 import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.security.app.LoginService;
 import com.haulmont.cuba.security.global.LoginException;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -44,6 +49,8 @@ public class LoginDialog extends JDialog {
     protected JComboBox<String> localeCombo;
     protected JButton loginBtn;
     protected LoginProperties loginProperties;
+    protected LoginService loginService = AppBeans.get(LoginService.class);
+    protected Boolean bruteForceProtectionEnabled;
 
     public LoginDialog(JFrame owner, Connection connection) {
         super(owner);
@@ -135,9 +142,27 @@ public class LoginDialog extends JDialog {
         }
     }
 
+    protected boolean isBruteForceProtectionEnabled() {
+        if (bruteForceProtectionEnabled == null) {
+            bruteForceProtectionEnabled = loginService.isBruteForceProtectionEnabled();
+        }
+        return bruteForceProtectionEnabled;
+    }
+
     protected void doLogin() {
         String name = nameField.getText();
         String password = passwordField.getText();
+
+        String ipAddress = null;
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            ipAddress = address.getHostAddress();
+            if (!bruteForceProtectionCheck(name, ipAddress))
+                return;
+        } catch (UnknownHostException e) {
+            log.error("Unable to obtain local IP address",e );
+        }
+
         String selectedItem = (String) localeCombo.getSelectedItem();
         Locale locale = locales.get(selectedItem);
         try {
@@ -148,6 +173,10 @@ public class LoginDialog extends JDialog {
         } catch (LoginException ex) {
             log.info("Login failed: " + ex.toString());
             String caption = messages.getMainMessage("loginWindow.loginFailed", locale);
+            String bruteForceCaption = registerUnsuccessfulLoginAttempt(name, ipAddress);
+            if (!Strings.isNullOrEmpty(bruteForceCaption))
+                caption = bruteForceCaption;
+
             App.getInstance().getMainFrame().showNotification(
                     caption,
                     ex.getMessage(),
@@ -155,6 +184,47 @@ public class LoginDialog extends JDialog {
             );
         }
     }
+
+    protected boolean bruteForceProtectionCheck(String login, String ipAddress) {
+        if (isBruteForceProtectionEnabled()) {
+            if (loginService.loginAttemptsLeft(login, ipAddress) <= 0) {
+                String title = messages.getMainMessage("loginWindow.loginFailed", resolvedLocale);
+                String message = messages.formatMessage(messages.getMainMessagePack(),
+                        "loginWindow.loginAttemptsNumberExceeded",
+                        resolvedLocale,
+                        loginService.getBruteForceBlockIntervalSec());
+
+                App.getInstance().getMainFrame().showNotification(
+                        title,
+                        message,
+                        com.haulmont.cuba.gui.components.IFrame.NotificationType.ERROR);
+                log.info(String.format("Blocked user login attempt: login=%s, ip=%s", login, ipAddress));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Nullable
+    protected String registerUnsuccessfulLoginAttempt(String login, String ipAddress) {
+        String message = null;
+        if (isBruteForceProtectionEnabled()) {
+            int loginAttemptsLeft = loginService.registerUnsuccessfulLogin(login, ipAddress);
+            if (loginAttemptsLeft > 0) {
+                message = messages.formatMessage(messages.getMainMessagePack(),
+                        "loginWindow.loginFailedAttemptsLeft",
+                        resolvedLocale,
+                        loginAttemptsLeft);
+            } else {
+                message = messages.formatMessage(messages.getMainMessagePack(),
+                        "loginWindow.loginAttemptsNumberExceeded",
+                        resolvedLocale,
+                        loginService.getBruteForceBlockIntervalSec());
+            }
+        }
+        return message;
+    }
+
 
     protected void initLocales(JComboBox<String> localeCombo) {
         String currLocale = loginProperties.loadLastLocale();
