@@ -139,6 +139,8 @@ public class TaskHandlerImpl<T, V> implements BackgroundTaskHandler<V> {
                     String windowClass = ownerFrame.getClass().getCanonicalName();
 
                     log.trace(String.format("Task was cancelled. Task: %s. User: %s. Frame: %s", taskDescription, userId.toString(), windowClass));
+                } else {
+                    log.trace(String.format("Task was cancelled. Task: %s. User: %s", taskDescription, userId.toString()));
                 }
             }
         } else {
