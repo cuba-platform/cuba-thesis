@@ -439,7 +439,6 @@ public class LoginWindow extends UIView {
             String bruteForceMsg = registerUnsuccessfulLoginAttempt(login, app.getClientAddress());
             if (!Strings.isNullOrEmpty(bruteForceMsg)) message = bruteForceMsg;
             showLoginException(message);
-            showLoginException(message);
         } catch (Exception e) {
             log.warn("Unable to login", e);
             showException(e);
