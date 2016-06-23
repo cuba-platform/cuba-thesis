@@ -11,9 +11,9 @@ import com.haulmont.chile.core.model.Session;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.actions.ExcelAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.components.actions.RefreshAction;
@@ -27,12 +27,9 @@ import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.entity.EntityOp;
 import org.apache.commons.lang.BooleanUtils;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.persistence.*;
 import java.util.*;
 
 /**
@@ -43,6 +40,8 @@ public class EntityInspectorBrowse extends AbstractLookup {
 
     public interface Companion {
         void setHorizontalScrollEnabled(Table table, boolean enabled);
+
+        void setTextSelectionEnabled(Table table, boolean enabled);
     }
 
     public static final String SCREEN_NAME = "entityInspector.browse";
@@ -80,10 +79,16 @@ public class EntityInspectorBrowse extends AbstractLookup {
     protected CheckBox removedRecords;
 
     @Inject
+    protected CheckBox textSelection;
+
+    @Inject
     protected BoxLayout filterBox;
 
     protected Filter filter;
     protected Table entitiesTable;
+
+    @Inject
+    protected EntityInspectorBrowse.Companion companion;
 
     /**
      * Buttons
@@ -150,6 +155,14 @@ public class EntityInspectorBrowse extends AbstractLookup {
         }
     }
 
+    protected void changeTableTextSelectionEnabled() {
+        if (BooleanUtils.isTrue(textSelection.<Boolean>getValue())) {
+            companion.setTextSelectionEnabled(entitiesTable, true);
+        } else {
+            companion.setTextSelectionEnabled(entitiesTable, false);
+        }
+    }
+
     protected void createEntitiesTable(MetaClass meta) {
         if (entitiesTable != null)
             tableBox.remove(entitiesTable);
@@ -159,9 +172,17 @@ public class EntityInspectorBrowse extends AbstractLookup {
 
         entitiesTable = componentsFactory.createComponent(Table.NAME);
         entitiesTable.setFrame(frame);
-        Companion companion = getCompanion();
-        if (companion != null) {
-            companion.setHorizontalScrollEnabled(entitiesTable, true);
+        companion.setHorizontalScrollEnabled(entitiesTable, true);
+
+        ClientType clientType = AppConfig.getClientType();
+        if (clientType == ClientType.WEB) {
+            textSelection.setVisible(true);
+            textSelection.addListener(new ValueListener() {
+                @Override
+                public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                    changeTableTextSelectionEnabled();
+                }
+            });
         }
 
         //collect properties in order to add non-system columns first
@@ -238,7 +259,7 @@ public class EntityInspectorBrowse extends AbstractLookup {
         filter.setEditable(true);
 
         filter.setDatasource(entitiesDs);
-        ((FilterImplementation)filter).loadFiltersAndApplyDefault();
+        ((FilterImplementation) filter).loadFiltersAndApplyDefault();
         filter.apply(true);
     }
 

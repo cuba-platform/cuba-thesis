@@ -10,8 +10,6 @@ import com.haulmont.cuba.gui.app.core.entityinspector.EntityInspectorBrowse;
 import com.haulmont.cuba.gui.components.Table;
 import org.jdesktop.swingx.JXTable;
 
-import javax.swing.*;
-
 /**
  * @author zlatoverov
  * @version $Id$
@@ -21,5 +19,10 @@ public class EntityInspectorBrowseCompanion implements EntityInspectorBrowse.Com
     public void setHorizontalScrollEnabled(Table table, boolean enabled) {
         JXTable jxTable = DesktopComponentsHelper.unwrap(table);
         jxTable.setHorizontalScrollEnabled(enabled);
+    }
+
+    @Override
+    public void setTextSelectionEnabled(Table table, boolean enabled) {
+        // For desktop coping text from cell works by hotkey
     }
 }
