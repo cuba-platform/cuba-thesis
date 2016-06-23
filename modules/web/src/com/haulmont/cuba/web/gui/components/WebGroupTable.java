@@ -778,12 +778,14 @@ public class WebGroupTable extends WebAbstractTable<CubaGroupTable> implements G
         public void valueChanged(Entity source, String property, Object prevValue, Object value) {
             super.valueChanged(source, property, prevValue, value);
 
-            if (datasource instanceof GroupDatasource) {
-                GroupDatasource groupDs = ((GroupDatasource) datasource);
-                @SuppressWarnings("unchecked")
-                Collection<GroupInfo> roots = groupDs.rootGroups();
-                for (final GroupInfo root : roots) {
-                    recalcAggregation(root);
+            if (isAggregatable() && aggregationCells != null) {
+                if (datasource instanceof GroupDatasource) {
+                    GroupDatasource groupDs = ((GroupDatasource) datasource);
+                    @SuppressWarnings("unchecked")
+                    Collection<GroupInfo> roots = groupDs.rootGroups();
+                    for (final GroupInfo root : roots) {
+                        recalcAggregation(root);
+                    }
                 }
             }
         }
