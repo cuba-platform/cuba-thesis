@@ -394,4 +394,62 @@ public interface Component {
          */
         void setInputPrompt(String inputPrompt);
     }
+
+    interface HasDropZone {
+        /**
+         * @return current drop zone
+         */
+        DropZone getDropZone();
+        /**
+         * Set drop zone reference to this upload component. Files can be dropped to component of the drop zone
+         * to be uploaded by this upload component.
+         *
+         * @param dropZone drop zone descriptor
+         */
+        void setDropZone(DropZone dropZone);
+
+        /**
+         * @return current drop zone prompt
+         */
+        String getDropZonePrompt();
+        /**
+         * Set drop zone prompt that will be shown on drag over window with file.
+         *
+         * @param dropZonePrompt drop zone prompt
+         */
+        void setDropZonePrompt(String dropZonePrompt);
+
+        /**
+         * Drop zone descriptor. BoxLayout or Window can be used as drop zone for an upload component.
+         */
+        class DropZone {
+            protected BoxLayout layout;
+
+            protected Window window;
+
+            public DropZone(BoxLayout targetLayout) {
+                this.layout = targetLayout;
+            }
+
+            public DropZone(Window window) {
+                this.window = window;
+            }
+
+            public BoxLayout getTargetLayout() {
+                return layout;
+            }
+
+            public Window getTargetWindow() {
+                return window;
+            }
+
+            public Component getTarget() {
+                if (window != null) {
+                    return window;
+                } else {
+                    return layout;
+                }
+            }
+        }
+    }
 }

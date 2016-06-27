@@ -4,7 +4,9 @@
  */
 package com.haulmont.cuba.gui.xml.layout.loaders;
 
+import com.haulmont.cuba.gui.components.BoxLayout;
 import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.Component.HasDropZone.DropZone;
 import com.haulmont.cuba.gui.components.FileUploadField;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import org.apache.commons.lang.StringUtils;
@@ -22,7 +24,7 @@ public class FileUploadFieldLoader extends ComponentLoader {
 
     @Override
     public Component loadComponent(ComponentsFactory factory, Element element, Component parent) {
-        FileUploadField component = (FileUploadField) factory.createComponent(element.getName());
+        FileUploadField component = factory.createComponent(element.getName());
 
         initComponent(element, component, parent);
 
@@ -46,6 +48,8 @@ public class FileUploadFieldLoader extends ComponentLoader {
 
         loadAccept(component, element);
 
+        loadDropZone(component, element);
+
         assignFrame(component);
     }
 
@@ -53,6 +57,21 @@ public class FileUploadFieldLoader extends ComponentLoader {
         String accept = element.attributeValue("accept");
         if (StringUtils.isNotEmpty(accept)) {
             uploadField.setAccept(accept);
+        }
+    }
+
+    protected void loadDropZone(FileUploadField uploadField, Element element) {
+        String dropZoneId = element.attributeValue("dropZone");
+        if (StringUtils.isNotEmpty(dropZoneId)) {
+            Component dropZone = context.getFrame().getComponent(dropZoneId);
+            if (dropZone instanceof BoxLayout) {
+                uploadField.setDropZone(new DropZone((BoxLayout) dropZone));
+            }
+        }
+
+        String dropZonePrompt = element.attributeValue("dropZonePrompt");
+        if (StringUtils.isNotEmpty(dropZonePrompt)) {
+            uploadField.setDropZonePrompt(loadResourceString(dropZonePrompt));
         }
     }
 }

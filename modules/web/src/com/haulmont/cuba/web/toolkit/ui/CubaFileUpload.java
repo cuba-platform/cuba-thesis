@@ -282,6 +282,26 @@ public class CubaFileUpload extends AbstractComponent
         this.receiver = receiver;
     }
 
+    public Component getDropZone() {
+        return (Component) getState(false).dropZone;
+    }
+
+    public void setDropZone(Component component) {
+        if (getDropZone() != component) {
+            getState().dropZone = component;
+        }
+    }
+
+    public String getDropZonePrompt() {
+        return getState(false).dropZonePrompt;
+    }
+
+    public void setDropZonePrompt(String dropZonePrompt) {
+        if (!StringUtils.equals(getDropZonePrompt(), dropZonePrompt)) {
+            getState().dropZonePrompt = dropZonePrompt;
+        }
+    }
+
     protected com.vaadin.server.StreamVariable getStreamVariable() {
         if (streamVariable == null) {
             streamVariable = new com.vaadin.server.StreamVariable() {

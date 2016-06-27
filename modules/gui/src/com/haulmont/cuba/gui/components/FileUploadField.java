@@ -8,11 +8,9 @@ import com.haulmont.cuba.core.entity.FileDescriptor;
 
 import java.util.UUID;
 
-/**
- * @author abramov
- * @version $Id$
- */
-public interface FileUploadField extends Component, Component.HasCaption, Component.BelongToFrame, Component.HasIcon {
+public interface FileUploadField extends Component, Component.HasCaption, Component.BelongToFrame, Component.HasIcon,
+        Component.HasDropZone {
+
     String NAME = "upload";
 
     interface Listener {

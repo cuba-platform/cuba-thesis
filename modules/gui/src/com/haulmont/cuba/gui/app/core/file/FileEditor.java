@@ -22,10 +22,6 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.Map;
 
-/**
- * @author krivopustov
- * @version $Id$
- */
 public class FileEditor extends AbstractEditor<FileDescriptor> {
 
     protected final Log log = LogFactory.getLog(getClass());
@@ -61,6 +57,8 @@ public class FileEditor extends AbstractEditor<FileDescriptor> {
         super.init(params);
 
         getDialogParams().setWidthAuto();
+
+        uploadField.setDropZone(new HasDropZone.DropZone(this));
     }
 
     @Override

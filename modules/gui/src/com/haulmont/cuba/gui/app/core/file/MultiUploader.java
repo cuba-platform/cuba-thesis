@@ -20,10 +20,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 
-/**
- * @author artamonov
- * @version $Id$
- */
+import static com.haulmont.cuba.gui.components.Component.HasDropZone.DropZone;
+
 public class MultiUploader extends AbstractEditor {
 
     protected boolean needSave;
@@ -44,6 +42,8 @@ public class MultiUploader extends AbstractEditor {
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
+
+        multiUpload.setDropZone(new DropZone(this));
 
         getDialogParams().setResizable(true);
 

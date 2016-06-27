@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.FileMultiUploadField;
 import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.web.App;
@@ -24,6 +25,7 @@ import com.haulmont.cuba.web.toolkit.ui.CubaMultiUpload;
 import com.haulmont.cuba.web.toolkit.ui.UploadComponent;
 import com.vaadin.server.Page;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.ui.Component;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +35,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.*;
 
-/**
- * @author artamonov
- * @version $Id$
- */
 public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponent> implements FileMultiUploadField {
 
     private static final int BYTES_IN_MEGABYTE = 1048576;
@@ -51,6 +49,9 @@ public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponen
     protected UUID tempFileId;
     protected String icon;
     protected String accept;
+
+    protected DropZone dropZone;
+    protected String dropZonePrompt;
 
     public WebFileMultiUploadField() {
         fileUploading = AppBeans.get(FileUploadingAPI.NAME);
@@ -210,6 +211,7 @@ public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponen
         impl.setUnableToUploadFileMessage(messages.getMainMessage("upload.unableToUploadFile"));
         impl.setCancelButtonCaption(messages.getMainMessage("upload.cancel"));
         impl.setCaption(messages.getMainMessage("upload.submit"));
+        impl.setDropZonePrompt(messages.getMainMessage("upload.dropZonePrompt"));
         impl.setDescription(null);
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
@@ -447,5 +449,43 @@ public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponen
                     ? FileUploadTypesHelper.convertSeparator(accept, ";")
                     : FileUploadTypesHelper.convertToMIME(accept));
         }
+    }
+
+    @Override
+    public void setDropZone(DropZone dropZone) {
+        this.dropZone = dropZone;
+
+        if (component instanceof CubaFileUpload) {
+            if (dropZone == null) {
+                ((CubaFileUpload) component).setDropZone(null);
+            } else {
+                com.haulmont.cuba.gui.components.Component target = dropZone.getTarget();
+                if (target instanceof Window.Wrapper) {
+                    target = ((Window.Wrapper) target).getWrappedWindow();
+                }
+
+                Component vComponent = WebComponentsHelper.unwrap(target);
+                ((CubaFileUpload) this.component).setDropZone(vComponent);
+            }
+        }
+    }
+
+    @Override
+    public DropZone getDropZone() {
+        return dropZone;
+    }
+
+    @Override
+    public void setDropZonePrompt(String dropZonePrompt) {
+        this.dropZonePrompt = dropZonePrompt;
+
+        if (component instanceof CubaFileUpload) {
+            ((CubaFileUpload) component).setDropZonePrompt(dropZonePrompt);
+        }
+    }
+
+    @Override
+    public String getDropZonePrompt() {
+        return dropZonePrompt;
     }
 }

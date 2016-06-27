@@ -5,6 +5,7 @@
 
 package com.haulmont.cuba.web.toolkit.ui.client.jqueryfileupload;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -13,19 +14,16 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
+import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.client.StyleConstants;
 import com.vaadin.client.WidgetUtil;
 import com.vaadin.client.ui.VButton;
 import com.vaadin.client.ui.VNotification;
 import com.vaadin.shared.Position;
 
-/**
- * @author artamonov
- * @version $Id$
- */
 public class CubaFileUploadWidget extends FlowPanel implements Focusable {
-
     public static final String DEFAULT_CLASSNAME = "cuba-fileupload";
+    public static final String CUBA_FILEUPLOAD_DROPZONE_CLASS = "cuba-fileupload-dropzone";
 
     protected VButton submitButton;
 
@@ -215,6 +213,21 @@ public class CubaFileUploadWidget extends FlowPanel implements Focusable {
 
     public void setUploadUrl(String uploadUrl) {
         fileUpload.setUploadUrl(uploadUrl);
+    }
+
+    public void setDropZone(final Widget dropZone, String dropZonePrompt) {
+        if (dropZone != null) {
+            Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+                @Override
+                public void execute() {
+                    fileUpload.setDropZone(dropZone.getElement());
+                }
+            });
+
+            dropZone.getElement().setAttribute("dropzone-prompt", dropZonePrompt != null ? dropZonePrompt : "");
+        } else {
+            fileUpload.setDropZone(null);
+        }
     }
 
     public void setAccept(String accept) {

@@ -5,15 +5,13 @@
 package com.haulmont.cuba.gui.xml.layout.loaders;
 
 import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.Component.HasDropZone.DropZone;
 import com.haulmont.cuba.gui.components.FileMultiUploadField;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.cuba.gui.components.*;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
-/**
- * @author abramov
- * @version $Id$
- */
 public class FileMultiUploadFieldLoader extends ComponentLoader {
 
     public FileMultiUploadFieldLoader(Context context) {
@@ -22,7 +20,7 @@ public class FileMultiUploadFieldLoader extends ComponentLoader {
 
     @Override
     public Component loadComponent(ComponentsFactory factory, Element element, Component parent) {
-        FileMultiUploadField component = (FileMultiUploadField) factory.createComponent(element.getName());
+        FileMultiUploadField component = factory.createComponent(element.getName());
 
         initComponent(element, component, parent);
 
@@ -46,6 +44,8 @@ public class FileMultiUploadFieldLoader extends ComponentLoader {
 
         loadAccept(component, element);
 
+        loadDropZone(component, element);
+
         assignFrame(component);
     }
 
@@ -53,6 +53,21 @@ public class FileMultiUploadFieldLoader extends ComponentLoader {
         String accept = element.attributeValue("accept");
         if (StringUtils.isNotEmpty(accept)) {
             uploadField.setAccept(accept);
+        }
+    }
+
+    protected void loadDropZone(FileMultiUploadField uploadField, Element element) {
+        String dropZoneId = element.attributeValue("dropZone");
+        if (StringUtils.isNotEmpty(dropZoneId)) {
+            Component dropZone = context.getFrame().getComponent(dropZoneId);
+            if (dropZone instanceof BoxLayout) {
+                uploadField.setDropZone(new DropZone((BoxLayout) dropZone));
+            }
+        }
+
+        String dropZonePrompt = element.attributeValue("dropZonePrompt");
+        if (StringUtils.isNotEmpty(dropZonePrompt)) {
+            uploadField.setDropZonePrompt(loadResourceString(dropZonePrompt));
         }
     }
 }
