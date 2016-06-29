@@ -8,6 +8,7 @@ import com.haulmont.bali.util.ReflectionHelper;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.gui.exception.GenericExceptionHandler;
 import com.haulmont.cuba.web.App;
+import com.haulmont.cuba.web.WebWindowManager;
 import com.vaadin.server.ErrorEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,9 +25,6 @@ import java.util.*;
  * <strong>id</strong>, e.g. <code>refapp_ExceptionHandlersConfiguration</code></p>
  *
  * <p>An instance of this class is bound to {@link App}.</p>
- *
- * @author krivopustov
- * @version $Id$
  */
 public class ExceptionHandlers {
 
@@ -96,9 +94,13 @@ public class ExceptionHandlers {
             if (handler.handle(event, app))
                 return;
         }
-        for (GenericExceptionHandler handler : genericHandlers) {
-            if (handler.handle(event.getThrowable(), app.getWindowManager()))
-                return;
+
+        WebWindowManager wm = app.getWindowManager();
+        if (wm != null) {
+            for (GenericExceptionHandler handler : genericHandlers) {
+                if (handler.handle(event.getThrowable(), wm))
+                    return;
+            }
         }
         defaultHandler.handle(event, app);
     }

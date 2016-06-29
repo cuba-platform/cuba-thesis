@@ -10,6 +10,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.ErrorEvent;
 import com.vaadin.ui.AbstractComponent;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,10 +20,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author krivopustov
- * @version $Id$
- */
 public class AppLog {
 
     private transient LinkedList<LogItem> items = new LinkedList<>();
@@ -79,6 +76,15 @@ public class AppLog {
             // Most likely client browser closed socket
             LogItem item = new LogItem(LogLevel.WARNING,
                     "SocketException in CommunicationManager. Most likely client (browser) closed socket.", null);
+            log(item);
+            return;
+        }
+
+        // Support Tomcat 8 ClientAbortException
+        if (StringUtils.contains(ExceptionUtils.getMessage(t), "ClientAbortException")) {
+            // Most likely client browser closed socket
+            LogItem item = new LogItem(LogLevel.WARNING,
+                    "ClientAbortException on write response to client. Most likely client (browser) closed socket.", null);
             log(item);
             return;
         }

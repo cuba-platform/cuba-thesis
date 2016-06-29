@@ -16,15 +16,13 @@ import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Window;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.net.SocketException;
 
 /**
  * This exception handler comes into play if no other handler in the chain has handled the exception.
- *
- * @author krivopustov
- * @version $Id$
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
 
@@ -39,6 +37,12 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         //noinspection ThrowableResultOfMethodCallIgnored
         if (t instanceof SocketException
                 || ExceptionUtils.getRootCause(t) instanceof SocketException) {
+            // Most likely client browser closed socket
+            return true;
+        }
+
+        // Support Tomcat 8 ClientAbortException
+        if (StringUtils.contains(ExceptionUtils.getMessage(t), "ClientAbortException")) {
             // Most likely client browser closed socket
             return true;
         }
