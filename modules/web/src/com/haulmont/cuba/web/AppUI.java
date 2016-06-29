@@ -5,14 +5,12 @@
 
 package com.haulmont.cuba.web;
 
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.core.global.GlobalConfig;
-import com.haulmont.cuba.core.global.MessageTools;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.TestIdManager;
 import com.haulmont.cuba.security.app.UserSessionService;
 import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.cuba.web.sys.LinkHandler;
+import com.haulmont.cuba.web.toolkit.ui.CubaClientManager;
 import com.haulmont.cuba.web.toolkit.ui.client.appui.AppUIClientRpc;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
@@ -56,6 +54,8 @@ public class AppUI extends UI implements ErrorHandler {
 
     protected Map<String, String> profiledScreens;
 
+    protected CubaClientManager clientManager;
+
     public AppUI() {
         if (log.isTraceEnabled()) {
             log.trace("Creating UI " + this);
@@ -96,6 +96,8 @@ public class AppUI extends UI implements ErrorHandler {
         setTabIndex(-1);
 
         initJsLibraries();
+
+        initInternalComponents();
     }
 
     /**
@@ -129,6 +131,11 @@ public class AppUI extends UI implements ErrorHandler {
      * If you want to include scripts to generated page statically see {@link com.haulmont.cuba.web.sys.CubaBootstrapListener}.
      */
     protected void initJsLibraries() {
+    }
+
+    protected void initInternalComponents() {
+        clientManager = new CubaClientManager();
+        clientManager.extend(this);
     }
 
     protected App createApplication() {
@@ -322,5 +329,24 @@ public class AppUI extends UI implements ErrorHandler {
         for (String profilerMarker : profilerMarkers) {
             profiledScreens.remove(profilerMarker);
         }
+    }
+
+    protected void updateClientSystemMessages(Locale locale) {
+        CubaClientManager.SystemMessages msgs = new CubaClientManager.SystemMessages();
+        Messages messages = AppBeans.get(Messages.NAME);
+
+        msgs.communicationErrorCaption = messages.getMainMessage("communicationErrorCaption", locale);
+        msgs.communicationErrorMessage = messages.getMainMessage("communicationErrorMessage", locale);
+
+        msgs.sessionExpiredErrorCaption = messages.getMainMessage("sessionExpiredErrorCaption", locale);
+        msgs.sessionExpiredErrorMessage = messages.getMainMessage("sessionExpiredErrorMessage", locale);
+
+        msgs.authorizationErrorCaption = messages.getMainMessage("authorizationErrorCaption", locale);
+        msgs.authorizationErrorMessage = messages.getMainMessage("authorizationErrorMessage", locale);
+
+        clientManager.updateSystemMessagesLocale(msgs);
+
+        getReconnectDialogConfiguration().setDialogText(messages.getMainMessage("reconnectDialogText", locale));
+        getReconnectDialogConfiguration().setDialogTextGaveUp(messages.getMainMessage("reconnectDialogTextGaveUp", locale));
     }
 }

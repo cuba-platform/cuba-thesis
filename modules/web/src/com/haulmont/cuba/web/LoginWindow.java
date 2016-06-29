@@ -46,9 +46,6 @@ import java.util.Set;
  * Standard login window.
  * <p/>
  * To use a specific implementation override {@link App#createLoginWindow(AppUI)} method.
- *
- * @author krivopustov
- * @version $Id$
  */
 public class LoginWindow extends UIView {
 
@@ -304,6 +301,8 @@ public class LoginWindow extends UIView {
     }
 
     protected void initUI() {
+        ui.updateClientSystemMessages(resolvedLocale);
+
         boolean localeSelectVisible = globalConfig.getLocaleSelectVisible();
 
         ThemeConstants theme = app.getThemeConstants();

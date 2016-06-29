@@ -27,9 +27,6 @@ import java.util.*;
  * Standard main application window.
  * <p/>
  * To use a specific implementation override {@link App#createAppWindow(AppUI)} method.
- *
- * @author krivopustov
- * @version $Id$
  */
 public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackHandler {
 
@@ -42,8 +39,6 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
     protected final Connection connection;
 
     protected final WebWindowManager windowManager;
-
-    protected CubaClientManager clientManager;
 
     protected CubaFileDownloader fileDownloader;
 
@@ -113,9 +108,6 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
      * init system components
      */
     protected void initInternalComponents() {
-        clientManager = new CubaClientManager();
-        clientManager.extend(this);
-
         workerTimer = new CubaTimer();
         workerTimer.setTimerId("backgroundWorkerTimer");
 
@@ -138,20 +130,10 @@ public class AppWindow extends UIView implements CubaHistoryControl.HistoryBackH
     }
 
     protected void updateClientSystemMessages() {
-        CubaClientManager.SystemMessages msgs = new CubaClientManager.SystemMessages();
         UserSessionSource sessionSource = AppBeans.get(UserSessionSource.NAME);
         Locale locale = sessionSource.getLocale();
 
-        msgs.communicationErrorCaption = messages.getMainMessage("communicationErrorCaption", locale);
-        msgs.communicationErrorMessage = messages.getMainMessage("communicationErrorMessage", locale);
-
-        msgs.sessionExpiredErrorCaption = messages.getMainMessage("sessionExpiredErrorCaption", locale);
-        msgs.sessionExpiredErrorMessage = messages.getMainMessage("sessionExpiredErrorMessage", locale);
-
-        msgs.authorizationErrorCaption = messages.getMainMessage("authorizationErrorCaption", locale);
-        msgs.authorizationErrorMessage = messages.getMainMessage("authorizationErrorMessage", locale);
-
-        clientManager.updateSystemMessagesLocale(msgs);
+        ui.updateClientSystemMessages(locale);
     }
 
     /**
