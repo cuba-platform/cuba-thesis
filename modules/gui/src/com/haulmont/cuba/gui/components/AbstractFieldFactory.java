@@ -47,10 +47,6 @@ import java.lang.reflect.Method;
 import static com.haulmont.cuba.gui.WindowManager.OpenType;
 import static com.haulmont.cuba.gui.components.EntityLinkField.EntityLinkClickHandler;
 
-/**
- * @author artamonov
- * @version $Id$
- */
 public abstract class AbstractFieldFactory implements FieldFactory {
 
     protected ComponentsFactory componentsFactory = AppConfig.getFactory();
@@ -133,7 +129,7 @@ public abstract class AbstractFieldFactory implements FieldFactory {
         return linkField;
     }
 
-    private Component createUuidField(Datasource datasource, String property) {
+    protected Component createUuidField(Datasource datasource, String property) {
         MaskedField maskedField = componentsFactory.createComponent(MaskedField.NAME);
         maskedField.setDatasource(datasource, property);
         maskedField.setMask("hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh");

@@ -43,7 +43,7 @@ public class WebFieldGroup extends WebAbstractComponent<CubaFieldGroup>
     protected Set<FieldConfig> readOnlyFields = new HashSet<>();
 
     protected Datasource<Entity> datasource;
-    protected FieldFactory fieldFactory = new WebFieldGroupFieldFactory();
+    protected FieldFactory fieldFactory;
 
     protected int cols = 1;
 
@@ -76,6 +76,7 @@ public class WebFieldGroup extends WebAbstractComponent<CubaFieldGroup>
             }
         };
         component.setLayout(new CubaFieldGroupLayout());
+        fieldFactory = createFieldFactory();
     }
 
     @Override
@@ -960,11 +961,16 @@ public class WebFieldGroup extends WebAbstractComponent<CubaFieldGroup>
         }
     }
 
-    protected class WebFieldGroupFieldFactory extends AbstractFieldFactory {
+    protected static class WebFieldGroupFieldFactory extends AbstractFieldFactory {
+        protected WebFieldGroup fieldGroup;
+
+        public WebFieldGroupFieldFactory(WebFieldGroup fieldGroup) {
+            this.fieldGroup = fieldGroup;
+        }
 
         @Override
         protected CollectionDatasource getOptionsDatasource(Datasource datasource, String property) {
-            FieldConfig field = fields.get(property);
+            FieldConfig field = fieldGroup.fields.get(property);
 
             Datasource ds = datasource;
 
@@ -1011,5 +1017,17 @@ public class WebFieldGroup extends WebAbstractComponent<CubaFieldGroup>
         public Component getField() {
             return field;
         }
+    }
+
+    protected WebFieldGroupFieldFactory createFieldFactory() {
+        return new WebFieldGroupFieldFactory(this);
+    }
+
+    public FieldFactory getFieldFactory() {
+        return fieldFactory;
+    }
+
+    public void setFieldFactory(FieldFactory fieldFactory) {
+        this.fieldFactory = fieldFactory;
     }
 }
