@@ -11,6 +11,7 @@ import com.haulmont.cuba.web.toolkit.ui.client.window.CubaWindowServerRpc;
 import com.haulmont.cuba.web.toolkit.ui.client.window.CubaWindowState;
 import com.vaadin.event.Action;
 import com.vaadin.event.ConnectorEvent;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.KeyMapper;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Window;
@@ -20,9 +21,6 @@ import java.util.*;
 
 /**
  * Dialog window container for OpenType.DIALOG windows.
- *
- * @author artamonov
- * @version $Id$
  */
 public class CubaWindow extends Window {
 
@@ -70,7 +68,7 @@ public class CubaWindow extends Window {
     static {
         try {
             BEFORE_WINDOW_CLOSE_METHOD = PreCloseListener.class.getDeclaredMethod(
-                    "beforeWindowClose", new Class[] { PreCloseEvent.class });
+                    "beforeWindowClose", PreCloseEvent.class);
         } catch (final java.lang.NoSuchMethodException e) {
             // This should never happen
             throw new java.lang.RuntimeException(
@@ -119,6 +117,8 @@ public class CubaWindow extends Window {
     public CubaWindow(String caption) {
         super(caption);
         registerRpc(rpc);
+
+        removeCloseShortcut(KeyCode.ESCAPE);
     }
 
     protected HashSet<Action> getContextActions(Component actionTarget) {

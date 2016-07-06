@@ -5,10 +5,10 @@
   -->
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-           version="2.5">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
 
     <!-- Application properties config files -->
     <context-param>
@@ -31,6 +31,9 @@
         <param-value>${webResourcesTs}</param-value>
     </context-param>
 
+    <listener>
+        <listener-class>com.vaadin.server.communication.JSR356WebsocketInitializer</listener-class>
+    </listener>
     <listener>
         <listener-class>com.haulmont.cuba.web.sys.WebAppContextLoader</listener-class>
     </listener>
@@ -58,7 +61,12 @@
             <param-name>widgetset</param-name>
             <param-value>com.haulmont.cuba.web.toolkit.ui.WidgetSet</param-value>
         </init-param>
+        <init-param>
+            <param-name>org.atmosphere.useWebSocketAndServlet3</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>0</load-on-startup>
+        <async-supported>true</async-supported>
     </servlet>
 
     <servlet>
@@ -80,6 +88,7 @@
     <filter>
         <filter-name>CubaHttpFilter</filter-name>
         <filter-class>com.haulmont.cuba.web.sys.CubaHttpFilter</filter-class>
+        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>

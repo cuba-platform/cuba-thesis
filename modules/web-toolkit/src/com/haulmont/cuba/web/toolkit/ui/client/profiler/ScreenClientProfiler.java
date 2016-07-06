@@ -20,7 +20,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.vaadin.client.ValueMap;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

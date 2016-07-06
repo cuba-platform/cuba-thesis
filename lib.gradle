@@ -3,10 +3,11 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
  */
 
-project.ext.vaadinVersion = '7.4.6.cuba.37'
+project.ext.vaadinVersion = '7.6.7.cuba.1'
 
 project.ext.vaadinShared = [group: 'com.vaadin', name: 'vaadin-shared', version: vaadinVersion]
 project.ext.vaadinServer = [group: 'com.vaadin', name: 'vaadin-server', version: vaadinVersion]
 project.ext.vaadinClient = [group: 'com.vaadin', name: 'vaadin-client', version: vaadinVersion]
 project.ext.vaadinCompiler = [group: 'com.vaadin', name: 'vaadin-client-compiler', version: vaadinVersion]
 project.ext.vaadinThemes = [group: 'com.vaadin', name: 'vaadin-themes', version: vaadinVersion]
+project.ext.vaadinPush = [group: 'com.vaadin', name: 'vaadin-push', version: vaadinVersion]

@@ -32,10 +32,6 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * @author artamonov
- * @version $Id$
- */
 public class CubaTable extends com.vaadin.ui.Table implements TableContainer, CubaEnhancedTable {
 
     protected LinkedList<Object> editableColumns;
@@ -50,8 +46,6 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
     protected boolean showTotalAggregation = true;
 
     protected boolean aggregatable = false;
-
-    protected List<ColumnCollapseListener> columnCollapseListeners; // lazily initialized List
 
     protected Set<Object> nonSortableProperties; // lazily initialized Set
 
@@ -320,33 +314,6 @@ public class CubaTable extends com.vaadin.ui.Table implements TableContainer, Cu
         if (shortcutActionManager != null) {
             shortcutActionManager.removeAction(shortcut);
         }
-    }
-
-    @Override
-    public void addColumnCollapseListener(ColumnCollapseListener listener) {
-        if (columnCollapseListeners == null) {
-            columnCollapseListeners = new LinkedList<>();
-        }
-
-        columnCollapseListeners.add(listener);
-    }
-
-    @Override
-    public void removeColumnCollapseListener(ColumnCollapseListener listener) {
-        if (columnCollapseListeners != null) {
-            columnCollapseListeners.remove(listener);
-        }
-    }
-
-    @Override
-    public void setColumnCollapsed(Object propertyId, boolean collapsed) throws IllegalStateException {
-        if (isColumnCollapsed(propertyId) != collapsed
-                && columnCollapseListeners != null) {
-            for (ColumnCollapseListener listener : columnCollapseListeners) {
-                listener.columnCollapsed(propertyId, collapsed);
-            }
-        }
-        super.setColumnCollapsed(propertyId, collapsed);
     }
 
     @Override

@@ -67,11 +67,6 @@ import java.util.*;
 
 import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
 
-/**
- * @param <T>
- * @author abramov
- * @version $Id$
- */
 public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhancedTable>
         extends WebAbstractList<T>
         implements Table {
@@ -2324,10 +2319,12 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         if (columnCollapseListeners == null) {
             columnCollapseListeners = new LinkedList<>();
 
-            component.addColumnCollapseListener(new CubaEnhancedTable.ColumnCollapseListener() {
+            component.addColumnCollapseListener(new com.vaadin.ui.Table.ColumnCollapseListener() {
                 @Override
-                public void columnCollapsed(Object columnId, boolean collapsed) {
-                    final Column collapsedColumn = getColumn(columnId.toString());
+                public void columnCollapseStateChange(com.vaadin.ui.Table.ColumnCollapseEvent event) {
+                    Column collapsedColumn = getColumn(event.getPropertyId().toString());
+                    boolean collapsed = component.isColumnCollapsed(event.getPropertyId());
+
                     for (ColumnCollapseListener listener : columnCollapseListeners) {
                         listener.columnCollapsed(collapsedColumn, collapsed);
                     }

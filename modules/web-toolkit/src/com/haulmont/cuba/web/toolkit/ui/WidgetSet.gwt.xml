@@ -3,11 +3,7 @@
   ~ Copyright (c) 2008-2013 Haulmont. All rights reserved.
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
-
-<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.0//EN"
-        "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
 <module>
-
     <!-- Inherit DefaultWidgetSet -->
     <inherits name="com.vaadin.DefaultWidgetSet"/>
     <!-- Add-ons -->
@@ -24,8 +20,12 @@
         <when-type-is class="com.vaadin.client.ui.ui.UIConnector"/>
     </replace-with>
 
-    <replace-with class="com.haulmont.cuba.web.toolkit.ui.client.CubaApplicationConnection">
-        <when-type-is class="com.vaadin.client.ApplicationConnection"/>
+    <replace-with class="com.haulmont.cuba.web.toolkit.ui.client.communication.CubaMessageHandler">
+        <when-type-is class="com.vaadin.client.communication.MessageHandler"/>
+    </replace-with>
+
+    <replace-with class="com.haulmont.cuba.web.toolkit.ui.client.communication.CubaXhrConnection">
+        <when-type-is class="com.vaadin.client.communication.XhrConnection"/>
     </replace-with>
 
     <!-- Text selection enable functions deffered binding -->

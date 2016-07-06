@@ -14,10 +14,6 @@ import com.google.gwt.user.client.DOM;
 import com.vaadin.client.ui.VFilterSelect;
 import com.vaadin.client.ui.menubar.MenuItem;
 
-/**
- * @author artamonov
- * @version $Id$
- */
 public class CubaSearchSelectWidget extends VFilterSelect {
 
     protected static final String CLASSNAME = "cuba-searchselect";
@@ -44,7 +40,9 @@ public class CubaSearchSelectWidget extends VFilterSelect {
 
         waitingForFilteringResponse = true;
         client.updateVariable(paintableId, "filter", filter, false);
-        client.updateVariable(paintableId, "page", page, true);
+        client.updateVariable(paintableId, "page", page, immediate);
+        afterUpdateClientVariables();
+
         lastFilter = filter;
         currentPage = page;
     }
@@ -70,7 +68,7 @@ public class CubaSearchSelectWidget extends VFilterSelect {
                                 suggestionPopup.selectFirstItem();
 
                                 MenuItem selectedItem = suggestionPopup.menu.getSelectedItem();
-                                suggestionPopup.menu.setKeyboardSelectedItem(selectedItem);
+                                suggestionPopup.menu.selectItem(selectedItem);
 
                                 tb.setText(selectedItem.getText());
 
@@ -117,25 +115,6 @@ public class CubaSearchSelectWidget extends VFilterSelect {
         }
     }
 
-    @Override
-    protected void handleSelectionOnBlur() {
-        if (tabPressedWhenPopupOpen) {
-            tabPressedWhenPopupOpen = false;
-            waitingForFilteringResponse = false;
-            suggestionPopup.menu.doSelectedItemAction();
-            suggestionPopup.hide();
-        } else if (!suggestionPopup.isAttached() || suggestionPopup.isJustClosed()) {
-            waitingForFilteringResponse = false;
-            if (currentSuggestion == null) {
-                if (tb.getText() != null && !"".equals(tb.getText().trim())) {
-                    suggestionPopup.menu.doSelectedItemAction();
-                }
-            } else if (!currentSuggestion.getReplacementString().equals(tb.getText())) {
-                suggestionPopup.menu.doSelectedItemAction();
-            }
-        }
-    }
-
     protected void updateEditState() {
         if (enabled && !readonly) {
             if (currentSuggestion != null) {
@@ -164,7 +143,7 @@ public class CubaSearchSelectWidget extends VFilterSelect {
             case KeyCodes.KEY_DOWN:
                 keyboardNavigation = true;
                 suggestionPopup.selectNextItem();
-                suggestionPopup.menu.setKeyboardSelectedItem(suggestionPopup.menu
+                suggestionPopup.menu.selectItem(suggestionPopup.menu
                         .getSelectedItem());
                 DOM.eventGetCurrentEvent().preventDefault();
                 event.stopPropagation();
@@ -172,7 +151,7 @@ public class CubaSearchSelectWidget extends VFilterSelect {
             case KeyCodes.KEY_UP:
                 keyboardNavigation = true;
                 suggestionPopup.selectPrevItem();
-                suggestionPopup.menu.setKeyboardSelectedItem(suggestionPopup.menu
+                suggestionPopup.menu.selectItem(suggestionPopup.menu
                         .getSelectedItem());
                 DOM.eventGetCurrentEvent().preventDefault();
                 event.stopPropagation();
@@ -191,15 +170,12 @@ public class CubaSearchSelectWidget extends VFilterSelect {
                 }
                 event.stopPropagation();
                 break;
-            case KeyCodes.KEY_TAB:
-                keyboardNavigation = false;
-                tabPressedWhenPopupOpen = true;
-                break;
             case KeyCodes.KEY_ESCAPE:
                 keyboardNavigation = false;
                 reset();
                 event.stopPropagation();
                 break;
+            case KeyCodes.KEY_TAB:
             case KeyCodes.KEY_ENTER:
                 int selectedIndex = suggestionPopup.menu.getSelectedIndex();
                 currentSuggestion = currentSuggestions.get(selectedIndex);
@@ -221,7 +197,15 @@ public class CubaSearchSelectWidget extends VFilterSelect {
         if (enabled && !readonly) {
             switch (event.getNativeKeyCode()) {
                 case KeyCodes.KEY_ENTER:
-                    onEnterKeyUp(event);
+                    String tbText = tb.getText() == null ? "" : tb.getText();
+                    String currentText = currentSuggestion == null ? "" : currentSuggestion.getReplacementString();
+                    if (!this.preventFilterAfterSelect && !tbText.equals(currentText))
+                        filterOptions(currentPage);
+                    else {
+                        if (!event.isAnyModifierKeyDown())
+                            event.stopPropagation();
+                    }
+                    this.preventFilterAfterSelect = false;
                     break;
                 case KeyCodes.KEY_TAB:
                 case KeyCodes.KEY_SHIFT:
@@ -240,17 +224,5 @@ public class CubaSearchSelectWidget extends VFilterSelect {
 
             updateEditState();
         }
-    }
-    
-    protected void onEnterKeyUp(KeyUpEvent event) {
-        String tbText = tb.getText() == null ? "" : tb.getText();
-        String currentText = currentSuggestion == null ? "" : currentSuggestion.getReplacementString();
-        if (!this.preventFilterAfterSelect && !tbText.equals(currentText))
-            filterOptions(currentPage);
-        else {
-            if (!event.isAnyModifierKeyDown())
-                event.stopPropagation();
-        }
-        this.preventFilterAfterSelect = false;
     }
 }

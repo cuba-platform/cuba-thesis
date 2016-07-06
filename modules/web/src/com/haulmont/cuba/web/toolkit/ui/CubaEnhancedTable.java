@@ -52,9 +52,6 @@ public interface CubaEnhancedTable extends AggregationContainer {
     boolean isShowTotalAggregation();
     void setShowTotalAggregation(boolean showTotalAggregation);
 
-    void addColumnCollapseListener(ColumnCollapseListener listener);
-    void removeColumnCollapseListener(ColumnCollapseListener listener);
-
     void setClickListener(Object propertyId, CellClickListener clickListener);
     void removeClickListener(Object propertyId);
 
@@ -68,10 +65,6 @@ public interface CubaEnhancedTable extends AggregationContainer {
 
     boolean getColumnSortable(Object columnId);
     void setColumnSortable(Object columnId, boolean sortable);
-
-    interface ColumnCollapseListener {
-        void columnCollapsed(Object columnId, boolean collapsed);
-    }
 
     interface CellClickListener {
         void onClick(Object itemId, Object columnId);

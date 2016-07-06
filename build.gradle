@@ -12,7 +12,7 @@ allprojects {
 }
 
 buildscript {
-    ext.cubaVersion = '5.6-SNAPSHOT'
+    ext.cubaVersion = '5.7-SNAPSHOT'
     ext.cubaVersion = rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : cubaVersion
     
     println("CUBA Platform Version ${ext.cubaVersion}")
@@ -355,9 +355,13 @@ configure(webModule) {
         compile(commonsUpload)
         compile(group: 'org.springframework', name: 'spring-webmvc', version: springVersion)
 
+        compile(vaadinPush) {
+            exclude(group: 'com.vaadin.external.google', module: 'guava')
+        }
         compile(vaadinShared) {
             exclude(group: 'com.vaadin.external.google', module: 'guava')
         }
+        compile(group: 'com.vaadin.external.google', name: 'guava-vaadin-shaded', version: '16.0.1.vaadin1')
         compile(vaadinServer) {
             exclude(group: 'com.vaadin', module: 'vaadin-sass-compiler')
         }
@@ -380,7 +384,10 @@ configure(webModule) {
     }
 
     jar {
-        from sourceSets.main.allJava
+        with copySpec {
+            from sourceSets.main.allJava
+            include "com/haulmont/cuba/web/toolkit/ui/client/**"
+        }
     }
 
     task buildScssThemes(type: CubaWebScssThemeCreation) {
