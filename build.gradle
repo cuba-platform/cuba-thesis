@@ -56,7 +56,7 @@ apply from: "$rootProject.projectDir/lib.gradle"
 def springVersion = '3.2.13.RELEASE'
 def springSecurityVersion = '3.2.7.RELEASE'
 
-def servletApi = [group: 'org.apache.tomcat', name: 'tomcat-servlet-api', version: '7.0.53']
+def servletApi = [group: 'org.apache.tomcat', name: 'tomcat-servlet-api', version: '7.0.70']
 def groovyArtifact = [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.1.6']
 def asm = [group: 'org.ow2.asm', name: 'asm', version: '5.0.3']
 def poi = [group: 'com.haulmont.thirdparty', name: 'poi', version: '3.9.20130515']
