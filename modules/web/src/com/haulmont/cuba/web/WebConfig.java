@@ -256,4 +256,17 @@ public interface WebConfig extends Config {
     @DefaultBoolean(false)
     boolean getUseRedirectWithBlankPageForLinkAction();
 
+    /**
+     * @return true if push should use long polling transport instead of websocket+xhr
+     */
+    @Property("cuba.web.pushLongPolling")
+    @DefaultBoolean(value = false)
+    boolean getUsePushLongPolling();
+
+    /**
+     * @return true if push is enabled
+     */
+    @Property("cuba.web.pushEnabled")
+    @DefaultBoolean(value = true)
+    boolean getPushEnabled();
 }
