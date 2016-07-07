@@ -28,12 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.haulmont.cuba.gui.upload.FileUploadingAPI.*;
+import static com.haulmont.cuba.gui.upload.FileUploadingAPI.FileInfo;
 
-/**
- * @author budarov
- * @version $Id$
- */
 public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> implements FileUploadField {
 
     private static final int BYTES_IN_MEGABYTE = 1048576;
@@ -54,6 +50,9 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
     protected UUID tempFileId;
 
     protected List<Listener> listeners = new ArrayList<>();
+
+    protected DropZone dropZone;
+    protected String dropZonePrompt;
 
     public DesktopFileUploadField() {
         fileUploading = AppBeans.get(FileUploadingAPI.NAME);
@@ -235,5 +234,25 @@ public class DesktopFileUploadField extends DesktopAbstractComponent<JButton> im
     @Override
     public void setAccept(String accept) {
         // do nothing
+    }
+
+    @Override
+    public DropZone getDropZone() {
+        return dropZone;
+    }
+
+    @Override
+    public void setDropZone(DropZone dropZone) {
+        this.dropZone = dropZone;
+    }
+
+    @Override
+    public String getDropZonePrompt() {
+        return dropZonePrompt;
+    }
+
+    @Override
+    public void setDropZonePrompt(String dropZonePrompt) {
+        this.dropZonePrompt = dropZonePrompt;
     }
 }

@@ -23,12 +23,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.*;
 
-import static com.haulmont.cuba.gui.upload.FileUploadingAPI.*;
+import static com.haulmont.cuba.gui.upload.FileUploadingAPI.FileInfo;
 
-/**
- * @author artamonov
- * @version $Id$
- */
 public class DesktopFileMultiUploadField extends DesktopAbstractComponent<JButton> implements FileMultiUploadField {
 
     protected static final int BYTES_IN_MEGABYTE = 1048576;
@@ -41,6 +37,9 @@ public class DesktopFileMultiUploadField extends DesktopAbstractComponent<JButto
 
     protected Map<UUID, String> filesMap = new HashMap<>();
     protected String icon;
+
+    protected DropZone dropZone;
+    protected String dropZonePrompt;
 
     public DesktopFileMultiUploadField() {
         fileUploading = AppBeans.get(FileUploadingAPI.NAME);
@@ -211,5 +210,25 @@ public class DesktopFileMultiUploadField extends DesktopAbstractComponent<JButto
     @Override
     public void setAccept(String accept) {
         // do nothing
+    }
+
+    @Override
+    public DropZone getDropZone() {
+        return dropZone;
+    }
+
+    @Override
+    public void setDropZone(DropZone dropZone) {
+        this.dropZone = dropZone;
+    }
+
+    @Override
+    public String getDropZonePrompt() {
+        return dropZonePrompt;
+    }
+
+    @Override
+    public void setDropZonePrompt(String dropZonePrompt) {
+        this.dropZonePrompt = dropZonePrompt;
     }
 }
