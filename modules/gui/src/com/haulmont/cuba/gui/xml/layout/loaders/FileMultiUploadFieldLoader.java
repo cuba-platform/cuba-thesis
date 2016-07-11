@@ -56,13 +56,18 @@ public class FileMultiUploadFieldLoader extends ComponentLoader {
         }
     }
 
-    protected void loadDropZone(FileMultiUploadField uploadField, Element element) {
-        String dropZoneId = element.attributeValue("dropZone");
+    protected void loadDropZone(final FileMultiUploadField uploadField, Element element) {
+        final String dropZoneId = element.attributeValue("dropZone");
         if (StringUtils.isNotEmpty(dropZoneId)) {
-            Component dropZone = context.getFrame().getComponent(dropZoneId);
-            if (dropZone instanceof BoxLayout) {
-                uploadField.setDropZone(new DropZone((BoxLayout) dropZone));
-            }
+            context.addPostInitTask(new PostInitTask() {
+                @Override
+                public void execute(Context context, IFrame window) {
+                    Component dropZone = window.getComponent(dropZoneId);
+                    if (dropZone instanceof BoxLayout) {
+                        uploadField.setDropZone(new DropZone((BoxLayout) dropZone));
+                    }
+                }
+            });
         }
 
         String dropZonePrompt = element.attributeValue("dropZonePrompt");
