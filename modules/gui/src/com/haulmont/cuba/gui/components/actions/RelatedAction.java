@@ -11,10 +11,7 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.app.RelatedEntitiesService;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.core.global.ExtendedEntities;
-import com.haulmont.cuba.core.global.MessageTools;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.ComponentFinder;
 import com.haulmont.cuba.gui.ComponentsHelper;
@@ -117,10 +114,10 @@ public class RelatedAction extends AbstractAction {
 
     protected void applyFilter(Filter component, Set<Entity> selectedParents) {
         MessageTools messageTools = AppBeans.get(MessageTools.NAME);
+        Metadata metadata = AppBeans.get(MessageTools.NAME);
 
         List<UUID> relatedIds = getRelatedIds(selectedParents);
-
-        FilterEntity filterEntity = new FilterEntity();
+        FilterEntity filterEntity = metadata.create(FilterEntity.class);
         filterEntity.setComponentId(ComponentsHelper.getFilterComponentPath(component));
 
         if (StringUtils.isNotEmpty(filterCaption)) {
@@ -152,7 +149,8 @@ public class RelatedAction extends AbstractAction {
         String[] strings = ValuePathHelper.parse(filterComponentPath);
         String filterComponentName = ValuePathHelper.format(Arrays.copyOfRange(strings, 1, strings.length));
 
-        PropertyConditionDescriptor conditionDescriptor = new PropertyConditionDescriptor("id", "id", AppConfig.getMessagesPack(), filterComponentName, component.getDatasource());
+        PropertyConditionDescriptor conditionDescriptor = new PropertyConditionDescriptor("id", "id",
+                AppConfig.getMessagesPack(), filterComponentName, component.getDatasource());
 
         PropertyCondition condition = (PropertyCondition) conditionDescriptor.createCondition();
         condition.setInExpr(true);
@@ -160,9 +158,18 @@ public class RelatedAction extends AbstractAction {
         condition.setOperator(Op.IN);
 
         ConditionParamBuilder paramBuilder = AppBeans.get(ConditionParamBuilder.class);
-        Param param = new Param(paramBuilder.createParamName(condition), UUID.class, "", "", component.getDatasource(), metaClass.getProperty("id"), true, true);
-        param.setValue(ids);
 
+        Param param = Param.Builder.getInstance().setName(paramBuilder.createParamName(condition))
+                .setJavaClass(UUID.class)
+                .setEntityWhere("")
+                .setEntityView("")
+                .setDataSource(component.getDatasource())
+                .setProperty(metaClass.getProperty("id"))
+                .setInExpr(true)
+                .setRequired(true)
+                .build();
+
+        param.setValue(ids);
         condition.setParam(param);
 
         tree.setRootNodes(Collections.singletonList(new Node<AbstractCondition>(condition)));

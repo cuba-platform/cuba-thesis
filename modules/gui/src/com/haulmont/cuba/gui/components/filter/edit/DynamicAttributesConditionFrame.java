@@ -20,10 +20,10 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Label;
 import com.haulmont.cuba.gui.components.LookupField;
+import com.haulmont.cuba.gui.components.filter.ConditionParamBuilder;
 import com.haulmont.cuba.gui.components.filter.Op;
 import com.haulmont.cuba.gui.components.filter.OpManager;
 import com.haulmont.cuba.gui.components.filter.Param;
-import com.haulmont.cuba.gui.components.filter.ConditionParamBuilder;
 import com.haulmont.cuba.gui.components.filter.condition.DynamicAttributesCondition;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
@@ -32,8 +32,6 @@ import org.apache.commons.lang.RandomStringUtils;
 
 import javax.inject.Inject;
 import java.util.*;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * @author devyatkin
@@ -181,19 +179,26 @@ public class DynamicAttributesConditionFrame extends ConditionFrame<DynamicAttri
         condition.setEntityParamWhere(null);
         condition.setInExpr(Op.IN.equals(op) || Op.NOT_IN.equals(op));
         condition.setOperator(operationLookup.<Op>getValue());
-        Class paramJavaClass = op.isUnary() ? Boolean.class : javaClass;
         condition.setJavaClass(javaClass);
-        Param param = new Param(paramName, paramJavaClass, null, null, condition.getDatasource(),
-                DynamicAttributesUtils.getMetaPropertyPath(null, attribute).getMetaProperty(),
-                condition.getInExpr(), condition.getRequired(), attribute.getId());
+        condition.setCategoryId(categoryLookup.<Category>getValue().getId());
+        condition.setCategoryAttributeId(attributeLookup.<CategoryAttribute>getValue().getId());
+        condition.setLocCaption(attribute.getName());
+
+        Class paramJavaClass = op.isUnary() ? Boolean.class : javaClass;
+        Param param = Param.Builder.getInstance()
+                .setName(paramName)
+                .setJavaClass(paramJavaClass)
+                .setDataSource(condition.getDatasource())
+                .setProperty(DynamicAttributesUtils.getMetaPropertyPath(null, attribute).getMetaProperty())
+                .setInExpr(condition.getInExpr())
+                .setRequired(condition.getRequired())
+                .setCategoryAttrId(attribute.getId())
+                .build();
 
         Object defaultValue = condition.getParam().getDefaultValue();
         param.setDefaultValue(defaultValue);
 
         condition.setParam(param);
-        condition.setCategoryId(categoryLookup.<Category>getValue().getId());
-        condition.setCategoryAttributeId(attributeLookup.<CategoryAttribute>getValue().getId());
-        condition.setLocCaption(attribute.getName());
 
         return true;
     }

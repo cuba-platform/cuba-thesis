@@ -7,7 +7,6 @@ package com.haulmont.cuba.gui.components.filter;
 
 import com.haulmont.chile.core.datatypes.Datatype;
 import com.haulmont.chile.core.datatypes.Datatypes;
-import com.haulmont.chile.core.datatypes.impl.DateDatatype;
 import com.haulmont.chile.core.datatypes.impl.DateTimeDatatype;
 import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.MetaClass;
@@ -39,6 +38,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrBuilder;
 import org.dom4j.Element;
+import org.springframework.context.annotation.Scope;
 
 import javax.annotation.Nullable;
 import javax.persistence.TemporalType;
@@ -50,6 +50,8 @@ import java.util.*;
  * @author devyatkin
  * @version $Id$
  */
+@org.springframework.stereotype.Component(Param.NAME)
+@Scope("prototype")
 public class Param {
 
     public enum Type {
@@ -65,6 +67,7 @@ public class Param {
         DEFAULT_VALUE
     }
 
+    public static final String NAME = "cuba_filterParam";
     public static final String NULL = "NULL";
 
     protected String name;
@@ -87,31 +90,89 @@ public class Param {
     protected ComponentsFactory componentsFactory = AppBeans.get(ComponentsFactory.NAME);
     protected ThemeConstants theme = AppBeans.get(ThemeConstantsManager.class).getConstants();
 
-    protected List<ValueListener> listeners = new ArrayList<>();
+    protected List<ValueListener<Param>> listeners = new ArrayList<>();
 
-    public Param(String name, Class javaClass, String entityWhere, String entityView,
-                 Datasource datasource, boolean inExpr, boolean required) {
-        this(name, javaClass, entityWhere, entityView, datasource, null, inExpr, required);
+    public static class Builder {
+        private String name;
+        private Class javaClass;
+        private String entityWhere;
+        private String entityView;
+        private Datasource dataSource;
+        private MetaProperty property;
+        private boolean inExpr;
+        private boolean required;
+        private UUID categoryAttrId;
+
+        private Builder() {
+        }
+
+        public static Builder getInstance() {
+            return new Builder();
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setJavaClass(Class javaClass) {
+            this.javaClass = javaClass;
+            return this;
+        }
+
+        public Builder setEntityWhere(String entityWhere) {
+            this.entityWhere = entityWhere;
+            return this;
+        }
+
+        public Builder setEntityView(String entityView) {
+            this.entityView = entityView;
+            return this;
+        }
+
+        public Builder setDataSource(Datasource dataSource) {
+            this.dataSource = dataSource;
+            return this;
+        }
+
+        public Builder setProperty(MetaProperty property) {
+            this.property = property;
+            return this;
+        }
+
+        public Builder setInExpr(boolean inExpr) {
+            this.inExpr = inExpr;
+            return this;
+        }
+
+        public Builder setRequired(boolean required) {
+            this.required = required;
+            return this;
+        }
+
+        public Builder setCategoryAttrId(UUID categoryAttrId) {
+            this.categoryAttrId = categoryAttrId;
+            return this;
+        }
+
+        public Param build() {
+            return AppBeans.getPrototype(Param.NAME, this);
+        }
     }
 
-    public Param(String name, Class javaClass, String entityWhere, String entityView,
-                 Datasource datasource, MetaProperty property, boolean inExpr, boolean required, UUID categoryAttrId) {
-        this(name, javaClass, entityWhere, entityView, datasource, property, inExpr, required);
-        this.categoryAttrId = categoryAttrId;
-    }
+    public Param(Builder builder) {
+        name = builder.name;
+        setJavaClass(builder.javaClass);
+        entityWhere = builder.entityWhere;
+        entityView = (builder.entityView != null) ? builder.entityView : View.MINIMAL;
+        datasource = builder.dataSource;
+        property = builder.property;
+        inExpr = builder.inExpr;
+        required = builder.required;
+        categoryAttrId = builder.categoryAttrId;
 
-    public Param(String name, Class javaClass, String entityWhere, String entityView, Datasource datasource,
-                 MetaProperty property, boolean inExpr, boolean required) {
-        this.name = name;
-        setJavaClass(javaClass);
-        this.entityWhere = entityWhere;
-        this.entityView = (entityView != null) ? entityView : View.MINIMAL;
-        this.datasource = datasource;
-        this.property = property;
-        this.inExpr = inExpr;
-        this.required = required;
-        if (DynamicAttributesUtils.isDynamicAttribute(property)) {
-            CategoryAttribute categoryAttribute = DynamicAttributesUtils.getCategoryAttribute(property);
+        if (DynamicAttributesUtils.isDynamicAttribute(builder.property)) {
+            CategoryAttribute categoryAttribute = DynamicAttributesUtils.getCategoryAttribute(builder.property);
             if (categoryAttribute.getDataType() == PropertyType.ENUMERATION) {
                 type = Type.RUNTIME_ENUM;
             }
@@ -158,7 +219,7 @@ public class Param {
         if (!ObjectUtils.equals(value, this.value)) {
             Object prevValue = this.value;
             this.value = value;
-            for (ValueListener listener : listeners) {
+            for (ValueListener<Param> listener : listeners) {
                 listener.valueChanged(this, "value", prevValue, value);
             }
             if (updateEditComponent && this.editComponent instanceof Component.HasValue) {
@@ -185,6 +246,7 @@ public class Param {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void parseValue(String text) {
         if (NULL.equals(text)) {
             value = null;
@@ -237,14 +299,14 @@ public class Param {
                         try {
                             value = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(text);
                         } catch (ParseException exception) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("Can not parse date from string " + text, e);
                         }
                     }
                 } else {
                     try {
                         value = datatype.parse(text);
                     } catch (ParseException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException("Parse exception for string " + text, e);
                     }
                 }
                 break;
@@ -257,20 +319,18 @@ public class Param {
 
     protected List<Entity> loadEntityList(String[] ids) {
         Metadata metadata = AppBeans.get(Metadata.class);
-        MetaClass metaClass = metadata.getSession().getClass(javaClass);
+        MetaClass metaClass = metadata.getSession().getClassNN(javaClass);
         LoadContext ctx = new LoadContext(javaClass);
         LoadContext.Query query = ctx.setQueryString("select e from " + metaClass.getName() + " e where e.id in (:ids)");
         query.setParameter("ids", Arrays.asList(ids));
         DataManager dataManager = AppBeans.get(DataManager.class);
-        List result = dataManager.loadList(ctx);
-        return result;
+        return dataManager.loadList(ctx);
     }
 
     protected Object loadEntity(String id) {
         LoadContext ctx = new LoadContext(javaClass).setId(UUID.fromString(id));
         DataService dataService = AppBeans.get(DataService.NAME);
-        Entity entity = dataService.load(ctx);
-        return entity;
+        return dataService.load(ctx);
     }
 
     public String formatValue(Object value) {
@@ -302,10 +362,9 @@ public class Param {
             case ENUM:
                 return ((Enum) v).name();
             case RUNTIME_ENUM:
-//                return (String) v;
-
             case DATATYPE:
             case UNARY:
+                //noinspection unchecked
                 Datatype<Object> datatype = Datatypes.getNN(javaClass);
                 return datatype.format(v);
 
@@ -334,7 +393,7 @@ public class Param {
             case DATATYPE:
                 return FilterConditionUtils.formatParamValue(this, v);
             case UNARY:
-                Datatype<Object> datatype = Datatypes.getNN(javaClass);
+                @SuppressWarnings("unchecked") Datatype<Object> datatype = Datatypes.getNN(javaClass);
                 return datatype.format(v, userSessionSource.getLocale());
 
             default:
@@ -449,6 +508,7 @@ public class Param {
                         paramValue = new ArrayList<String>();
                         String[] parts = ((String) value).split(",");
                         for (String part : parts) {
+                            //noinspection unchecked
                             ((List) paramValue).add(part.trim());
                         }
                     } else {
@@ -555,6 +615,7 @@ public class Param {
                                         "Param.numberInvalid"), IFrame.NotificationType.ERROR);
                                 return;
                             }
+                            //noinspection unchecked
                             ((List) v).add(p);
                         }
                     } else {
@@ -575,6 +636,7 @@ public class Param {
         });
 
         UserSessionSource sessionSource = AppBeans.get(UserSessionSource.NAME);
+        //noinspection unchecked
         field.setValue(datatype.format(_getValue(valueProperty), sessionSource.getLocale()));
         return field;
     }
@@ -611,12 +673,12 @@ public class Param {
             public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 String strValue = (String) value;
                 if (strValue == null)
-                    _setValue(strValue, valueProperty);
+                    _setValue(null, valueProperty);
                 else if ((!StringUtils.isBlank(strValue))) {
                     Messages messages = AppBeans.get(Messages.NAME);
 
                     if (inExpr) {
-                        List list = new ArrayList();
+                        List<UUID> list = new ArrayList<>();
                         String[] parts = strValue.split(",");
                         try {
                             for (String part : parts) {
@@ -659,7 +721,7 @@ public class Param {
 
     protected Component createEntityLookup(final ValueProperty valueProperty) {
         Metadata metadata = AppBeans.get(Metadata.NAME);
-        MetaClass metaClass = metadata.getSession().getClass(javaClass);
+        MetaClass metaClass = metadata.getSession().getClassNN(javaClass);
 
         ThemeConstants theme = AppBeans.get(ThemeConstantsManager.class).getConstants();
         PersistenceManagerService persistenceManager = AppBeans.get(PersistenceManagerService.NAME);
@@ -692,45 +754,23 @@ public class Param {
                 return picker;
             }
         } else {
-            CollectionDatasource ds = new DsBuilder(datasource.getDsContext())
-                    .setMetaClass(metaClass)
-                    .setViewName(entityView)
-                    .buildCollectionDatasource();
-
-            ds.setRefreshOnComponentValueChange(true);
-            ((DatasourceImplementation) ds).initialized();
-
-            if (!StringUtils.isBlank(entityWhere)) {
-                QueryTransformer transformer = QueryTransformerFactory.createTransformer(
-                        "select e from " + metaClass.getName() + " e",
-                        metaClass.getName());
-                transformer.addWhere(entityWhere);
-                String q = transformer.getResult();
-                ds.setQuery(q);
-            }
-
-            if (WindowParams.DISABLE_AUTO_REFRESH.getBool(datasource.getDsContext().getFrameContext())) {
-                if (ds instanceof CollectionDatasource.Suspendable)
-                    ((CollectionDatasource.Suspendable) ds).refreshIfNotSuspended();
-                else
-                    ds.refresh();
-            }
+            CollectionDatasource<Entity<Object>, Object> optionsDataSource = createOptionsDataSource(metaClass);
 
             if (inExpr) {
-                final InListParamComponent inListParamComponent = new InListParamComponent(ds);
+                final InListParamComponent inListParamComponent = new InListParamComponent(optionsDataSource);
                 initListEdit(inListParamComponent, valueProperty);
                 return inListParamComponent.getComponent();
             } else {
                 final LookupPickerField lookup = componentsFactory.createComponent(LookupPickerField.NAME);
                 lookup.addClearAction();
                 lookup.setWidth(theme.get("cuba.gui.filter.Param.textComponent.width"));
-                lookup.setOptionsDatasource(ds);
+                lookup.setOptionsDatasource(optionsDataSource);
 
-                ds.addListener(
-                        new CollectionDsListenerAdapter<Entity>() {
+                optionsDataSource.addListener(
+                        new CollectionDsListenerAdapter<Entity<Object>>() {
                             @Override
                             public void collectionChanged(CollectionDatasource ds, Operation operation,
-                                                          List<Entity> items) {
+                                                          List<Entity<Object>> items) {
                                 lookup.setValue(null);
                             }
                         }
@@ -748,6 +788,33 @@ public class Param {
                 return lookup;
             }
         }
+    }
+
+    protected CollectionDatasource<Entity<Object>, Object> createOptionsDataSource(MetaClass metaClass) {
+        CollectionDatasource<Entity<Object>, Object> ds = new DsBuilder(datasource.getDsContext())
+                .setMetaClass(metaClass)
+                .setViewName(entityView)
+                .buildCollectionDatasource();
+
+        ds.setRefreshOnComponentValueChange(true);
+        ((DatasourceImplementation) ds).initialized();
+
+        if (!StringUtils.isBlank(entityWhere)) {
+            QueryTransformer transformer = QueryTransformerFactory.createTransformer(
+                    "select e from " + metaClass.getName() + " e",
+                    metaClass.getName());
+            transformer.addWhere(entityWhere);
+            String q = transformer.getResult();
+            ds.setQuery(q);
+        }
+
+        if (WindowParams.DISABLE_AUTO_REFRESH.getBool(datasource.getDsContext().getFrameContext())) {
+            if (ds instanceof CollectionDatasource.Suspendable)
+                ((CollectionDatasource.Suspendable) ds).refreshIfNotSuspended();
+            else
+                ds.refresh();
+        }
+        return ds;
     }
 
     protected Component createEnumLookup(final ValueProperty valueProperty) {
@@ -788,6 +855,8 @@ public class Param {
         context.setView("_local");
         q.setParameter("id", categoryAttrId);
         CategoryAttribute categoryAttribute = dataService.load(context);
+        if (categoryAttribute == null)
+            throw new RuntimeException("Can not find category attribute with id " + categoryAttrId);
 
         runtimeEnum = new LinkedList<>();
         String enumerationString = categoryAttribute.getEnumeration();
@@ -849,7 +918,7 @@ public class Param {
         paramElem.setText(formatValue(_getValue(valueProperty)));
     }
 
-    public void addListener(ValueListener listener) {
+    public void addListener(ValueListener<Param> listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }

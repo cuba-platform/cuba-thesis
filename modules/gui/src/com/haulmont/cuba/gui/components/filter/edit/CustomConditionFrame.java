@@ -11,11 +11,11 @@ import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.core.sys.jpql.DomainModel;
 import com.haulmont.cuba.core.sys.jpql.DomainModelBuilder;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.autocomplete.AutoCompleteSupport;
 import com.haulmont.cuba.gui.components.autocomplete.JpqlSuggestionFactory;
 import com.haulmont.cuba.gui.components.autocomplete.Suggester;
 import com.haulmont.cuba.gui.components.autocomplete.Suggestion;
-import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.autocomplete.impl.HintProvider;
 import com.haulmont.cuba.gui.components.autocomplete.impl.HintRequest;
 import com.haulmont.cuba.gui.components.autocomplete.impl.HintResponse;
@@ -361,12 +361,17 @@ public class CustomConditionFrame extends ConditionFrame<CustomCondition> {
         String entityParamView = entityParamViewField.getValue();
         condition.setEntityParamView(entityParamView);
 
-        Param param = new Param(
-                paramName, javaClass, entityParamWhere, entityParamView, condition.getDatasource(),
-                condition.getInExpr(), condition.getRequired());
+        Param param = Param.Builder.getInstance()
+                .setName(paramName)
+                .setJavaClass(javaClass)
+                .setEntityWhere(entityParamWhere)
+                .setEntityView(entityParamView)
+                .setDataSource(condition.getDatasource())
+                .setInExpr(condition.getInExpr())
+                .setRequired(condition.getRequired())
+                .build();
 
         param.setDefaultValue(condition.getParam().getDefaultValue());
-
         condition.setParam(param);
 
         return true;
@@ -501,7 +506,7 @@ public class CustomConditionFrame extends ConditionFrame<CustomCondition> {
             int cursorPos = hintRequest.getPosition();
             String lastWord = getLastWord(input, cursorPos);
             return (":".equals(lastWord)) ?
-                    hintParameterNames(lastWord):
+                    hintParameterNames(lastWord) :
                     super.requestHint(hintRequest);
         }
 
