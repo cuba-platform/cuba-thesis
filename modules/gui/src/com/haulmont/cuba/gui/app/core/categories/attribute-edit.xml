@@ -31,7 +31,15 @@
                         <field id="entityClass" custom="true" required="true"/>
                         <field id="screen" custom="true"/>
                         <field id="lookup"/>
-                        <field id="defaultEntityId" custom="true"/>
+                        <field id="width" width="100%">
+                            <validator class="com.haulmont.cuba.gui.components.validators.PatternValidator"
+                                       pattern="^(\d*(\.\d+)?)(%|px)?$" message="msg://widthValidationMsg"/>
+                        </field>
+                        <field id="rowsCount" width="100%">
+                            <validator class="com.haulmont.cuba.gui.components.validators.IntegerValidator"
+                                       onlyPositive="true" message="msg://rowsCountValidationMsg"/>
+                        </field>
+                        <field id="defaultEntityId" custom="true" width="100%"/>
 
                         <field id="enumeration" required="true"/>
                         <field id="defaultString"/>

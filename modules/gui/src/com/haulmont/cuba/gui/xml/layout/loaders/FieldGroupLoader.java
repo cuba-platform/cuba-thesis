@@ -25,7 +25,6 @@ import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.gui.xml.layout.LayoutLoaderConfig;
 import com.haulmont.cuba.security.entity.EntityOp;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.LogFactory;
@@ -202,6 +201,9 @@ public class FieldGroupLoader extends AbstractFieldLoader {
                             messages.getMainMessagePack(),
                             "validation.required.defaultMsg",
                             attribute.getName()));
+                    if (StringUtils.isNotBlank(attribute.getWidth())) {
+                        field.setWidth(loadThemeString(attribute.getWidth()));
+                    }
                     fields.add(field);
                 }
                 dynamicAttributesGuiTools.listenDynamicAttributesChanges(ds);
