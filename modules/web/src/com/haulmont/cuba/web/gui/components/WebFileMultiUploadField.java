@@ -215,8 +215,8 @@ public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponen
         impl.setDescription(null);
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
-        final int maxUploadSizeMb = configuration.getConfig(ClientConfig.class).getMaxUploadSizeMb();
-        final int maxSizeBytes = maxUploadSizeMb * BYTES_IN_MEGABYTE;
+        final long maxUploadSizeMb = configuration.getConfig(ClientConfig.class).getMaxUploadSizeMb();
+        final long maxSizeBytes = maxUploadSizeMb * BYTES_IN_MEGABYTE;
 
         impl.setFileSizeLimit(maxSizeBytes);
 
