@@ -44,7 +44,7 @@ public class WebFileMultiUploadField extends WebAbstractComponent<UploadComponen
     protected FileUploadingAPI fileUploading;
 
     protected final List<UploadListener> listeners = new LinkedList<>();
-    protected final Map<UUID, String> files = new HashMap<>();
+    protected final Map<UUID, String> files = new LinkedHashMap<>();
 
     protected UUID tempFileId;
     protected String icon;

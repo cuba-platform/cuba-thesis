@@ -35,7 +35,7 @@ public class DesktopFileMultiUploadField extends DesktopAbstractComponent<JButto
 
     protected List<UploadListener> listeners = new ArrayList<>();
 
-    protected Map<UUID, String> filesMap = new HashMap<>();
+    protected Map<UUID, String> filesMap = new LinkedHashMap<>();
     protected String icon;
 
     protected DropZone dropZone;
