@@ -54,6 +54,9 @@ public class CubaTwinColSelectWidget extends VTwinColSelect {
 
     @Override
     public void buildOptions(UIDL uidl) {
+        options.setMultipleSelect(isMultiselect());
+        selections.setMultipleSelect(isMultiselect());
+
         int optionsSelectedIndex = options.getSelectedIndex();
         int selectionsSelectedIndex = selections.getSelectedIndex();
         options.clear();
@@ -88,7 +91,6 @@ public class CubaTwinColSelectWidget extends VTwinColSelect {
         if (getRows() > 0) {
             options.setVisibleItemCount(getRows());
             selections.setVisibleItemCount(getRows());
-
         }
 
         setSelectedIndex(options, optionsSelectedIndex);

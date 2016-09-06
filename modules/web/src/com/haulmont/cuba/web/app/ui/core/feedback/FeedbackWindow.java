@@ -11,7 +11,6 @@ import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.security.entity.User;
-import com.haulmont.cuba.web.WebConfig;
 import com.haulmont.cuba.web.gui.WebWindow;
 
 import javax.inject.Inject;
@@ -86,34 +85,7 @@ public class FeedbackWindow extends AbstractWindow {
         }
         if (result) {
             try {
-                ClientConfig clientConfig = configuration.getConfig(ClientConfig.class);
-                String infoHeader = "";
-                infoHeader += (getMessage("supportEmail") + ".\n");
-                infoHeader += (getMessage("systemID") + ": " + (clientConfig.getSystemID() == null ? "none" : clientConfig.getSystemID()) + "\n");
-                User user = userSessionSource.getUserSession().getUser();
-                infoHeader += (getMessage("userLogin") + ": " + (user.getLogin() == null ? "none" : user.getLogin()) + "\n");
-                infoHeader += (getMessage("userEmail") + ": " + (user.getEmail() == null ? "none" : user.getEmail()) + "\n");
-                infoHeader += (getMessage("userFirstName") + ": " + (user.getFirstName() == null ? "none" : user.getFirstName()) + "\n");
-                infoHeader += (getMessage("userMiddleName") + ": " + (user.getMiddleName() == null ? "none" : user.getMiddleName()) + "\n");
-                infoHeader += (getMessage("userLastName") + ": " + (user.getLastName() == null ? "none" : user.getLastName()) + "\n");
-                infoHeader += (getMessage("timestamp") + ": " + (Datatypes.getNN(Date.class).format(timeSource.currentTimestamp())) + "\n");
-                infoHeader += (getMessage("reason") + ": "
-                        + (otherReason.equals(reason.getValue())
-                                ? reasonFreeText.getValue()
-                                : reason.getValue()) + "\n");
-                infoHeader += (getMessage("mailBody") + ": \n");
-                infoHeader += mainBody.getValue();
-                EmailInfo emailInfo = new EmailInfo(
-                        clientConfig.getSupportEmail(),
-                        "[Feedback Form][" + clientConfig.getSystemID() + "]["
-                                + user.getLogin() + "]["
-                                + Datatypes.getNN(Date.class).format(timeSource.currentTimestamp()) + "] "
-                                + (otherReason.equals(reason.getValue())
-                                    ? reasonFreeText.getValue()
-                                    : reason.getValue()),
-                        infoHeader
-                        );
-                emailService.sendEmail(emailInfo);
+                emailService.sendEmail(buildEmailInfo());
                 showNotification(getMessage("emailSent"), NotificationType.HUMANIZED);
             } catch (Exception e) {
                 showNotification(getMessage("emailSentErr"), NotificationType.ERROR);
@@ -156,6 +128,36 @@ public class FeedbackWindow extends AbstractWindow {
                         close("cancel");
                     }
                 }
+        );
+    }
+
+    protected EmailInfo buildEmailInfo() {
+        ClientConfig clientConfig = configuration.getConfig(ClientConfig.class);
+        String infoHeader = "";
+        infoHeader += (getMessage("supportEmail") + ".\n");
+        infoHeader += (getMessage("systemID") + ": " + (clientConfig.getSystemID() == null ? "none" : clientConfig.getSystemID()) + "\n");
+        User user = userSessionSource.getUserSession().getUser();
+        infoHeader += (getMessage("userLogin") + ": " + (user.getLogin() == null ? "none" : user.getLogin()) + "\n");
+        infoHeader += (getMessage("userEmail") + ": " + (user.getEmail() == null ? "none" : user.getEmail()) + "\n");
+        infoHeader += (getMessage("userFirstName") + ": " + (user.getFirstName() == null ? "none" : user.getFirstName()) + "\n");
+        infoHeader += (getMessage("userMiddleName") + ": " + (user.getMiddleName() == null ? "none" : user.getMiddleName()) + "\n");
+        infoHeader += (getMessage("userLastName") + ": " + (user.getLastName() == null ? "none" : user.getLastName()) + "\n");
+        infoHeader += (getMessage("timestamp") + ": " + (Datatypes.getNN(Date.class).format(timeSource.currentTimestamp())) + "\n");
+        infoHeader += (getMessage("reason") + ": "
+                + (otherReason.equals(reason.getValue())
+                ? reasonFreeText.getValue()
+                : reason.getValue()) + "\n");
+        infoHeader += (getMessage("mailBody") + ": \n");
+        infoHeader += mainBody.getValue();
+        return new EmailInfo(
+                clientConfig.getSupportEmail(),
+                "[Feedback Form][" + clientConfig.getSystemID() + "]["
+                        + user.getLogin() + "]["
+                        + Datatypes.getNN(Date.class).format(timeSource.currentTimestamp()) + "] "
+                        + (otherReason.equals(reason.getValue())
+                        ? reasonFreeText.getValue()
+                        : reason.getValue()),
+                infoHeader
         );
     }
 }

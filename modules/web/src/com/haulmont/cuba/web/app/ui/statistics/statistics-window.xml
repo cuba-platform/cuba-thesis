@@ -55,6 +55,12 @@
         </groupBox>
         <groupTable id="paramsTable" reorderingAllowed="false" sortable="false" columnControlVisible="false"
                     width="theme://cuba.web.perf-stat.width">
+            <actions>
+                <action id="excel"/>
+            </actions>
+            <buttonsPanel>
+                <button id="excel" action="paramsTable.excel"/>
+            </buttonsPanel>
             <columns>
                 <group>
                     <column id="parameterGroup"/>

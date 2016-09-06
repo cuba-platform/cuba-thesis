@@ -11,10 +11,6 @@ import com.haulmont.cuba.gui.xml.layout.*;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
-/**
- * @author Gorodnov
- * @version $Id$
- */
 public class TwinColumnLoader extends AbstractFieldLoader {
 
     public TwinColumnLoader(Context context, LayoutLoaderConfig config, ComponentsFactory factory) {
@@ -46,6 +42,11 @@ public class TwinColumnLoader extends AbstractFieldLoader {
         String addBtnEnabled = element.attributeValue("addAllBtnEnabled");
         if (!StringUtils.isEmpty(addBtnEnabled)) {
             component.setAddAllBtnEnabled(Boolean.valueOf(addBtnEnabled));
+        }
+
+        String multiselect = element.attributeValue("multiselect");
+        if (StringUtils.isNotEmpty(multiselect)) {
+            component.setMultiSelect(Boolean.parseBoolean(multiselect));
         }
     }
 

@@ -45,7 +45,7 @@ public class ScreenProfilerWindow extends AbstractWindow {
     @Inject
     protected CollectionDatasource<ScreenProfilerEvent, UUID> profilerEventsDs;
     @Inject
-    private CollectionDatasource<User, UUID> usersDs;
+    protected CollectionDatasource<User, UUID> usersDs;
     @Inject
     protected ScreenProfilerService screenProfilerService;
 
