@@ -18,6 +18,7 @@ import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
 import com.haulmont.cuba.web.toolkit.ui.CubaTabSheet;
 import com.vaadin.event.Action;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.VerticalLayout;
 
 import javax.annotation.Nonnull;
@@ -29,7 +30,7 @@ import java.util.List;
  * @author artamonov
  * @version $Id$
  */
-public class WebAppWorkArea extends WebAbstractComponent<VerticalLayout> implements AppWorkArea {
+public class WebAppWorkArea extends WebAbstractComponent<CssLayout> implements AppWorkArea {
 
     public static final String WORKAREA_STYLENAME = "cuba-app-workarea";
 
@@ -55,7 +56,7 @@ public class WebAppWorkArea extends WebAbstractComponent<VerticalLayout> impleme
     protected List<StateChangeListener> stateChangeListeners = null;
 
     public WebAppWorkArea() {
-        component = new VerticalLayout();
+        component = new CssLayout();
         component.addStyleName(WORKAREA_STYLENAME);
         component.addStyleName(MODE_TABBED_STYLENAME);
         component.addStyleName(STATE_INITIAL_STYLENAME);
@@ -121,7 +122,6 @@ public class WebAppWorkArea extends WebAbstractComponent<VerticalLayout> impleme
         Component vInitialLayout = WebComponentsHelper.getComposition(initialLayout);
         vInitialLayout.addStyleName(INITIAL_LAYOUT_STYLENAME);
         component.addComponent(vInitialLayout);
-        component.setExpandRatio(vInitialLayout, 1);
     }
 
     @Override
