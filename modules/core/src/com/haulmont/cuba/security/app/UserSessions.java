@@ -4,9 +4,12 @@
  */
 package com.haulmont.cuba.security.app;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.haulmont.bali.db.QueryRunner;
 import com.haulmont.bali.db.ResultSetHandler;
 import com.haulmont.bali.util.Dom4j;
+import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.model.MetaModel;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.app.ClusterListener;
@@ -30,6 +33,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 
 import javax.annotation.ManagedBean;
+import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.inject.Inject;
 import java.io.*;
@@ -45,11 +49,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
+
 /**
  * User sessions distributed cache.
  *
  * @author krivopustov
- * @version $Id$
  */
 @ManagedBean(UserSessionsAPI.NAME)
 public final class UserSessions implements UserSessionsAPI, AppContext.Listener {
@@ -524,6 +530,33 @@ public final class UserSessions implements UserSessionsAPI, AppContext.Listener 
             usi.lastUsedTs = 0;
             clusterManager.send(usi);
         }
+    }
+
+    @Override
+    public List<UUID> findUserSessionsByAttribute(final String attributeName, final Object attributeValue) {
+        Preconditions.checkNotNullArgument(attributeName);
+
+        List<UserSessionInfo> sessionInfos = new ArrayList<>(cache.values());
+
+        Collection<UserSessionInfo> filteredSessions = filter(sessionInfos, new Predicate<UserSessionInfo>() {
+            @Override
+            public boolean apply(@Nullable UserSessionInfo usInfo) {
+                return usInfo != null && Objects.equals(usInfo.session.getAttribute(attributeName), attributeValue);
+            }
+        });
+        //noinspection UnnecessaryLocalVariable
+        List<UUID> sessionIds = new ArrayList<>(transform(filteredSessions, new Function<UserSessionInfo, UUID>() {
+            @Nullable
+            @Override
+            public UUID apply(@Nullable UserSessionInfo usInfo) {
+                if (usInfo != null) {
+                    return usInfo.session.getId();
+                }
+                return null;
+            }
+        }));
+
+        return sessionIds;
     }
 
     @Override

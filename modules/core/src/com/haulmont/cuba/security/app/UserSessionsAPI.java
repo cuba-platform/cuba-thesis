@@ -8,6 +8,7 @@ import com.haulmont.cuba.security.entity.UserSessionEntity;
 import com.haulmont.cuba.security.global.UserSession;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,7 +16,6 @@ import java.util.UUID;
  * User sessions distributed cache API.
  *
  * @author krivopustov
- * @version $Id$
  */
 public interface UserSessionsAPI {
 
@@ -51,6 +51,15 @@ public interface UserSessionsAPI {
      * @param id    session id
      */
     void killSession(UUID id);
+
+    /**
+     * Finds sessions with attribute with name {@param attributeName} and value equal to passed {@param attributeValue}
+     *
+     * @param attributeName attribute name
+     * @param attributeValue attribute value
+     * @return session ids
+     */
+    List<UUID> findUserSessionsByAttribute(String attributeName, Object attributeValue);
 
     /**
      * @return session expiration timeout in the cache
