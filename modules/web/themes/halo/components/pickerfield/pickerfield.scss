@@ -3,10 +3,14 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
  */
 
-// Version: $Id$
-
 @mixin halo-cuba-pickerfield($primary-stylename: cuba-pickerfield) {
   .#{$primary-stylename} {
+    display: inline-table;
+  }
+
+  .#{$primary-stylename}-layout {
+    display: table-row;
+
     .v-textfield.v-textfield-readonly {
       @if $v-textfield-background-color {
         background: $v-textfield-background-color;
@@ -33,11 +37,13 @@
     }
 
     .v-button {
-      display: block !important;
+      display: table-cell !important;
       text-align: center !important;
+      vertical-align: middle;
       padding: 0;
       min-width: $v-unit-size;
-      height: $v-unit-size;
+      width: $v-unit-size;
+      height: 100%;
 
       border: valo-border($v-textfield-border,
                           darkest-color($v-textfield-background-color, $v-app-background-color));
@@ -70,11 +76,22 @@
       &:after,
       &:hover:after {
         background: transparent;
+
+        border: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+
+        height: $v-unit-size;
+      }
+
+      &:before {
+        height: 100% !important;
       }
 
       &:focus:after {
         border-color: transparent;
-
         @include box-shadow(none);
       }
 
@@ -90,35 +107,34 @@
         }
       }
     }
+  }
 
-    .v-slot:last-child .v-button {
+  .#{$primary-stylename}-layout > .v-button:last-child {
+    border-top-right-radius: $v-border-radius;
+    border-bottom-right-radius: $v-border-radius;
+
+    border-top-right-radius: $v-textfield-border-radius;
+    border-bottom-right-radius: $v-textfield-border-radius;
+
+    &:focus {
       border-top-right-radius: $v-border-radius;
       border-bottom-right-radius: $v-border-radius;
-
-      &:focus {
-        border-top-right-radius: $v-border-radius;
-        border-bottom-right-radius: $v-border-radius;
-      }
     }
+  }
 
-    .v-slot:last-child .v-textfield {
-      &:focus {
-        border-right-color: $v-focus-color;
-      }
+  .#{$primary-stylename}-layout > .v-textfield.#{$primary-stylename}-text:last-child,
+  .#{$primary-stylename}-layout > .v-filterselect:last-child > input {
+    border-top-right-radius: $v-textfield-border-radius;
+    border-bottom-right-radius: $v-textfield-border-radius;
+  }
 
-      border-top-right-radius: $v-textfield-border-radius;
-      border-bottom-right-radius: $v-textfield-border-radius;
-    }
+  .#{$primary-stylename}-layout > .v-filterselect,
+  .v-textfield.#{$primary-stylename}-text {
+    display: table-cell;
+  }
 
-    .v-slot:last-child .cuba-searchselect,
-    .v-slot:last-child .v-filterselect {
-      &:focus {
-        border-right-color: $v-focus-color;
-      }
-
-      border-top-right-radius: $v-textfield-border-radius;
-      border-bottom-right-radius: $v-textfield-border-radius;
-    }
+  .#{$primary-stylename}-layout > .v-filterselect > input {
+    height: $v-unit-size;
   }
 
   .#{$primary-stylename}-error {

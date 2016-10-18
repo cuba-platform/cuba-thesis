@@ -14,24 +14,22 @@ import com.vaadin.event.Action;
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.CompositeErrorMessage;
 import com.vaadin.server.ErrorMessage;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.TextField;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author krivopustov
- * @version $Id$
- */
 public class CubaPickerField extends com.vaadin.ui.CustomField implements Action.Container {
-
-    protected com.vaadin.ui.AbstractField field;
+    protected Field field;
     protected Converter captionFormatter;
 
     protected List<Button> buttons = new ArrayList<>();
-    protected CubaHorizontalActionsLayout container;
+    protected CubaCssActionsLayout container;
 
     protected boolean useCustomField = false;
     protected boolean fieldReadOnly = true;
@@ -39,19 +37,27 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
     protected boolean suppressTextChangeListener = false;
 
     public CubaPickerField() {
+        init();
+
         initTextField();
         initLayout();
-        setValidationVisible(false);
-        setShowBufferedSourceException(false);
-        setShowErrorForDisabledState(false);
     }
 
     public CubaPickerField(com.vaadin.ui.AbstractField field) {
+        init();
+
         this.field = field;
         this.useCustomField = true;
         initLayout();
+    }
+
+    protected void init() {
+        setPrimaryStyleName("cuba-pickerfield");
+        setSizeUndefined();
+
         setValidationVisible(false);
         setShowBufferedSourceException(false);
+        setShowErrorForDisabledState(false);
     }
 
     @Override
@@ -60,14 +66,11 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
     }
 
     protected void initLayout() {
-        container = new CubaHorizontalActionsLayout();
-        container.setWidth("100%");
+        container = new CubaCssActionsLayout();
+        container.setStyleName("cuba-pickerfield-layout");
 
         field.setWidth("100%");
         container.addComponent(field);
-        container.setExpandRatio(field, 1);
-
-        setPrimaryStyleName("cuba-pickerfield");
 
         if (App.isBound()) {
             ThemeConstants theme = App.getInstance().getThemeConstants();
@@ -76,12 +79,13 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
     }
 
     protected void initTextField() {
-        field = new CubaTextField();
-        ((CubaTextField) field).setReadOnlyFocusable(true);
+        CubaTextField field = new CubaTextField();
+        field.setStyleName("cuba-pickerfield-text");
+        field.setReadOnlyFocusable(true);
 
         field.setImmediate(true);
         field.setReadOnly(true);
-        ((TextField) field).setNullRepresentation("");
+        field.setNullRepresentation("");
         addValueChangeListener(new ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -90,6 +94,8 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
                 }
             }
         });
+
+        this.field = field;
     }
 
     public boolean isFieldReadOnly() {
@@ -121,9 +127,39 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
 
         suppressTextChangeListener = false;
 
-        // update text representaion manually
+        // update text representation manually
         if (field instanceof TextField) {
             updateTextRepresentation();
+        }
+    }
+
+    @Override
+    public void setWidth(float width, Unit unit) {
+        super.setWidth(width, unit);
+
+        if (container != null) {
+            if (width < 0) {
+                container.setWidthUndefined();
+                field.setWidthUndefined();
+            } else {
+                container.setWidth(100, Unit.PERCENTAGE);
+                field.setWidth(100, Unit.PERCENTAGE);
+            }
+        }
+    }
+
+    @Override
+    public void setHeight(float height, Unit unit) {
+        super.setHeight(height, unit);
+
+        if (container != null) {
+            if (height < 0) {
+                container.setHeightUndefined();
+                field.setHeightUndefined();
+            } else {
+                container.setHeight(100, Unit.PERCENTAGE);
+                field.setHeight(100, Unit.PERCENTAGE);
+            }
         }
     }
 
@@ -152,6 +188,7 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
 
     public void addButton(Button button, int index) {
         button.setTabIndex(-1);
+        button.setStyleName("cuba-pickerfield-button");
 
         buttons.add(index, button);
         container.addComponent(button, index + 1); // 0 - field
@@ -162,7 +199,7 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
         container.removeComponent(button);
     }
 
-    public AbstractField getField() {
+    public Field getField() {
         return field;
     }
 
@@ -179,7 +216,7 @@ public class CubaPickerField extends com.vaadin.ui.CustomField implements Action
 
                     suppressTextChangeListener = false;
 
-                    // update text representaion manually
+                    // update text representation manually
                     if (field instanceof TextField) {
                         updateTextRepresentation();
                     }

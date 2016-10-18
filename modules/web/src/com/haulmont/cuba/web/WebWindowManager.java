@@ -285,7 +285,7 @@ public class WebWindowManager extends WindowManager {
                 workArea.switchTo(AppWorkArea.State.WINDOW_CONTAINER);
 
                 if (workArea.getMode() == AppWorkArea.Mode.SINGLE) {
-                    VerticalLayout mainLayout = workArea.getSingleWindowContainer();
+                    Layout mainLayout = workArea.getSingleWindowContainer();
                     if (mainLayout.iterator().hasNext()) {
                         ComponentContainer oldLayout = (ComponentContainer) mainLayout.iterator().next();
                         WindowBreadCrumbs oldBreadCrumbs = tabs.get(oldLayout);
@@ -518,7 +518,7 @@ public class WebWindowManager extends WindowManager {
             tabs.put(layout, breadCrumbs);
             layout.addStyleName("cuba-app-single-window");
 
-            VerticalLayout mainLayout = workArea.getSingleWindowContainer();
+            Layout mainLayout = workArea.getSingleWindowContainer();
             mainLayout.removeAllComponents();
             mainLayout.addComponent(layout);
         }
@@ -875,7 +875,7 @@ public class WebWindowManager extends WindowManager {
                     tabSheet.silentCloseTabAndSelectPrevious(layout);
                     tabSheet.removeComponent(layout);
                 } else {
-                    VerticalLayout singleLayout = workArea.getSingleWindowContainer();
+                    Layout singleLayout = workArea.getSingleWindowContainer();
                     singleLayout.removeComponent(layout);
                 }
 
@@ -1384,10 +1384,10 @@ public class WebWindowManager extends WindowManager {
                     return;
                 }
 
-                if (AppWorkArea.Mode.TABBED == workArea.getMode()) {
+                if (workArea.getMode() == AppWorkArea.Mode.TABBED) {
                     final CubaTabSheet tabSheet = workArea.getTabbedWindowContainer();
                     if (tabSheet != null) {
-                        VerticalLayout layout = (VerticalLayout) tabSheet.getSelectedTab();
+                        Layout layout = (Layout) tabSheet.getSelectedTab();
                         if (layout != null) {
                             tabSheet.focus();
 

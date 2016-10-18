@@ -33,9 +33,6 @@ import java.util.*;
 import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
 import static com.haulmont.cuba.gui.ComponentsHelper.findActionById;
 
-/**
- * @author abramov
- */
 public class WebPickerField extends WebAbstractField<CubaPickerField>
         implements PickerField, Component.SecuredActionsHolder {
 
@@ -359,10 +356,6 @@ public class WebPickerField extends WebAbstractField<CubaPickerField>
     }
 
     protected class PickerButton extends WebButton {
-        protected PickerButton() {
-            component.setTabIndex(-1);
-        }
-
         @Override
         protected void beforeActionPerformed() {
             WebPickerField.this.requestFocus();
@@ -379,8 +372,7 @@ public class WebPickerField extends WebAbstractField<CubaPickerField>
     }
 
     public static class Picker extends CubaPickerField {
-
-        private PickerField owner;
+        protected PickerField owner;
 
         public Picker(PickerField owner) {
             this.owner = owner;
