@@ -3,13 +3,32 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
  */
 
-// Version: $Id$
-
 @mixin havana-datefield($primary-stylename : cuba-datefield) {
   @include base-datefield($primary-stylename);
 
+  .#{$primary-stylename}-composition {
+    display: inline-table;
+  }
+
+  div.#{$primary-stylename}-layout.v-csslayout {
+    display: table-row;
+
+    .cuba-maskedfield {
+      margin-left: 5px;
+      display: table-cell;
+    }
+
+    .#{$primary-stylename} {
+      display: table-cell;
+    }
+  }
+
   .#{$primary-stylename} {
     white-space: nowrap;
+
+    input {
+      height: 25px;
+    }
 
     input.#{$primary-stylename}-empty {
       color: #ccc;

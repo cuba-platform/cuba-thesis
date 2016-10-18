@@ -3,13 +3,28 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
  */
 
-// Version: $Id$
-
 @mixin halo-datefield($primary-stylename : cuba-datefield) {
   @include valo-datefield($primary-stylename);
 
   .#{$primary-stylename}-popup {
     @include valo-datefield-calendarpanel-style(#{$primary-stylename}-calendarpanel);
+  }
+
+  .#{$primary-stylename}-composition {
+    display: inline-table;
+  }
+
+  .#{$primary-stylename}-layout {
+    display: table-row;
+
+    .cuba-maskedfield {
+      margin-left: $v-layout-spacing-horizontal/2;
+      display: table-cell;
+    }
+
+    .#{$primary-stylename} {
+      display: table-cell;
+    }
   }
 
   .#{$primary-stylename} {
@@ -19,6 +34,7 @@
     [class*="textfield"] {
       padding-left: $padding-width;
       padding-right: $v-unit-size * 1.2;
+      height: $v-unit-size;
     }
 
     [class*="button"] {
