@@ -36,7 +36,6 @@ import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
 
 /**
  * @author gorodnov
- * @version $Id$
  */
 public class FieldGroupLoader extends AbstractFieldLoader {
     protected DynamicAttributes dynamicAttributes = AppBeans.get(DynamicAttributes.NAME);
@@ -59,6 +58,9 @@ public class FieldGroupLoader extends AbstractFieldLoader {
     protected void initComponent(final FieldGroup component, Element element, Component parent) {
         assignXmlDescriptor(component, element);
         loadId(component, element);
+
+        // required for border visible
+        loadBorder(component, element);
 
         assignFrame(component);
 
@@ -138,8 +140,6 @@ public class FieldGroupLoader extends AbstractFieldLoader {
 
         loadHeight(component, element);
         loadAlign(component, element);
-
-        loadBorder(component, element);
 
         loadCaptionAlignment(component, element);
 
