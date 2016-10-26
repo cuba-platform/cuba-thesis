@@ -78,6 +78,10 @@
       font-weight: bold;
       font-family: $cuba-havana-fonts;
     }
+
+    & > .v-spacing {
+      width: 2px;
+    }
   }
 
   .cuba-app-menubar {
@@ -164,5 +168,19 @@
   .cuba-splitpanel-dockable-right > div > div.v-splitpanel-second-container .cuba-app-tabbed-window.v-margin-left,
   .cuba-splitpanel-dockable-left > div > div.v-splitpanel-second-container .cuba-app-tabbed-window.v-margin-left {
     padding-left: 9px;
+  }
+
+  .cuba-app-window-wrap {
+    @include box-defaults;
+    padding: 5px 5px;
+  }
+
+  .cuba-app-window-wrap.cuba-breadcrumbs-visible {
+    padding-top: 25px;
+
+    .cuba-headline-container {
+      margin-top: -25px;
+      padding-top: 3px;
+    }
   }
 }

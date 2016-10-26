@@ -7,11 +7,13 @@
 
 // Application Window styles
 @mixin cuba-application-window {
-  .v-tabsheet.cuba-main-tabsheet {
-    padding-top: round($v-unit-size/6);
+   .v-tabsheet.cuba-main-tabsheet {
+     & > .v-tabsheet-tabcontainer {
+        padding-top: round($v-unit-size/6);
 
-    @include valo-tabsheet-framed-style();
-    @include valo-tabsheet-padded-tabbar-style();
+    }
+   @include valo-tabsheet-framed-style();
+   @include valo-tabsheet-padded-tabbar-style();
   }
 
   .v-tabsheet.cuba-main-tabsheet > .v-tabsheet-tabcontainer .v-tabsheet-caption-close {
@@ -84,13 +86,13 @@
     padding-left: 0;
     padding-right: 0;
 
-    .v-spacing {
-      width: $v-layout-spacing-horizontal/2;
+    & > .v-spacing {
+      width: ceil($v-layout-spacing-horizontal/2);
     }
   }
 
   .cuba-app-full-header .cuba-app-menubar {
-    padding-left: $v-layout-spacing-horizontal/2;
+    padding-left: ceil($v-layout-spacing-horizontal/2);
   }
 
   .cuba-app-work-area-single {
@@ -106,5 +108,18 @@
   .cuba-splitpanel-dockable-right > div > div.v-splitpanel-second-container .cuba-app-tabbed-window.v-margin-left,
   .cuba-splitpanel-dockable-left > div > div.v-splitpanel-second-container .cuba-app-tabbed-window.v-margin-left {
     padding-left: $cuba-splitpanel-dock-button-width + $cuba-splitpanel-splitter-width - first-number($v-border);
+  }
+
+  .cuba-app-window-wrap {
+    @include box-defaults;
+    padding: $v-layout-spacing-vertical $v-layout-spacing-horizontal;
+  }
+
+  .cuba-app-window-wrap.cuba-breadcrumbs-visible {
+    padding-top: $v-unit-size;
+
+    .cuba-headline-container {
+      margin-top: -1 * $v-unit-size;
+    }
   }
 }

@@ -165,4 +165,12 @@
   .cuba-table-view-textcut {
     @include valo-selection-overlay-style;
   }
+
+  .cuba-table-composition.has-top-panel {
+      padding-top: $v-unit-size + ceil($v-layout-spacing-vertical);
+
+      .cuba-table-top {
+        margin-top: -1 * ($v-unit-size + ceil($v-layout-spacing-vertical));
+      }
+  }
 }

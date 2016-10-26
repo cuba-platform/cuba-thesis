@@ -333,4 +333,12 @@
     padding: 3px;
     border: 1px solid $cuba-field-focused-border-color;
   }
+
+  .cuba-table-composition.has-top-panel {
+      padding-top: 31px;
+
+      .cuba-table-top {
+        margin-top: -31px;
+      }
+    }
 }

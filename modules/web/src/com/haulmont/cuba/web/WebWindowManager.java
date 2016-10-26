@@ -41,6 +41,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.*;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
 import org.apache.commons.lang.BooleanUtils;
@@ -450,8 +451,8 @@ public class WebWindowManager extends WindowManager {
 
     protected Layout createNewTabLayout(final Window window, final boolean multipleOpen, WindowBreadCrumbs breadCrumbs,
                                         Component... additionalComponents) {
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setStyleName("cuba-app-tabbed-window");
+        Layout layout = new CssLayout();
+        layout.setStyleName("cuba-app-window-wrap");
         layout.setSizeFull();
 
         layout.addComponent(breadCrumbs);
@@ -464,14 +465,13 @@ public class WebWindowManager extends WindowManager {
         final Component component = WebComponentsHelper.getComposition(window);
         component.setSizeFull();
         layout.addComponent(component);
-        layout.setExpandRatio(component, 1);
 
         WebAppWorkArea workArea = getConfiguredWorkArea();
 
         if (workArea.getMode() == AppWorkArea.Mode.TABBED) {
+            layout.addStyleName("cuba-app-tabbed-window");
             CubaTabSheet tabSheet = workArea.getTabbedWindowContainer();
 
-            layout.setMargin(true);
             TabSheet.Tab newTab;
             Integer hashCode = getWindowHashCode(window);
             ComponentContainer tab = null;
@@ -517,7 +517,6 @@ public class WebWindowManager extends WindowManager {
         } else {
             tabs.put(layout, breadCrumbs);
             layout.addStyleName("cuba-app-single-window");
-            layout.setMargin(true);
 
             VerticalLayout mainLayout = workArea.getSingleWindowContainer();
             mainLayout.removeAllComponents();
@@ -566,12 +565,12 @@ public class WebWindowManager extends WindowManager {
 
         WebAppWorkArea workArea = getConfiguredWorkArea();
 
-        VerticalLayout layout;
+        Layout layout;
         if (workArea.getMode() == AppWorkArea.Mode.TABBED) {
             TabSheet tabSheet = workArea.getTabbedWindowContainer();
-            layout = (VerticalLayout) tabSheet.getSelectedTab();
+            layout = (Layout) tabSheet.getSelectedTab();
         } else {
-            layout = (VerticalLayout) workArea.getSingleWindowContainer().getComponent(0);
+            layout = (Layout) workArea.getSingleWindowContainer().getComponent(0);
         }
 
         final WindowBreadCrumbs breadCrumbs = tabs.get(layout);
@@ -601,7 +600,6 @@ public class WebWindowManager extends WindowManager {
         final Component component = WebComponentsHelper.getComposition(window);
         component.setSizeFull();
         layout.addComponent(component);
-        layout.setExpandRatio(component, 1);
 
         breadCrumbs.addWindow(window);
 
@@ -896,7 +894,7 @@ public class WebWindowManager extends WindowManager {
                 break;
             }
             case THIS_TAB: {
-                final VerticalLayout layout = (VerticalLayout) openMode.getData();
+                final Layout layout = (Layout) openMode.getData();
 
                 final WindowBreadCrumbs breadCrumbs = tabs.get(layout);
                 if (breadCrumbs == null) {
@@ -917,7 +915,6 @@ public class WebWindowManager extends WindowManager {
                 layout.removeComponent(WebComponentsHelper.getComposition(window));
                 if (app.getConnection().isConnected()) {
                     layout.addComponent(component);
-                    layout.setExpandRatio(component, 1);
 
                     if (workArea.getMode() == AppWorkArea.Mode.TABBED) {
                         TabSheet tabSheet = workArea.getTabbedWindowContainer();
@@ -1328,7 +1325,6 @@ public class WebWindowManager extends WindowManager {
         // attach main window to UI
         Component windowLayout = windowImpl.getComposition();
         appWindow.addComponent(windowLayout, 0);
-        appWindow.setExpandRatio(windowLayout, 1);
 
         appWindow.setMainWindow((Window.MainWindow) mainWindow);
 

@@ -65,8 +65,15 @@
   }
 
   .cuba-headline-container {
+    display: block;
+
     .v-button:hover {
       background: transparent;
     }
+  }
+
+  .cuba-breadcrumbs-separator,
+  .cuba-breadcrumbs-win-caption {
+    vertical-align: bottom;
   }
 }

@@ -35,7 +35,6 @@ import com.haulmont.cuba.security.entity.Presentation;
 import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.AppUI;
 import com.haulmont.cuba.web.WebConfig;
-import com.haulmont.cuba.web.gui.CompositionLayout;
 import com.haulmont.cuba.web.gui.components.presentations.TablePresentations;
 import com.haulmont.cuba.web.gui.data.CollectionDsWrapper;
 import com.haulmont.cuba.web.gui.data.ItemWrapper;
@@ -71,6 +70,8 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         extends WebAbstractList<T>
         implements Table {
 
+    private static final String HAS_TOP_PANEL_STYLENAME = "has-top-panel";
+
     protected Map<Object, Column> columns = new HashMap<>();
     protected List<Table.Column> columnsOrder = new ArrayList<>();
 
@@ -89,7 +90,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
 
     protected Map<Entity, Datasource> fieldDatasources; // lazily initialized WeakHashMap;
 
-    protected CompositionLayout componentComposition;
+    protected CssLayout componentComposition;
 
     protected HorizontalLayout topPanel;
 
@@ -397,7 +398,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         this.rowsCount = rowsCount;
         if (rowsCount != null) {
             if (topPanel == null) {
-                topPanel = new HorizontalLayout();
+                topPanel = createTopPanel();
                 topPanel.setWidth("100%");
                 componentComposition.addComponentAsFirst(topPanel);
             }
@@ -405,6 +406,39 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             topPanel.addComponent(rc);
             topPanel.setExpandRatio(rc, 1);
             topPanel.setComponentAlignment(rc, com.vaadin.ui.Alignment.BOTTOM_RIGHT);
+
+            if (rowsCount instanceof VisibilityChangeNotifier) {
+                ((VisibilityChangeNotifier) rowsCount).addVisibilityChangeListener(
+                        new VisibilityChangeNotifier.VisibilityChangeListener() {
+
+                            @Override
+                            public void componentVisibilityChanged(VisibilityChangeNotifier.VisibilityChangeEvent event) {
+                                updateCompositionStylesTopPanelVisible();
+                            }
+                        }
+                );
+            }
+        }
+
+        updateCompositionStylesTopPanelVisible();
+    }
+
+    // if buttons panel becomes hidden we need to set top panel height to 0
+    protected void updateCompositionStylesTopPanelVisible() {
+        if (topPanel != null) {
+            boolean topPanelVisible = topPanel.getComponentCount() > 0;
+            for (Component childComponent : topPanel) {
+                if (!childComponent.isVisible()) {
+                    topPanelVisible = false;
+                    break;
+                }
+            }
+
+            if (!topPanelVisible) {
+                componentComposition.removeStyleName(HAS_TOP_PANEL_STYLENAME);
+            } else {
+                componentComposition.addStyleName(HAS_TOP_PANEL_STYLENAME);
+            }
         }
     }
 
@@ -562,15 +596,14 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
 
         setEditable(false);
 
-        componentComposition = new CompositionLayout(component);
-        componentComposition.setSpacing(true);
-        componentComposition.setMargin(false);
-        componentComposition.setWidth("-1px");
+        componentComposition = new CssLayout();
+        componentComposition.setStyleName("cuba-table-composition");
+        componentComposition.addComponent(component);
+        componentComposition.setWidthUndefined();
 
         // todo artamonov adjust component size relative to composition size
 
         component.setSizeFull();
-        componentComposition.setExpandRatio(component, 1);
 
         component.setCellStyleGenerator(createStyleGenerator());
     }
@@ -1376,13 +1409,33 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             }
 
             if (topPanel == null) {
-                topPanel = new HorizontalLayout();
+                topPanel = createTopPanel();
                 topPanel.setWidth("100%");
                 componentComposition.addComponentAsFirst(topPanel);
             }
             topPanel.addComponent(WebComponentsHelper.unwrap(panel));
+            if (panel instanceof VisibilityChangeNotifier) {
+                ((VisibilityChangeNotifier) panel).addVisibilityChangeListener(
+                        new VisibilityChangeNotifier.VisibilityChangeListener() {
+
+                            @Override
+                            public void componentVisibilityChanged(VisibilityChangeNotifier.VisibilityChangeEvent event) {
+                                updateCompositionStylesTopPanelVisible();
+                            }
+                        }
+
+                );
+            }
             panel.setParent(this);
         }
+
+        updateCompositionStylesTopPanelVisible();
+    }
+
+    protected HorizontalLayout createTopPanel() {
+        HorizontalLayout topPanel = new HorizontalLayout();
+        topPanel.setStyleName("cuba-table-top");
+        return topPanel;
     }
 
     @Override
@@ -1924,7 +1977,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
     }
 
     protected static class AbbreviatedColumnGenerator implements SystemTableColumnGenerator,
-                                                                 CubaEnhancedTable.PlainTextGeneratedColumn {
+            CubaEnhancedTable.PlainTextGeneratedColumn {
 
         protected Table.Column column;
 
@@ -2398,7 +2451,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
             if (propertyId != null && itemId != null
                     && !component.isColumnEditable(propertyId)
                     && (component.getColumnGenerator(propertyId) == null
-                        || component.getColumnGenerator(propertyId) instanceof AbbreviatedColumnGenerator)) {
+                    || component.getColumnGenerator(propertyId) instanceof AbbreviatedColumnGenerator)) {
 
                 MetaPropertyPath propertyPath = datasource.getMetaClass().getPropertyPath(propertyId.toString());
                 Column column = getColumn(propertyId.toString());

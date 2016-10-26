@@ -9,19 +9,18 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ListComponent;
 import com.haulmont.cuba.gui.components.RowsCount;
+import com.haulmont.cuba.gui.components.VisibilityChangeNotifier;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.web.toolkit.ui.CubaRowsCount;
 import com.vaadin.ui.Button;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author krivopustov
- * @version $Id$
- */
-public class WebRowsCount extends WebAbstractComponent<CubaRowsCount> implements RowsCount {
+public class WebRowsCount extends WebAbstractComponent<CubaRowsCount> implements RowsCount, VisibilityChangeNotifier {
 
     protected CollectionDatasource datasource;
     protected boolean refreshing;
@@ -29,6 +28,8 @@ public class WebRowsCount extends WebAbstractComponent<CubaRowsCount> implements
     protected int start;
     protected int size;
     protected ListComponent owner;
+
+    protected List<VisibilityChangeListener> visibilityChangeListeners;
 
     public WebRowsCount() {
         component = new CubaRowsCount();
@@ -228,6 +229,36 @@ public class WebRowsCount extends WebAbstractComponent<CubaRowsCount> implements
         if (component.getCountButton().isVisible() && !refreshing) {
             component.getCountButton().setCaption(messages.getMainMessage("table.rowsCount.msg3"));
             component.getCountButton().removeStyleName("cuba-paging-count-number");
+        }
+    }
+
+    @Override
+    public void addVisibilityChangeListener(VisibilityChangeListener listener) {
+        if (visibilityChangeListeners == null) {
+            visibilityChangeListeners = new LinkedList<>();
+        }
+
+        if (!visibilityChangeListeners.contains(listener)) {
+            visibilityChangeListeners.add(listener);
+        }
+    }
+
+    @Override
+    public void removeVisibilityChangeListener(VisibilityChangeListener listener) {
+        if (!visibilityChangeListeners.contains(listener)) {
+            visibilityChangeListeners.remove(listener);
+        }
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+
+        if (visibilityChangeListeners != null) {
+            VisibilityChangeEvent event = new VisibilityChangeEvent(this, visible);
+            for (VisibilityChangeListener listener : new ArrayList<>(visibilityChangeListeners)) {
+                listener.componentVisibilityChanged(event);
+            }
         }
     }
 }

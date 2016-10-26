@@ -29,6 +29,13 @@
   }
 
   .cuba-headline-container {
-    margin-bottom: $v-layout-margin-bottom/2;
+    height: $v-unit-size;
+    padding-top: ceil(($v-unit-size - $v-font-size * $v-line-height) / 2);
+    display: block;
+  }
+
+  .cuba-breadcrumbs-separator,
+  .cuba-breadcrumbs-win-caption {
+    vertical-align: bottom;
   }
 }
