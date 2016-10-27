@@ -8,6 +8,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
+import com.haulmont.cuba.gui.components.IFrame.MessageType;
 import com.haulmont.cuba.gui.export.ExcelExporter;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.theme.ThemeConstantsManager;
@@ -18,9 +19,6 @@ import static com.haulmont.cuba.gui.export.ExcelExporter.ExportMode;
  * Standard table action to export the list of entities to XLS.
  * <p>
  * Action's behaviour can be customized by providing arguments to constructor or setting properties.
- *
- * @author krivopustov
- * @version $Id$
  */
 public class ExcelAction extends BaseAction {
 
@@ -70,36 +68,35 @@ public class ExcelAction extends BaseAction {
      */
     @Override
     public void actionPerform(Component component) {
-        if (table.getSelected().size() > 0) {
+        if (table.getSelected().isEmpty() || table.getDatasource().size() <= 1) {
+            export(ExportMode.ALL_ROWS);
+        } else {
             String title = messages.getMainMessage("actions.exportSelectedTitle");
             String caption = messages.getMainMessage("actions.exportSelectedCaption");
-            Action[] actions = new Action[] {
-                    new AbstractAction("actions.export.SELECTED_ROWS", Status.PRIMARY) {
-                        {
-                            setCaption(messages.getMainMessage(getId()));
-                        }
 
-                        @Override
-                        public void actionPerform(Component component) {
-                            export(ExportMode.SELECTED_ROWS);
-                        }
-                    },
-                    new AbstractAction("actions.export.ALL_ROWS") {
-                        {
-                            setCaption(messages.getMainMessage(getId()));
-                        }
+            AbstractAction exportSelectedAction = new AbstractAction("actions.export.SELECTED_ROWS", Status.PRIMARY) {
+                @Override
+                public void actionPerform(Component component) {
+                    export(ExportMode.SELECTED_ROWS);
+                }
+            };
+            exportSelectedAction.setCaption(messages.getMainMessage(exportSelectedAction.getId()));
 
-                        @Override
-                        public void actionPerform(Component component) {
-                            export(ExportMode.ALL_ROWS);
-                        }
-                    },
+            AbstractAction exportAllAction = new AbstractAction("actions.export.ALL_ROWS") {
+                @Override
+                public void actionPerform(Component component) {
+                    export(ExportMode.ALL_ROWS);
+                }
+            };
+            exportAllAction.setCaption(messages.getMainMessage(exportAllAction.getId()));
+
+            Action[] actions = new Action[]{
+                    exportSelectedAction,
+                    exportAllAction,
                     new DialogAction(Type.CANCEL)
             };
             IFrame frame = table.getFrame();
-            frame.showOptionDialog(title, caption, IFrame.MessageType.CONFIRMATION, actions);
-        } else {
-            export(ExportMode.ALL_ROWS);
+            frame.showOptionDialog(title, caption, MessageType.CONFIRMATION, actions);
         }
     }
 
