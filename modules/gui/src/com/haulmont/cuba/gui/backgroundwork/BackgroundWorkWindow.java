@@ -5,7 +5,7 @@
 
 package com.haulmont.cuba.gui.backgroundwork;
 
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.AbstractWindow;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Label;
@@ -34,9 +34,6 @@ import java.util.Map;
  * <li>Shows Warning message if for background task specified owner window</li>
  * </ul>
  * <p/>
- *
- * @author budarov
- * @version $Id$
  */
 public class BackgroundWorkWindow<T, V> extends AbstractWindow {
 
@@ -78,7 +75,7 @@ public class BackgroundWorkWindow<T, V> extends AbstractWindow {
         params.put("message", message);
         params.put("cancelAllowed", cancelAllowed);
 
-        task.getOwnerFrame().openWindow("backgroundWorkWindow", WindowManager.OpenType.DIALOG, params);
+        task.getOwnerFrame().openWindow("backgroundWorkWindow", OpenType.DIALOG, params);
     }
 
     /**
@@ -148,13 +145,14 @@ public class BackgroundWorkWindow<T, V> extends AbstractWindow {
     }
 
     public void cancel() {
-        if (!taskHandler.cancel()) {
-            close(Window.CLOSE_ACTION_ID);
-        }
+        close(Window.CLOSE_ACTION_ID);
     }
 
     @Override
-    protected boolean preClose(String actionId) {
-        return cancelAllowed;
+    public boolean close(String actionId) {
+        if (taskHandler.cancel()) {
+            return super.close(actionId);
+        }
+        return false;
     }
 }

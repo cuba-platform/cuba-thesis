@@ -663,7 +663,9 @@ public class WebWindowManager extends WindowManager {
         actions.put(exitAction, new Runnable() {
             @Override
             public void run() {
-                window.close(Window.CLOSE_ACTION_ID);
+                if (vWindow.isClosable()) {
+                    window.close(Window.CLOSE_ACTION_ID);
+                }
             }
         });
 

@@ -297,7 +297,7 @@ public class DesktopWindowManager extends WindowManager {
         }
 
         if (addWindowData) {
-            addWindowData(window, windowData, openType);
+            addWindowData(window, windowData, openType, getDialogParams());
         }
         afterShowWindow(window);
     }
@@ -438,17 +438,21 @@ public class DesktopWindowManager extends WindowManager {
         return DesktopComponentsHelper.getComposition(window);
     }
 
-    protected void addShortcuts(final Window window) {
+    protected void addShortcuts(final Window window, final OpenType openType, DialogParams dialogParams) {
         Configuration configuration = AppBeans.get(Configuration.NAME);
+
         ClientConfig clientConfig = configuration.getConfig(ClientConfig.class);
 
-        String closeShortcut = clientConfig.getCloseShortcut();
-        window.addAction(new com.haulmont.cuba.gui.components.AbstractAction("closeWindowShortcutAction", closeShortcut) {
-            @Override
-            public void actionPerform(Component component) {
-                window.close("close");
-            }
-        });
+        if (openType != OpenType.DIALOG
+                || BooleanUtils.isNotFalse(dialogParams.getCloseable())) {
+            String closeShortcut = clientConfig.getCloseShortcut();
+            window.addAction(new com.haulmont.cuba.gui.components.AbstractAction("closeWindowShortcutAction", closeShortcut) {
+                @Override
+                public void actionPerform(Component component) {
+                    window.close("close");
+                }
+            });
+        }
 
         String previousTabShortcut = clientConfig.getPreviousTabShortcut();
         window.addAction(new com.haulmont.cuba.gui.components.AbstractAction("onPreviousTab", previousTabShortcut) {
@@ -544,7 +548,7 @@ public class DesktopWindowManager extends WindowManager {
             dialog.addWindowListener(new ValidationAwareWindowClosingListener() {
                 @Override
                 public void windowClosingAfterValidation(WindowEvent e) {
-                    if (window.close("close", false)) {
+                    if (window.close("close")) {
                         dialog.dispose();
                     }
                 }
@@ -1664,7 +1668,7 @@ public class DesktopWindowManager extends WindowManager {
         }
     }
 
-    public void addWindowData(Window window, Object windowData, OpenType openType) {
+    public void addWindowData(Window window, Object windowData, OpenType openType, DialogParams dialogParams) {
         WindowOpenMode openMode = new WindowOpenMode(window, openType);
         openMode.setData(windowData);
         if (window instanceof Window.Wrapper) {
@@ -1674,7 +1678,7 @@ public class DesktopWindowManager extends WindowManager {
             windowOpenMode.put(window, openMode);
         }
 
-        addShortcuts(window);
+        addShortcuts(window, openType, dialogParams);
     }
 
     public void checkModificationsAndCloseAll(final Runnable runIfOk, final @Nullable Runnable runIfCancel) {
