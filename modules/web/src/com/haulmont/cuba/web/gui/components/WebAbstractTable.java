@@ -72,6 +72,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
 
     private static final String HAS_TOP_PANEL_STYLENAME = "has-top-panel";
 
+    // Style names used by table itself
+    protected List<String> internalStyles = new ArrayList<>();
+
     protected Map<Object, Column> columns = new HashMap<>();
     protected List<Table.Column> columnsOrder = new ArrayList<>();
 
@@ -436,8 +439,14 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
 
             if (!topPanelVisible) {
                 componentComposition.removeStyleName(HAS_TOP_PANEL_STYLENAME);
+
+                internalStyles.remove(HAS_TOP_PANEL_STYLENAME);
             } else {
                 componentComposition.addStyleName(HAS_TOP_PANEL_STYLENAME);
+
+                if (!internalStyles.contains(HAS_TOP_PANEL_STYLENAME)) {
+                    internalStyles.add(HAS_TOP_PANEL_STYLENAME);
+                }
             }
         }
     }
@@ -597,9 +606,12 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         setEditable(false);
 
         componentComposition = new CssLayout();
-        componentComposition.setStyleName("cuba-table-composition");
+        componentComposition.addStyleName("cuba-table-composition");
         componentComposition.addComponent(component);
         componentComposition.setWidthUndefined();
+
+        // default added style
+        internalStyles.add("cuba-table-composition");
 
         // todo artamonov adjust component size relative to composition size
 
@@ -1097,6 +1109,15 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         }
 
         tableValidators.add(validator);
+    }
+
+    @Override
+    public void setStyleName(String name) {
+        super.setStyleName(name);
+
+        for (String internalStyle : internalStyles) {
+            componentComposition.addStyleName(internalStyle);
+        }
     }
 
     public void validate() throws ValidationException {
