@@ -14,6 +14,8 @@
     border: none;
     background: transparent none;
     box-shadow: none;
+    padding: 0 ceil($v-layout-spacing-horizontal/2);
+    height: auto;
 
     .v-button-wrap {
       background: transparent none;
@@ -37,5 +39,9 @@
   .cuba-breadcrumbs-separator,
   .cuba-breadcrumbs-win-caption {
     vertical-align: bottom;
+  }
+
+  .c-breadcrumbs-container {
+    margin-right: ceil($v-layout-spacing-horizontal/2);
   }
 }

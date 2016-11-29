@@ -22,6 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 
 public class WindowBreadCrumbs extends CssLayout {
+    protected static final String BREADCRUMBS_VISIBLE_WRAP_STYLE = "cuba-breadcrumbs-visible";
+
     protected boolean visibleExplicitly = true;
 
     public interface Listener {
@@ -38,7 +40,7 @@ public class WindowBreadCrumbs extends CssLayout {
 
     protected Map<Button, Window> btn2win = new HashMap<>();
 
-    protected Set<Listener> listeners = new HashSet<>();
+    protected List<Listener> listeners = new ArrayList<>();
 
     public WindowBreadCrumbs(WebAppWorkArea workArea) {
         setWidth(100, Unit.PERCENTAGE);
@@ -50,6 +52,13 @@ public class WindowBreadCrumbs extends CssLayout {
         if (tabbedMode) {
             super.setVisible(false);
         }
+
+        addAttachListener(new AttachListener() {
+            @Override
+            public void attach(AttachEvent event) {
+                adjustParentStyles();
+            }
+        });
 
         logoLayout = createLogoLayout();
 
@@ -123,11 +132,7 @@ public class WindowBreadCrumbs extends CssLayout {
             super.setVisible(visibleExplicitly);
 
         if (getParent() != null) {
-            if (isVisible()) {
-                getParent().addStyleName("cuba-breadcrumbs-visible");
-            } else {
-                getParent().removeStyleName("cuba-breadcrumbs-visible");
-            }
+            adjustParentStyles();
         }
     }
 
@@ -140,11 +145,7 @@ public class WindowBreadCrumbs extends CssLayout {
             super.setVisible(false);
 
         if (getParent() != null) {
-            if (isVisible()) {
-                getParent().addStyleName("cuba-breadcrumbs-visible");
-            } else {
-                getParent().removeStyleName("cuba-breadcrumbs-visible");
-            }
+            adjustParentStyles();
         }
     }
 
@@ -155,16 +156,22 @@ public class WindowBreadCrumbs extends CssLayout {
         super.setVisible(isVisible() && visibleExplicitly);
 
         if (getParent() != null) {
-            if (isVisible()) {
-                getParent().addStyleName("cuba-breadcrumbs-visible");
-            } else {
-                getParent().removeStyleName("cuba-breadcrumbs-visible");
-            }
+            adjustParentStyles();
+        }
+    }
+
+    protected void adjustParentStyles() {
+        if (isVisible()) {
+            getParent().addStyleName(BREADCRUMBS_VISIBLE_WRAP_STYLE);
+        } else {
+            getParent().removeStyleName(BREADCRUMBS_VISIBLE_WRAP_STYLE);
         }
     }
 
     public void addListener(Listener listener) {
-        listeners.add(listener);
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
 
     public void removeListener(Listener listener) {
@@ -175,7 +182,7 @@ public class WindowBreadCrumbs extends CssLayout {
         listeners.clear();
     }
 
-    private void fireListeners(Window window) {
+    protected void fireListeners(Window window) {
         for (Listener listener : listeners) {
             listener.windowClick(window);
         }
