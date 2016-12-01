@@ -80,7 +80,6 @@ public class CubaTextFieldWidget extends VTextField implements ShortcutActionHan
         if (!readOnlyFocusable) {
             super.setReadOnly(readOnly);
         } else {
-            setTabIndex(0);
             getElement().setPropertyBoolean("readOnly", readOnly);
             String readOnlyStyle = "readonly";
             if (readOnly) {
@@ -99,6 +98,9 @@ public class CubaTextFieldWidget extends VTextField implements ShortcutActionHan
 
     public void setReadOnlyFocusable(boolean readOnlyFocusable) {
         this.readOnlyFocusable = readOnlyFocusable;
+        if (readOnlyFocusable && getTabIndex() == -1) {
+            setTabIndex(0);
+        }
     }
 
     @Override
