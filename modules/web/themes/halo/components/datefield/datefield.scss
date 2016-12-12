@@ -10,20 +10,25 @@
     @include valo-datefield-calendarpanel-style(#{$primary-stylename}-calendarpanel);
   }
 
-  .#{$primary-stylename}-composition {
-    display: inline-table;
-  }
-
   .#{$primary-stylename}-layout {
-    display: table-row;
+    white-space: nowrap;
+    outline: none;
 
     .cuba-maskedfield {
       margin-left: $v-layout-spacing-horizontal/2;
-      display: table-cell;
     }
+  }
 
-    .#{$primary-stylename} {
-      display: table-cell;
+  .#{$primary-stylename}-composition.v-has-width {
+    display: inline-table;
+
+    .#{$primary-stylename}-layout {
+      display: table-row;
+
+      .#{$primary-stylename},
+      .cuba-maskedfield {
+        display: table-cell;
+      }
     }
   }
 

@@ -9,6 +9,7 @@
   }
 
   .#{$primary-stylename}-layout {
+    outline: none;
     display: table-row;
 
     .v-textfield.v-textfield-readonly {
