@@ -130,8 +130,7 @@
     border-bottom-right-radius: $v-textfield-border-radius;
   }
 
-  .#{$primary-stylename}-layout > .v-filterselect,
-  .v-textfield.#{$primary-stylename}-text {
+  .#{$primary-stylename}-layout > * {
     display: table-cell;
   }
 
