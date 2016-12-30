@@ -25,7 +25,6 @@ import com.vaadin.data.Item;
 import com.vaadin.server.Resource;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class WebTreeTable extends WebAbstractTable<CubaTreeTable> implements TreeTable {
 
@@ -150,9 +149,14 @@ public class WebTreeTable extends WebAbstractTable<CubaTreeTable> implements Tre
     }
 
     protected List<Object> toContainerPreOrder(Tree<Object> itemIdsTree) {
-        return itemIdsTree.toList().stream()
-                .map(objectNode -> objectNode.data)
-                .collect(Collectors.toList());
+        List<Node<Object>> nodes = itemIdsTree.toList();
+
+        List<Object> nodesData = new ArrayList<>();
+        for (Node<Object> node : nodes) {
+            nodesData.add(node.data);
+        }
+
+        return nodesData;
     }
 
     protected List<Object> getCollapsedItemIds() {
@@ -162,9 +166,15 @@ public class WebTreeTable extends WebAbstractTable<CubaTreeTable> implements Tre
 
         @SuppressWarnings("unchecked")
         Collection<Object> itemIds = getDatasource().getItemIds();
-        return itemIds.stream()
-                .filter(itemId -> component.isCollapsed(itemId))
-                .collect(Collectors.toList());
+
+        List<Object> collapsed = new ArrayList<>();
+        for (Object itemId : itemIds) {
+            if (component.isCollapsed(itemId)) {
+                collapsed.add(itemId);
+            }
+        }
+
+        return collapsed;
     }
 
     @Override
