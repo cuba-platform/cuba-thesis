@@ -21,9 +21,6 @@ import java.util.*;
 
 /**
  * Component for 'In list' filter condition
- *
- * @author krivopustov
- * @version $Id$
  */
 public class InListParamComponent {
 
@@ -105,7 +102,7 @@ public class InListParamComponent {
         composition.add(clearButton);
         composition.expand(field);
 
-        composition.setStyleName("cuba-pickerfield");
+        composition.setStyleName("cuba-listeditor");
     }
 
     public InListParamComponent(CollectionDatasource collectionDatasource) {

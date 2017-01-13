@@ -1,0 +1,156 @@
+/*
+ * Copyright (c) 2008-2014 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ */
+
+@mixin halo-cuba-listeditor($primary-stylename: cuba-listeditor) {
+  .#{$primary-stylename} {
+    .v-textfield.v-textfield-readonly {
+      @if $v-textfield-background-color {
+        background: $v-textfield-background-color;
+      }
+
+      color: valo-font-color($v-textfield-background-color);
+      @include box-shadow(valo-bevel-and-shadow(
+              $bevel: $v-textfield-bevel,
+              $shadow: $v-textfield-shadow,
+              $background-color:
+              $v-textfield-background-color, $gradient: none));
+      &:focus {
+        @include valo-textfield-focus-style;
+      }
+
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .cuba-searchselect,
+    .v-filterselect {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .v-button {
+      display: block !important;
+      text-align: center !important;
+      padding: 0;
+      min-width: $v-unit-size;
+      height: $v-unit-size;
+
+      border: valo-border($v-textfield-border,
+                          darkest-color($v-textfield-background-color, $v-app-background-color));
+
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+
+      color: mix($v-textfield-background-color, valo-font-color($v-textfield-background-color));
+      background: $v-textfield-background-color;
+      @include box-shadow(valo-bevel-and-shadow(
+              $bevel: $v-textfield-bevel,
+              $shadow: $v-textfield-shadow,
+              $background-color:
+              $v-textfield-background-color, $gradient: none));
+
+      .v-ie8 & {
+        background-color: $v-textfield-background-color;
+      }
+
+      @if $v-hover-styles-enabled and type-of($v-textfield-background-color) == color {
+        &:hover {
+          color: valo-font-color($v-textfield-background-color);
+        }
+      }
+
+      &:after,
+      &:hover:after {
+        background: transparent;
+      }
+
+      &:focus:after {
+        border-color: transparent;
+
+        @include box-shadow(none);
+      }
+
+      &:active:after {
+        @if type-of($v-textfield-background-color) == color {
+          @include valo-button-active-style($v-textfield-background-color);
+        }
+      }
+
+      .v-button-wrap {
+        .v-button-caption {
+          display: none;
+        }
+      }
+    }
+
+    .v-slot:last-child .v-button {
+      border-top-right-radius: $v-border-radius;
+      border-bottom-right-radius: $v-border-radius;
+
+      &:focus {
+        border-top-right-radius: $v-border-radius;
+        border-bottom-right-radius: $v-border-radius;
+      }
+    }
+
+    .v-slot:last-child .v-textfield {
+      &:focus {
+        border-right-color: $v-focus-color;
+      }
+
+      border-top-right-radius: $v-textfield-border-radius;
+      border-bottom-right-radius: $v-textfield-border-radius;
+    }
+
+    .v-slot:last-child .cuba-searchselect,
+    .v-slot:last-child .v-filterselect {
+      &:focus {
+        border-right-color: $v-focus-color;
+      }
+
+      border-top-right-radius: $v-textfield-border-radius;
+      border-bottom-right-radius: $v-textfield-border-radius;
+    }
+  }
+
+  .#{$primary-stylename}-error {
+    .v-textfield.v-textfield-readonly {
+      @include valo-textfield-error-style;
+    }
+
+    .v-filterselect {
+      .v-filterselect-input {
+        @include valo-textfield-error-style;
+      }
+
+      .v-filterselect-button {
+        color: $v-error-indicator-color;
+        border-color: $v-error-indicator-color;
+      }
+    }
+
+    .cuba-searchselect {
+      .cuba-searchselect-input {
+        @include valo-textfield-error-style;
+      }
+    }
+  }
+
+  .#{$primary-stylename}.v-readonly {
+    .v-textfield.v-textfield-readonly {
+      @include valo-textfield-readonly-style;
+    }
+  }
+
+  .#{$primary-stylename}.v-disabled {
+    .v-button:hover {
+      color: mix($v-textfield-background-color, valo-font-color($v-textfield-background-color));
+    }
+  }
+}

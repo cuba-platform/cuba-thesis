@@ -1,0 +1,90 @@
+/*
+ * Copyright (c) 2008-2014 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ */
+
+@mixin havana-cuba-listeditor($primary-stylename: cuba-listeditor) {
+  .#{$primary-stylename} {
+    .v-textfield {
+      height: 25px;
+      padding-top: 0;
+      padding-bottom: 0;
+      font-size: 11px;
+    }
+
+    .v-textfield.v-readonly,
+    .v-filterselect {
+      background-color: #fff;
+    }
+
+    .v-button {
+      padding: 0;
+      display: block !important;
+      text-align: center !important;
+      border: 1px solid $cuba-field-border-color;
+      background: #fff;
+      border-left: 0;
+      height: 25px;
+      line-height: 18px;
+      min-width: 24px;
+
+      .v-button-wrap {
+        display: inline-block;
+        line-height: 23px;
+        margin: 0;
+
+        img {
+          margin: 0;
+          border-top: 0;
+          border-bottom: 3px transparent solid;
+        }
+
+        .v-button-caption {
+          display: none;
+        }
+      }
+    }
+
+    .v-disabled.v-button:focus {
+      border: 1px solid $cuba-field-border-color;
+      border-left: 0;
+    }
+
+    .v-disabled.v-button {
+      opacity: 1;
+    }
+
+    .v-disabled.v-button .v-button-wrap {
+      opacity: 0.3;
+    }
+
+    .v-readonly.v-textfield.v-textfield-focus,
+    .v-textfield-readonly.v-textfield-focus,
+    .v-textfield-focus {
+      border-color: $cuba-field-focused-border-color;
+    }
+
+    .v-readonly.v-textfield,
+    .v-textfield-readonly {
+      border: 1px solid $cuba-field-border-color;
+      overflow: hidden;
+    }
+  }
+
+  .#{$primary-stylename}.v-readonly {
+    background-color: transparent;
+
+    .v-button {
+      border: 1px solid $cuba-field-readonly-border-color;
+      border-left: 0;
+    }
+
+    .v-textfield,
+    .v-readonly.v-textfield.v-textfield-focus,
+    .v-textfield-readonly.v-textfield-focus,
+    .v-textfield-focus {
+      border: 1px solid $cuba-field-readonly-border-color;
+      overflow: hidden;
+    }
+  }
+}

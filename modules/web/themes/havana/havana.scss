@@ -44,6 +44,7 @@
 @import "components/fileupload/fileupload";
 @import "components/widgetstree/widgetstree";
 @import "components/pickerfield/pickerfield";
+@import "components/listeditor/listeditor";
 @import "components/maskedfield/maskedfield";
 @import "components/multiupload/multiupload";
 @import "components/optiongroup/optiongroup";
@@ -123,6 +124,7 @@
   @include havana-cuba-grouptable;
   @include havana-cuba-fileupload;
   @include havana-cuba-pickerfield;
+  @include havana-cuba-listeditor;
   @include havana-cuba-multiupload;
   @include havana-cuba-widgetstree;
   @include havana-cuba-maskedfield;
