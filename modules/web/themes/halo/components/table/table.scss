@@ -170,6 +170,7 @@
       padding-top: $v-unit-size + ceil($v-layout-spacing-vertical);
 
       .cuba-table-top {
+        height: $v-unit-size;
         margin-top: -1 * ($v-unit-size + ceil($v-layout-spacing-vertical));
       }
   }
