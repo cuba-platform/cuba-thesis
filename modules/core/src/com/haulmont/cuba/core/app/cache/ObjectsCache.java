@@ -61,6 +61,10 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
         cacheSet = new CacheSet(Collections.emptyList());
     }
 
+    protected CacheSet createCacheSet(Collection<Object> items) {
+        return new CacheSet(items);
+    }
+
     @Override
     public String getName() {
         return name;
@@ -242,11 +246,8 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
                 try {
                     cacheLock.readLock().lock();
 
-                    temporaryCacheSet = (CacheSet) cacheSet.clone();
-                } catch (CloneNotSupportedException e) {
-                    log.error(String.format("Update data for cache %s failed", name), e);
-                    this.cacheSet = new CacheSet(Collections.emptyList());
-                    return;
+                    temporaryCacheSet = createCacheSet(new ArrayList<>(cacheSet.getItems()));
+                    temporaryCacheSet.setForUpdate(true);
                 } finally {
                     cacheLock.readLock().unlock();
                 }
@@ -262,6 +263,7 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
                 cacheLock.writeLock().lock();
 
                 try {
+                    temporaryCacheSet.setForUpdate(false);
                     // Modify cache set
                     this.cacheSet = temporaryCacheSet;
                     sendCacheUpdateMessage(cacheSet.getRemovedItems(),
