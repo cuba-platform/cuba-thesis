@@ -66,6 +66,9 @@ public class WebSearchField extends WebLookupField implements SearchField {
         getSearchComponent().setFilterHandler(new CubaSearchSelect.FilterHandler() {
             @Override
             public void onFilterChange(String newFilter) {
+                if (optionsDatasource == null)
+                    return;
+
                 String originalFilter = newFilter;
                 if (mode == Mode.LOWER_CASE) {
                     newFilter = StringUtils.lowerCase(newFilter);
