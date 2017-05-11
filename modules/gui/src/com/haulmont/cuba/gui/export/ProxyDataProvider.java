@@ -5,22 +5,26 @@
 
 package com.haulmont.cuba.gui.export;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * @author artamonov
- * @version $Id$
  */
 public class ProxyDataProvider implements ExportDataProvider {
 
     private boolean closed = false;
 
-    private InputStream dataInputStream = null;
     private ExportDataProvider dataProvider = null;
 
     public ProxyDataProvider(ExportDataProvider dataProvider) throws ClosedDataProviderException {
         this.dataProvider = dataProvider;
-        this.dataInputStream = dataProvider.provide();
+        InputStream dataInputStream = dataProvider.provide();
+        try {
+            dataInputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -28,7 +32,7 @@ public class ProxyDataProvider implements ExportDataProvider {
         if (closed)
             throw new ClosedDataProviderException();
 
-        return dataInputStream;
+        return dataProvider.provide();
     }
 
     @Override
