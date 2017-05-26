@@ -197,10 +197,12 @@ public class CubaApplicationServlet extends VaadinServlet {
         log.debug("Redirect to application " + httpSessionId);
 
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if ("JSESSIONID".equals(cookie.getName()) && !httpSessionId.equals(cookie.getValue())) {
-                cookie.setValue(httpSessionId);
-                break;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("JSESSIONID".equals(cookie.getName()) && !httpSessionId.equals(cookie.getValue())) {
+                    cookie.setValue(httpSessionId);
+                    break;
+                }
             }
         }
         response.sendRedirect(sb.toString());
