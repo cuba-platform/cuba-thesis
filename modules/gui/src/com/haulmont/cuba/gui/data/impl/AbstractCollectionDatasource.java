@@ -32,14 +32,13 @@ import java.util.regex.Pattern;
 /**
  * @param <T> type of entity
  * @param <K> type of entity ID
- *
  * @author abramov
  * @version $Id$
  */
 public abstract class AbstractCollectionDatasource<T extends Entity<K>, K>
         extends DatasourceImpl<T>
         implements CollectionDatasource<T, K>,
-                   CollectionDatasource.SupportsRefreshMode<T, K> {
+        CollectionDatasource.SupportsRefreshMode<T, K> {
 
     protected String query;
     protected QueryFilter filter;
@@ -75,7 +74,7 @@ public abstract class AbstractCollectionDatasource<T extends Entity<K>, K>
                 if (item != null) {
                     final MetaClass aClass = item.getMetaClass();
                     if (!aClass.equals(this.metaClass) && !this.metaClass.getDescendants().contains(aClass)) {
-                        throw new DevelopmentException(String.format("Invalid item metaClass '%s'",  aClass));
+                        throw new DevelopmentException(String.format("Invalid item metaClass '%s'", aClass));
                     }
                 }
                 this.item = item;
@@ -122,6 +121,13 @@ public abstract class AbstractCollectionDatasource<T extends Entity<K>, K>
     @Override
     public void setMaxResults(int maxResults) {
         this.maxResults = maxResults;
+    }
+
+    @Override
+    public Map<String, Object> getLastRefreshParameters() {
+        return savedParameters == null ?
+                Collections.<String, Object>emptyMap() :
+                Collections.unmodifiableMap(savedParameters);
     }
 
     @Override
@@ -244,7 +250,7 @@ public abstract class AbstractCollectionDatasource<T extends Entity<K>, K>
                             value = makeCaseInsensitive((String) value);
                         }
                         if (java.sql.Date.class.equals(info.getJavaClass()) && value != null && value instanceof Date) {
-                            value = new java.sql.Date(((Date)value).getTime());
+                            value = new java.sql.Date(((Date) value).getTime());
                         }
                         if (refreshOnComponentValueChange) {
                             if (componentValueListener == null)
