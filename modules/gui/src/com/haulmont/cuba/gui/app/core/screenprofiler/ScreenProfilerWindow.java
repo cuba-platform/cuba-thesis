@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class ScreenProfilerWindow extends AbstractWindow {
@@ -47,12 +48,15 @@ public class ScreenProfilerWindow extends AbstractWindow {
     @Inject
     protected CollectionDatasource<User, UUID> usersDs;
     @Inject
+    private CollectionDatasource<User, UUID> allUsersDs;
+    @Inject
     protected ScreenProfilerService screenProfilerService;
 
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
         updateProfilingCaption(screenProfilerService.isProfilingEnabled());
+        initProfilingComponents();
         disableComponents();
         refreshEventsCheck.addListener(new ValueListener() {
             @Override
@@ -88,6 +92,22 @@ public class ScreenProfilerWindow extends AbstractWindow {
             profilingButton.setCaption(getMessage("deactivateProfiling"));
         } else {
             profilingButton.setCaption(getMessage("activateProfiling"));
+        }
+    }
+
+    protected void initProfilingComponents() {
+        if (screenProfilerService.isProfilingEnabled()) {
+            timeThreshold.setValue(screenProfilerService.getTimeThreshold());
+            Set<UUID> userIds = screenProfilerService.getUserIds();
+            if (userIds != null && !userIds.isEmpty()) {
+                allUsersDs.refresh();
+                for (UUID id : userIds) {
+                    User user = allUsersDs.getItem(id);
+                    if (user != null) {
+                        usersDs.addItem(user);
+                    }
+                }
+            }
         }
     }
 
