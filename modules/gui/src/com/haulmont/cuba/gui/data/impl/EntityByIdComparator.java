@@ -39,7 +39,7 @@ public class EntityByIdComparator<T extends Entity<K>, K> extends AbstractCompar
             value = instance.getValueEx(propertyPath.toString());
         }
 
-        if (!(value == null || value instanceof Comparable)) {
+        if (!(value == null || value instanceof Comparable || value instanceof Instance)) {
             value = value.toString();
         }
 
