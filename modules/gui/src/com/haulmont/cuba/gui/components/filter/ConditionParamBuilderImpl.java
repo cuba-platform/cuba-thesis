@@ -104,6 +104,7 @@ public class ConditionParamBuilderImpl implements ConditionParamBuilder {
 
                 builder = Param.Builder.getInstance()
                         .setJavaClass(paramJavaClass)
+                        .setName(condition.getParamName())
                         .setEntityWhere(null)
                         .setEntityView(null)
                         .setDataSource(_condition.getDatasource())
