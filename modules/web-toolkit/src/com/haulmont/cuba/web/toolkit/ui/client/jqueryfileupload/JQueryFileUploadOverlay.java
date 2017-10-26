@@ -10,6 +10,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.vaadin.client.BrowserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +45,14 @@ public class JQueryFileUploadOverlay {
         //noinspection JSUnresolvedFunction
         var upload = $wnd.jQuery(fileInput);
 
+        var _forceIframeTransport = this.@com.haulmont.cuba.web.toolkit.ui.client.jqueryfileupload.JQueryFileUploadOverlay::isIframeTransportNecessary()();
+
         upload.fileupload({
             dropZone: upload,
             dataType: 'json',
             autoUpload: false,
-            sequentialUploads: true
+            sequentialUploads: true,
+            forceIframeTransport: _forceIframeTransport
         });
 
         var self = this;
@@ -159,6 +163,10 @@ public class JQueryFileUploadOverlay {
         if (currentXHRs.isEmpty()) {
             queueUploadStop();
         }
+    }
+
+    protected boolean isIframeTransportNecessary() {
+        return BrowserInfo.get().isIE10();
     }
 
     protected void queueUploadStop() {
