@@ -319,7 +319,7 @@ public class RuntimePropertiesFrame extends AbstractWindow {
     }
 
     protected void loadRequired(FieldGroup fieldGroup, FieldGroup.FieldConfig field) {
-        CategoryAttribute attribute = dynamicAttributes.getAttributeForMetaClass(rds.getMainDs().getMetaClass(), field.getId());
+        CategoryAttribute attribute = dynamicAttributes.getAttributeForMetaClass(rds.resolveCategorizedEntityClass(), field.getId());
         if (attribute != null) {
             String requiredMessage = messages.formatMessage(
                     AppConfig.getMessagesPack(),
