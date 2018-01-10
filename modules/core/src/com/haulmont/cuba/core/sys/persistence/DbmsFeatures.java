@@ -61,4 +61,11 @@ public interface DbmsFeatures {
      * @return default sort order of null values
      */
     boolean isNullsLastSorting();
+
+    /**
+     * Uses user name as schema name for Oracle database
+     * for correct table lookup {@link java.sql.DatabaseMetaData#getTables}.
+     * By default it returns all tables for all users in the Oracle database
+     */
+    boolean useUserForSchemaName();
 }

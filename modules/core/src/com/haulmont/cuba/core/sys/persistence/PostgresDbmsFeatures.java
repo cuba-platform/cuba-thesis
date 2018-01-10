@@ -62,4 +62,9 @@ public class PostgresDbmsFeatures implements DbmsFeatures {
     public boolean isNullsLastSorting() {
         return true;
     }
+
+    @Override
+    public boolean useUserForSchemaName() {
+        return false;
+    }
 }
