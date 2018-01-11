@@ -222,7 +222,7 @@ public class DbUpdaterEngine implements DbUpdater {
         try {
             connection = getDataSource().getConnection();
             DatabaseMetaData dbMetaData = connection.getMetaData();
-            boolean useUserForSchemaName = DbmsSpecificFactory.getDbmsFeatures().useUserForSchemaName();
+            boolean useUserForSchemaName = DbmsSpecificFactory.getDbmsFeatures().isSchemaByUser();
             String schemaName = useUserForSchemaName ? dbMetaData.getUserName() : null;
             ResultSet tables = dbMetaData.getTables(null, schemaName, null, null);
             boolean found = false;
