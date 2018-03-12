@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.*;
 
 /**
@@ -154,7 +153,7 @@ public class QueryResultsManager implements QueryResultsManagerAPI {
                 String sql = "insert into SYS_QUERY_RESULT (SESSION_ID, QUERY_KEY, ENTITY_ID) values ('"
                         + userSessionIdStr + "', " + queryKey + ", ?)";
 
-                int[] paramTypes = new int[] { converter.getSqlType(idList.get(0).getClass()) };
+                int[] paramTypes = new int[]{converter.getSqlType(idList.get(0).getClass())};
                 for (int i = 0; i < idList.size(); i += BATCH_SIZE) {
                     List<UUID> sublist = idList.subList(i, Math.min(i + BATCH_SIZE, idList.size()));
                     Object[][] params = new Object[sublist.size()][1];
@@ -176,16 +175,17 @@ public class QueryResultsManager implements QueryResultsManagerAPI {
 
     @Override
     public void delete(int queryKey) {
+        DbTypeConverter converter = persistence.getDbTypeConverter();
         UUID userSessionId = userSessionSource.getUserSession().getId();
         long start = System.currentTimeMillis();
         String logMsg = "Delete query results for " + userSessionId + " / " + queryKey;
         log.debug(logMsg);
 
-        String sql = "delete from SYS_QUERY_RESULT where SESSION_ID = '"
-                + userSessionId + "' and QUERY_KEY = " + queryKey;
-
         QueryRunner runner = new QueryRunner(persistence.getDataSource());
         try {
+            String userSessionIdStr = converter.getSqlObject(userSessionId).toString();
+            String sql = "delete from SYS_QUERY_RESULT where SESSION_ID = '"
+                    + userSessionIdStr + "' and QUERY_KEY = " + queryKey;
             runner.update(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -197,8 +197,11 @@ public class QueryResultsManager implements QueryResultsManagerAPI {
     public void deleteForCurrentSession() {
         QueryRunner runner = new QueryRunner(persistence.getDataSource());
         try {
+            DbTypeConverter converter = persistence.getDbTypeConverter();
+            UUID userSessionId = userSessionSource.getUserSession().getId();
+            String userSessionIdStr = converter.getSqlObject(userSessionId).toString();
             runner.update("delete from SYS_QUERY_RESULT where SESSION_ID = '"
-                    + userSessionSource.getUserSession().getId() + "'");
+                    + userSessionIdStr + "'");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -214,18 +217,21 @@ public class QueryResultsManager implements QueryResultsManagerAPI {
 
         StringBuilder sb = new StringBuilder("delete from SYS_QUERY_RESULT");
         Collection<UserSessionEntity> userSessionEntities = userSessions.getUserSessionInfo();
-        if (!userSessionEntities.isEmpty()) {
-            sb.append(" where SESSION_ID not in (");
-            for (Iterator<UserSessionEntity> it = userSessionEntities.iterator(); it.hasNext(); ) {
-                UserSessionEntity userSessionEntity = it.next();
-                sb.append("'").append(userSessionEntity.getId()).append("'");
-                if (it.hasNext())
-                    sb.append(",");
-            }
-            sb.append(")");
-        }
-        QueryRunner runner = new QueryRunner(persistence.getDataSource());
+        DbTypeConverter converter = persistence.getDbTypeConverter();
         try {
+            if (!userSessionEntities.isEmpty()) {
+                sb.append(" where SESSION_ID not in (");
+                for (Iterator<UserSessionEntity> it = userSessionEntities.iterator(); it.hasNext(); ) {
+                    UserSessionEntity userSessionEntity = it.next();
+                    UUID userSessionId = userSessionEntity.getId();
+                    String userSessionIdStr = converter.getSqlObject(userSessionId).toString();
+                    sb.append("'").append(userSessionIdStr).append("'");
+                    if (it.hasNext())
+                        sb.append(",");
+                }
+                sb.append(")");
+            }
+            QueryRunner runner = new QueryRunner(persistence.getDataSource());
             runner.update(sb.toString());
         } catch (SQLException e) {
             throw new RuntimeException(e);
