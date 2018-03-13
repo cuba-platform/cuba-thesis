@@ -119,7 +119,6 @@ public class ScheduledTask extends BaseUuidEntity implements Updatable, SoftDele
     @Column(name = "METHOD_PARAMS")
     protected String methodParamsXml;
 
-    @Lob
     @Column(name = "DESCRIPTION", length = 1000)
     protected String description;
 
