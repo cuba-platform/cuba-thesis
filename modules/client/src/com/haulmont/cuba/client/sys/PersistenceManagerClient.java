@@ -40,6 +40,7 @@ public class PersistenceManagerClient implements PersistenceManagerService {
     protected volatile String dbmsVersion;
     protected volatile String uniqueConstraintViolationPattern;
     protected volatile Boolean defaultNullSorting;
+    protected volatile Boolean supportsLobSortingAndFiltering;
 
     @Inject
     protected PersistenceManagerService service;
@@ -115,6 +116,13 @@ public class PersistenceManagerClient implements PersistenceManagerService {
         if (defaultNullSorting == null)
             defaultNullSorting = service.isNullsLastSorting();
         return defaultNullSorting;
+    }
+
+    @Override
+    public boolean supportsLobSortingAndFiltering() {
+        if (supportsLobSortingAndFiltering == null)
+            supportsLobSortingAndFiltering = service.supportsLobSortingAndFiltering();
+        return supportsLobSortingAndFiltering;
     }
 
     public void clearCache() {

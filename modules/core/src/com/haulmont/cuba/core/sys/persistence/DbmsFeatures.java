@@ -66,4 +66,9 @@ public interface DbmsFeatures {
      * @return true if user name must be used when providing schema name for obtaining database metadata
      */
     boolean isSchemaByUser();
+
+    /**
+     * @return true if the DBMS supports equals conditions in the filter and sort for LOB columns
+     */
+    boolean supportsLobSortingAndFiltering();
 }

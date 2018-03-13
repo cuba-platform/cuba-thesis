@@ -12,6 +12,8 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.client.ClientConfig;
+import com.haulmont.cuba.client.sys.PersistenceManagerClient;
+import com.haulmont.cuba.core.app.PersistenceManagerService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.SoftDelete;
 import com.haulmont.cuba.core.global.*;
@@ -160,6 +162,14 @@ public abstract class WebAbstractTable<T extends com.vaadin.ui.Table & CubaEnhan
         setColumnHeader(column.getId(), caption);
 
         column.setOwner(this);
+
+        if (column.getId() instanceof MetaPropertyPath) {
+            PersistenceManagerService persistenceManagerService = AppBeans.get(PersistenceManagerClient.NAME);
+            MetaProperty metaProperty = ((MetaPropertyPath) column.getId()).getMetaProperty();
+            if (metadataTools.isLob(metaProperty) && !persistenceManagerService.supportsLobSortingAndFiltering()) {
+                component.setColumnSortable(column.getId(), false);
+            }
+        }
     }
 
     @Override

@@ -67,4 +67,9 @@ public class HsqlDbmsFeatures implements DbmsFeatures {
     public boolean isSchemaByUser() {
         return false;
     }
+
+    @Override
+    public boolean supportsLobSortingAndFiltering() {
+        return true;
+    }
 }

@@ -19,6 +19,7 @@ import org.dom4j.Element;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -118,6 +119,7 @@ public class ScheduledTask extends BaseUuidEntity implements Updatable, SoftDele
     @Column(name = "METHOD_PARAMS")
     protected String methodParamsXml;
 
+    @Lob
     @Column(name = "DESCRIPTION", length = 1000)
     protected String description;
 

@@ -5,6 +5,8 @@
 
 package com.haulmont.cuba.gui.components.filter;
 
+import com.haulmont.chile.core.model.MetaProperty;
+
 import java.util.EnumSet;
 
 /**
@@ -15,4 +17,6 @@ public interface OpManager {
     String NAME = "cuba_OpManager";
 
     EnumSet<Op> availableOps(Class javaClass);
+
+    EnumSet<Op> availableOps(MetaProperty metaProperty);
 }

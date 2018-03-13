@@ -14,6 +14,7 @@ import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.chile.core.model.*;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesUtils;
 import com.haulmont.cuba.core.entity.*;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.annotation.IgnoreUserTimeZone;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import org.apache.commons.lang.BooleanUtils;
@@ -23,10 +24,7 @@ import javax.annotation.ManagedBean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.persistence.CascadeType;
-import javax.persistence.Embedded;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -230,6 +228,16 @@ public class MetadataTools {
     public boolean isEmbedded(MetaProperty metaProperty) {
         Objects.requireNonNull(metaProperty, "metaProperty is null");
         return metaProperty.getAnnotatedElement().isAnnotationPresent(Embedded.class);
+    }
+
+    /**
+     * Determine whether the given property is a LOB.
+     * @see Lob
+     */
+    public boolean isLob(MetaProperty metaProperty) {
+        Objects.requireNonNull(metaProperty, "metaProperty is null");
+        return metaProperty.getAnnotatedElement() != null
+                && metaProperty.getAnnotatedElement().isAnnotationPresent(Lob.class);
     }
 
     /**
