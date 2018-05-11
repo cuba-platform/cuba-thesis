@@ -1,6 +1,6 @@
 -- $Id$
 -- Add SYS_FTS_QUEUE.INDEXING_HOST
 
-alter table SYS_FTS_QUEUE add INDEXING_HOST varchar2(255)^
+alter table SYS_FTS_QUEUE add INDEXING_HOST varchar2(255 char)^
 
 create index IDX_SYS_FTS_QUEUE_IDXHOST_CRTS on SYS_FTS_QUEUE (INDEXING_HOST, CREATE_TS)^

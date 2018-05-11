@@ -2,13 +2,13 @@
 -- Description: add table for server-side remember me
 
 create table SEC_REMEMBER_ME (
-    ID varchar2(32) not null,
+    ID varchar2(32 char) not null,
     CREATE_TS timestamp,
-    CREATED_BY varchar2(50),
+    CREATED_BY varchar2(50 char),
     VERSION integer,
     --
-    USER_ID varchar2(32) not null,
-    TOKEN varchar2(32) not null,
+    USER_ID varchar2(32 char) not null,
+    TOKEN varchar2(32 char) not null,
     --
     primary key (ID)
 )^

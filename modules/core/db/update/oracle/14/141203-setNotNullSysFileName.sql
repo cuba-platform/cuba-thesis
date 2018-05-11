@@ -3,4 +3,4 @@
 
 update SYS_FILE set NAME=ID where NAME is null^
 
-alter table SYS_FILE modify NAME varchar2(500) not null^
+alter table SYS_FILE modify NAME varchar2(500 char) not null^
