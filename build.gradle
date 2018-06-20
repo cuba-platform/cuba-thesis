@@ -577,7 +577,7 @@ configure(desktopModule) {
         testRuntime(servletApi)
     }
 
-    installApp {
+    /*installApp {
         into("$buildDir/app/" + applicationName)
     }
 
@@ -593,7 +593,7 @@ configure(desktopModule) {
 
     task desktopStart(dependsOn: desktopInstall) << {
         run.execute()
-    }
+    }*/
 }
 
 configure(portalModule) {
