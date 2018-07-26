@@ -14,7 +14,6 @@ import com.haulmont.cuba.gui.DialogParams;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowParams;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -25,8 +24,6 @@ import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.toolkit.ui.CubaTokenListLabel;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.*;
 
 import javax.annotation.Nullable;
@@ -56,7 +53,7 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
 
     protected WebButton clearButton;
 
-    protected WebLookupPickerField lookupPickerField;
+    protected LookupPickerField lookupPickerField;
 
     protected String lookupScreen;
     protected WindowManager.OpenType lookupOpenMode = WindowManager.OpenType.THIS_TAB;
