@@ -56,7 +56,7 @@ public class WebTokenList extends WebAbstractField<WebTokenList.CubaTokenList> i
 
     protected WebButton clearButton;
 
-    protected WebLookupPickerField lookupPickerField;
+    protected LookupPickerField lookupPickerField;
 
     protected String lookupScreen;
     protected WindowManager.OpenType lookupOpenMode = WindowManager.OpenType.THIS_TAB;
