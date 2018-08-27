@@ -12,7 +12,7 @@ import com.haulmont.cuba.core.entity.BaseEntity;
 import com.haulmont.cuba.core.entity.BaseGenericIdEntity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.TimeProvider;
+import com.haulmont.cuba.core.global.TimeSource;
 import com.haulmont.cuba.core.sys.AppContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Cache for application objects
  *
  * @author artamonov
- * @version $Id$
+ * @version $Id: ObjectsCache.java 24607 2015-12-15 10:00:04Z chekashkin $
  */
 public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheController {
 
@@ -56,9 +56,11 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
     protected ObjectsCacheManagerAPI managerAPI;
     @Inject
     protected ClusterManagerAPI clusterManagerAPI;
+    @Inject
+    protected TimeSource timeSource;
 
     public ObjectsCache() {
-        cacheSet = new CacheSet(Collections.emptyList());
+        cacheSet = createCacheSet(Collections.emptyList());
     }
 
     protected CacheSet createCacheSet(Collection<Object> items) {
@@ -111,7 +113,7 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
 
     public void refresh() {
         if (isValidState()) {
-            Date updateStart = TimeProvider.currentTimestamp();
+            Date updateStart = timeSource.currentTimestamp();
 
             // Load data
             CacheSet data;
@@ -119,11 +121,11 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
                 data = loader.loadData(this);
             } catch (CacheException e) {
                 log.error(String.format("Load data for cache %s failed", name), e);
-                this.cacheSet = new CacheSet(Collections.emptyList());
+                this.cacheSet = createCacheSet(Collections.emptyList());
                 return;
             }
 
-            Date updateEnd = TimeProvider.currentTimestamp();
+            Date updateEnd = timeSource.currentTimestamp();
 
             this.lastUpdateDuration = updateEnd.getTime() - updateStart.getTime();
 
@@ -141,7 +143,7 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
 
             cacheLock.writeLock().unlock();
 
-            this.lastUpdateTime = TimeProvider.currentTimestamp();
+            this.lastUpdateTime = timeSource.currentTimestamp();
 
             if (logUpdateEvent)
                 log.debug("Updated cache set in " + name + " " +
@@ -256,7 +258,7 @@ public class ObjectsCache implements ObjectsCacheInstance, ObjectsCacheControlle
                     loader.updateData(temporaryCacheSet, params);
                 } catch (CacheException e) {
                     log.error(String.format("Update data for cache %s failed", name), e);
-                    this.cacheSet = new CacheSet(Collections.emptyList());
+                    this.cacheSet = createCacheSet(Collections.emptyList());
                     return;
                 }
 
