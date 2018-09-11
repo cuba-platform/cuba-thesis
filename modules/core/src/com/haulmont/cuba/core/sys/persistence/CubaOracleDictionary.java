@@ -12,6 +12,8 @@ import org.apache.openjpa.jdbc.sql.OracleDictionary;
 import org.apache.openjpa.jdbc.sql.SQLBuffer;
 import org.apache.openjpa.jdbc.sql.Select;
 
+import java.sql.Types;
+
 /**
  * @author degtyarjov
  * @version $Id$
@@ -58,5 +60,12 @@ public class CubaOracleDictionary extends OracleDictionary {
         buf.append(getTypeName(type).replaceAll("\\{0\\}", ""));//just a workaround because getTypeName returns NUMBER{0} for some types which is probably a bug
         appendLength(buf, type);
         buf.append(post);
+    }
+
+    @Override
+    protected void appendLength(SQLBuffer buf, int type) {
+        if (type == Types.VARCHAR)
+            buf.append("(").append(Integer.toString(characterColumnSize))
+                    .append(")");
     }
 }
