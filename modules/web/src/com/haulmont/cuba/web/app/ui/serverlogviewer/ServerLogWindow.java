@@ -464,7 +464,8 @@ public class ServerLogWindow extends AbstractWindow {
                             Level prevLevel = loggersMap.get(loggerName);
                             String logLevel = prevLevel == null ? null : prevLevel.toString();
 
-                            if (!StringUtils.equals(logLevel, newLogLevel.toString())) {
+                            if (newLogLevel != null
+                                    && !StringUtils.equals(logLevel, newLogLevel.toString())) {
                                 updates.put(loggerName, newLogLevel.toString());
                             }
                         }
