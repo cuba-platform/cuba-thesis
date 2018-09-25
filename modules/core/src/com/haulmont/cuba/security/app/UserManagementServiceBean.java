@@ -481,7 +481,7 @@ public class UserManagementServiceBean implements UserManagementService {
     }
 
     protected Group cloneGroup(Group group, Group parent, EntityManager em) {
-        Group groupClone = new Group();
+        Group groupClone = metadata.create(Group.class);
 
         groupClone.setName(group.getName());
         groupClone.setParent(parent);
