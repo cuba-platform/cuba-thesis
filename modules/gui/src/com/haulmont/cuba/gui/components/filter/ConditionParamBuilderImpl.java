@@ -87,6 +87,9 @@ public class ConditionParamBuilderImpl implements ConditionParamBuilder {
             if (!condition.getUnary())
                 builder.setJavaClass(condition.getJavaClass())
                         .setProperty(metaProperty);
+            else
+                builder.setJavaClass(Boolean.class);
+
             return builder;
         }
     }
