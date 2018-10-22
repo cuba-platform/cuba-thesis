@@ -16,6 +16,7 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
@@ -150,6 +151,21 @@ public class QueryFilterTest extends CubaClientTestCase {
         params.put("custom$filter_notSigned", "v1");
         s = filter.processQuery("select distinct d from saneco$GenDoc d where 1=1", params);
         assertEquals("select distinct d from saneco$GenDoc d , docflow$DocumentRole dr where 1=1 and (((d.processState = :custom$filter_state and d.barCode like :custom$filter_barCode) or d.processState <> :custom$filter_notSigned))", s);
+    }
+
+
+    @Test
+    public void test7() {
+        QueryFilter filter = createFilter("filter7.xml");
+
+
+        UUID randomId = UUID.randomUUID();
+
+        Map<String, Object> params = new HashMap<>();
+
+        params.put("custom$sessionId", randomId);
+        String s = filter.processQuery("select distinct d from df$Doc d", params);
+        assertEquals("select distinct d from df$Doc d where (((d.substitutedCreator.id = :custom$sessionId or d.owner.id = :custom$sessionId) and d.testField is not null))", s);
     }
 
 }

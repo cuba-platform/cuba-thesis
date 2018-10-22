@@ -4,8 +4,10 @@
  */
 package com.haulmont.cuba.gui.filter;
 
+import com.haulmont.cuba.core.global.QueryTransformerRegex;
 import com.haulmont.cuba.gui.xml.ParametersHelper;
 import com.haulmont.cuba.gui.xml.ParameterInfo;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -34,6 +36,12 @@ public class Clause extends Condition {
 
     @Override
     public String getContent() {
+        if (StringUtils.isBlank(content))
+            return content;
+
+        if (content != null && QueryTransformerRegex.OR_PATTERN.matcher(content).find())
+            return "(" + content + ")";
+
         return content;
     }
 
