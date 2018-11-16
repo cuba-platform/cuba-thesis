@@ -100,6 +100,9 @@ public class PersistenceConfigProcessor {
             puElem.addElement("class").setText(className);
         }
 
+        if (puElem.element("exclude-unlisted-classes") == null)
+            puElem.addElement("exclude-unlisted-classes").setText("true");
+
         Element propertiesEl = puElem.element("properties");
         if (propertiesEl != null)
             puElem.remove(propertiesEl);
