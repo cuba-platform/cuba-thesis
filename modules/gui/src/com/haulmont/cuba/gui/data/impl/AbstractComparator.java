@@ -9,6 +9,7 @@ import com.haulmont.cuba.client.sys.PersistenceManagerClient;
 import com.haulmont.cuba.core.global.AppBeans;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * @author gorodnov
@@ -35,12 +36,10 @@ public abstract class AbstractComparator<T> implements Comparator<T> {
             c = ((Comparable) o1).compareTo(o2);
         } else if (o1 instanceof Instance && o2 instanceof Instance) {
             c = ((Instance) o1).getInstanceName().compareToIgnoreCase(((Instance) o2).getInstanceName());
-        } else if (o1 == null) {
-            if (o2 != null) {
-                c = nullsLast;
-            } else {
-                c = 0;
-            }
+        } else if (Objects.equals(o1, o2)) {
+            c = 0;
+        } else if (o1 == null && o2 != null) {
+            c = nullsLast;
         } else {
             c = -nullsLast;
         }
