@@ -68,6 +68,9 @@ public class FileUploading implements FileUploadingAPI, FileUploadingMBean {
     protected UserSessionSource userSessionSource;
 
     @Inject
+    protected Metadata metadata;
+
+    @Inject
     public void setConfiguration(Configuration configuration) {
         tempDir = configuration.getConfig(GlobalConfig.class).getTempDir();
     }
@@ -195,7 +198,7 @@ public class FileUploading implements FileUploadingAPI, FileUploadingMBean {
             return null;
         }
 
-        FileDescriptor fDesc = new FileDescriptor();
+        FileDescriptor fDesc = metadata.create(FileDescriptor.class);
 
         fDesc.setSize(file.length());
         fDesc.setExtension(FilenameUtils.getExtension(name));

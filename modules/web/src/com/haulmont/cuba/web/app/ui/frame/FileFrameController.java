@@ -7,6 +7,7 @@ package com.haulmont.cuba.web.app.ui.frame;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.TimeProvider;
 import com.haulmont.cuba.gui.app.core.file.FileDownloadHelper;
 import com.haulmont.cuba.gui.components.AbstractWindow;
@@ -50,7 +51,8 @@ public class FileFrameController extends AbstractWindow {
         uploadField.addListener(new FileUploadField.ListenerAdapter() {
             @Override
             public void uploadSucceeded(Event event) {
-                fd = new FileDescriptor();
+                Metadata metadata = AppBeans.get(Metadata.NAME);
+                fd = metadata.create(FileDescriptor.class);
                 fd.setName(uploadField.getFileName());
                 fd.setExtension(FilenameUtils.getExtension(uploadField.getFileName()));
 
