@@ -13,11 +13,13 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
-import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.filter.Param;
+import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.TemporalType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gorbunkov
@@ -31,28 +33,17 @@ public class FilterConditionUtils {
         if (mpp == null) {
             return propertyPath;
         } else {
-            MetadataTools metadataTools = AppBeans.get(MetadataTools.class);
-
             MetaProperty[] metaProperties = mpp.getMetaProperties();
             StringBuilder sb = new StringBuilder();
 
-            MetaPropertyPath parentMpp = null;
-            MetaClass tempMetaClass;
+            List<String> metaPropertyNames = new ArrayList<>();
 
             for (int i = 0; i < metaProperties.length; i++) {
-                if (i == 0) {
-                    parentMpp = new MetaPropertyPath(metaClass, metaProperties[i]);
-                    tempMetaClass = metaClass;
-                } else {
-                    MetaProperty[] newMetaProperties = new MetaProperty[parentMpp.getMetaProperties().length + 1];
-                    System.arraycopy(parentMpp.getMetaProperties(), 0, newMetaProperties, 0, parentMpp.getMetaProperties().length);
-                    newMetaProperties[parentMpp.getMetaProperties().length - 1] = metaProperties[i];
+                metaPropertyNames.add(metaProperties[i].getName());
 
-                    parentMpp = new MetaPropertyPath(metaClass, newMetaProperties);
-                    tempMetaClass = metadataTools.getPropertyEnclosingMetaClass(parentMpp);
-                }
+                String currentMetaPropertyPath = StringUtils.join(metaPropertyNames, ".");
 
-                sb.append(messageTools.getPropertyCaption(tempMetaClass, metaProperties[i].getName()));
+                sb.append(messageTools.getPropertyCaption(metaClass, currentMetaPropertyPath));
                 if (i < metaProperties.length - 1) {
                     sb.append(".");
                 }
