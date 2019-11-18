@@ -7,6 +7,7 @@ package com.haulmont.cuba.security.app;
 import com.haulmont.cuba.core.*;
 import com.haulmont.cuba.core.app.ClusterManagerAPI;
 import com.haulmont.cuba.core.app.ServerConfig;
+import com.haulmont.cuba.core.entity.QueryResult;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.core.sys.remoting.RemoteClientInfo;
 import com.haulmont.cuba.security.entity.RememberMeToken;
@@ -309,6 +310,11 @@ public class LoginWorkerBean implements LoginWorker {
                     throw new javax.persistence.NoResultException("User not found");
                 else
                     user = list.get(0);
+                TypedQuery<QueryResult> clearSearchResultsQuery = em.createQuery(
+                        "delete from sys$QueryResult qr where qr.sessionId = ?1",
+                        QueryResult.class);
+                clearSearchResultsQuery.setParameter(1, currentSession.getId());
+                clearSearchResultsQuery.executeUpdate();
             }
 
             UserSession session = userSessionManager.createSession(currentSession, user);
