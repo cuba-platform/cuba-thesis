@@ -118,7 +118,7 @@ public class ScreenClientProfiler {
     public void setEnabled(boolean enabled) {
         boolean oldEnabled = this.enabled;
         this.enabled = enabled;
-        if (!oldEnabled && enabled) {
+        if (!oldEnabled && enabled && flushTimeout > 0) {
             timer.scheduleRepeating(flushTimeout / 2 * 1000);
         }
     }

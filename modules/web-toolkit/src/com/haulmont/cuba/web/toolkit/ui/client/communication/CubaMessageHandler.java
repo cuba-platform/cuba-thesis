@@ -18,7 +18,6 @@ public class CubaMessageHandler extends MessageHandler {
         ScreenClientProfiler profiler = ScreenClientProfiler.getInstance();
         if (profilerMarker != null) {
             profiler.setProfilerMarker(profilerMarker);
-            profiler.setEnabled(true);
         } else {
             profiler.clearProfilerMarker();
         }
@@ -30,6 +29,7 @@ public class CubaMessageHandler extends MessageHandler {
         ScreenClientProfiler profiler = ScreenClientProfiler.getInstance();
         String profilerMarker = profiler.getProfilerMarker();
         if (profilerMarker != null) {
+            profiler.setEnabled(true);
             profiler.registerClientTime(profilerMarker, lastProcessingTime);
         }
         profiler.clearProfilerMarker();
