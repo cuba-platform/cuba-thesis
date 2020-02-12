@@ -559,6 +559,10 @@ public class DataManagerBean implements DataManager {
 
         // Copy by iteration because subList() returns non-serializable class
         int max = Math.min(requestedFirst + requestedMax, set.size());
+        if (max <= requestedFirst) {
+            return new ArrayList();
+        }
+
         List result = new ArrayList(max - requestedFirst);
         int j = 0;
         for (Object item : set) {
