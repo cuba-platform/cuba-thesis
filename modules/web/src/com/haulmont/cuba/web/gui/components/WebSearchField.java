@@ -26,20 +26,7 @@ public class WebSearchField extends WebLookupField implements SearchField {
 
     protected IFrame.NotificationType defaultNotificationType = IFrame.NotificationType.TRAY;
 
-    protected SearchNotifications searchNotifications = new SearchNotifications() {
-        @Override
-        public void notFoundSuggestions(String filterString) {
-            String message = messages.formatMessage("com.haulmont.cuba.gui", "searchSelect.notFound", filterString);
-            App.getInstance().getWindowManager().showNotification(message, defaultNotificationType);
-        }
-
-        @Override
-        public void needMinSearchStringLength(String filterString, int minSearchStringLength) {
-            String message = messages.formatMessage(
-                    "com.haulmont.cuba.gui", "searchSelect.minimumLengthOfFilter", minSearchStringLength);
-            App.getInstance().getWindowManager().showNotification(message, defaultNotificationType);
-        }
-    };
+    protected SearchNotifications searchNotifications = new WebSearchNotifications();
 
     @Override
     protected void createComponent() {
@@ -148,5 +135,20 @@ public class WebSearchField extends WebLookupField implements SearchField {
     @Override
     public void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    public class WebSearchNotifications implements SearchNotifications {
+        @Override
+        public void notFoundSuggestions(String filterString) {
+            String message = messages.formatMessage("com.haulmont.cuba.gui", "searchSelect.notFound", filterString);
+            App.getInstance().getWindowManager().showNotification(message, defaultNotificationType);
+        }
+
+        @Override
+        public void needMinSearchStringLength(String filterString, int minSearchStringLength) {
+            String message = messages.formatMessage(
+                    "com.haulmont.cuba.gui", "searchSelect.minimumLengthOfFilter", minSearchStringLength);
+            App.getInstance().getWindowManager().showNotification(message, defaultNotificationType);
+        }
     }
 }
