@@ -160,11 +160,15 @@ public class DefaultApp extends App implements ConnectionListener, UserSubstitut
                 log.trace("Unable to login on start", e);
             } finally {
                 // Close attempt login on start
-                tryLoginOnStart = false;
+                setTryLoginOnStartToFalse();
             }
         }
 
         return false;
+    }
+
+    protected void setTryLoginOnStartToFalse() {
+        tryLoginOnStart = false;
     }
 
     @Override
